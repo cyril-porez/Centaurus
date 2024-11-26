@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "horses",
+  "info": {
+    "singularName": "horse",
+    "pluralName": "horses",
+    "displayName": "Horse",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "race": {
+      "type": "string"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "horses"
+    },
+    "age": {
+      "type": "integer"
+    },
+    "weights": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::weight.weight",
+      "mappedBy": "horse"
+    }
+  }
+}
