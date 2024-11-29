@@ -43,6 +43,7 @@ function UpdateHorse() {
         src="/icons/horseHead.png"
         width={50}
         className="absolute top-8 right-8"
+        alt="icon horse head"
       />
       <HeaderText
         props={{

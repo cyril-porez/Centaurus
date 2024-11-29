@@ -26,10 +26,10 @@ function SignIn() {
     email: yup
       .string()
       .email("L'email doit être valide")
-      .required("* L'email est requis"),
+      .required("* L'email est obligatoire!"),
     password: yup
       .string()
-      .required("* Le mot de passe est requis")
+      .required("* Le mot de passe est le mot de pas est obligatoire")
       .matches(/([A-Z])/, "Au minimum une lettre majuscule!")
       .matches(/([0-9])/, "Au minimum un entier")
       .min(8, "Le mot de passe doit avoir 8 caratères"),
@@ -47,76 +47,108 @@ function SignIn() {
     console.log(data);
     authUser(data);
   };
-  return (
-    <div className="flex flex-col h-screen overflow-hidden">
-      <HeaderText
-        props={{
-          title: "Connexion",
-          subtitle: "On est content de te revoir !",
-        }}
-      />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-        <div>
-          <fieldset
-            className={`
-                w-5/6 
-                my-2 mx-auto 
-                rounded-full 
-                border 
-                px-8 
-            `}
-          >
-            <legend className="px-2">E-mail</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="email"
-              id="email"
-              placeholder="marie.dupont@gmail.com"
-              {...register("email")}
-            />
-          </fieldset>
-          <p className="text-red-600 px-2">{errors.email?.message}</p>
-        </div>
-        <div>
-          <fieldset
-            className={`
-                w-5/6 
-                my-2 mx-auto 
-                rounded-full 
-                border 
-                px-8 
-            `}
-          >
-            <legend className={`px-2`}>Mot de passe</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="password"
-              id="password"
-              placeholder="...."
-              {...register("password")}
-            />
-          </fieldset>
-          <p className="text-red-600 px-[10%]">{errors.password?.message}</p>
-        </div>
-        <input
-          className="bg-blue-500
-                hover:bg-blue-700
+  const data = {
+    title: "Connexion",
+    subtitle: "On est content de te revoir !",
+  };
+  return (
+    <div
+      className="flex flex-col 
+                    items-center
+                    max-h-screen"
+    >
+      <div
+        className="w-[90%] 
+                    max-w-[400px] 
+                    p-[5%]"
+      >
+        <HeaderText props={data} />
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex 
+                    flex-col 
+                    mt-[4%]"
+        >
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <div className="mb-[5%] w-full">
+              <fieldset
+                className="w-full
+                        mx-auto
+                        rounded-lg
+                        border
+                        border-homa-beige
+                        p-[4%]"
+              >
+                <legend className="text-sm text-homa-beige">E-mail</legend>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="marie.dupont@gmail.com"
+                  {...register("email")}
+                  className="w-full focus:outline-none focus:ring-2 focus:ring-homa-beige"
+                />
+              </fieldset>
+              <p className="text-red mt-[2%]">{errors.email?.message}</p>
+            </div>
+
+            <div className="mb-[6%] w-full">
+              <fieldset
+                className="w-full
+                        mx-auto
+                        rounded-lg
+                        border
+                        border-homa-beige
+                        p-[4%]"
+              >
+                <legend className="tesxt-sm text-homa-beige">
+                  Mot de passe
+                </legend>
+                <input
+                  type="password"
+                  id="password"
+                  placeholder=".........."
+                  {...register("password")}
+                  className="w-full focus:outline-none focus:ring-2 focus:ring-homa-beige"
+                />
+              </fieldset>
+              <p className="text-red mt-[2%]">{errors.password?.message}</p>
+            </div>
+          </div>
+
+          <button
+            className="bg-sky-blue
+                hover:bg-sky-blue-hover
                 text-white
+                text-xl
                 font-bold
                 rounded-full
-                shadow-xl
+                shadow-lg
+                w-full 
+                p-[10px] 
                 py-5 w-80
-                mx-auto mt-6"
-          type="submit"
-        />
-        <Link
-          className="mx-auto mt-6 text-blue-700 underline text-lg"
-          to="/auth/signup"
-        >
-          S'inscrire
-        </Link>
-      </form>
+                mx-auto
+                transition
+                duration-300
+                flex
+                items-center
+                justify-center"
+            type="submit"
+          >
+            <span className="mt-2">C'est reparti</span>
+            <span className="text-[40px] font-extrabold ml-1 align-middle">
+              {">"}
+            </span>
+          </button>
+
+          <Link
+            className="mx-auto mt-6 text-sky-blue underline text-2xl"
+            to="/auth/signup"
+          >
+            S'inscrire
+          </Link>
+        </form>
+      </div>
     </div>
   );
 }

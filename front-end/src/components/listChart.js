@@ -15,8 +15,8 @@ const LineChart = (props) => {
         label: "Poid du cheval",
         data: props.weights,
         fill: false,
-        backgroundColor: "#BCBBFC",
-        borderColor: "#BCBBFC",
+        backgroundColor: "Lavender-Blue",
+        borderColor: "Lavender-Blue",
       },
     ],
   };

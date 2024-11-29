@@ -55,7 +55,7 @@ function SignUp() {
   };
 
   return (
-    <div className="flex flex-col h-screen justify-evenly">
+    <div className="flex flex-col justify-evenly">
       <HeaderText
         props={{
           title: "Inscription",
