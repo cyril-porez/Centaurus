@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import HeaderText from "../../../components/texts/HeaderText";
+import { HeaderText } from "../../../components/texts/HeaderText";
 import AddHorseButton from "../../../components/buttons/AddHorseButton";
 import HomeButton from "../../../components/buttons/HomeButton";
 import horseApi from "../../../services/horseApi";

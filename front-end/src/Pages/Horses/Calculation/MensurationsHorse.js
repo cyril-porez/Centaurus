@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import HeaderText from "../../../components/texts/HeaderText";
+import { HeaderText } from "../../../components/texts/HeaderText";
 import ToggleInput from "../../../components/inputs/ToggleInput";
 import { useNavigate, useParams } from "react-router-dom";
 import horseApi from "../../../services/horseApi";
@@ -72,7 +72,7 @@ export default function Mensurations() {
     let H = parseInt(garrotHeight, 10);
     let N = parseInt(neckSize, 10);
 
-    switch (horse.race) {
+    switch (horse?.race) {
       case "pure sang":
         const weight = Math.ceil((G ** 2 * L) / 11877);
         console.log("pur sang");

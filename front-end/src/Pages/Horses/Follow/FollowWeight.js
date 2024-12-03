@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Button from "../../../components/buttons/ButtonCenter";
 import AddHorseButton from "../../../components/buttons/AddHorseButton";
 import HomeButton from "../../../components/buttons/HomeButton";
-import HeaderText from "../../../components/texts/HeaderText";
+import { HeaderText } from "../../../components/texts/HeaderText";
 import { jwtDecode } from "jwt-decode";
 import horseApi from "../../../services/horseApi";
 import { useNavigate } from "react-router";

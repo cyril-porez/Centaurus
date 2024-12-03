@@ -2,11 +2,9 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import userApi from "../../services/userApi";
-import HeaderText from "../../components/texts/HeaderText";
-import TextInput from "../../components/inputs/TextInput";
-import NavigationButton from "../../components/buttons/NavigationButton";
+import { HeaderText } from "../../components/texts/HeaderText";
 
 function SignIn() {
   const [error, setError] = useState("");
@@ -25,14 +23,14 @@ function SignIn() {
   const schema = yup.object({
     email: yup
       .string()
-      .email("L'email doit être valide")
+      .email("*L'email doit être valide")
       .required("* L'email est obligatoire!"),
     password: yup
       .string()
-      .required("* Le mot de passe est le mot de pas est obligatoire")
-      .matches(/([A-Z])/, "Au minimum une lettre majuscule!")
-      .matches(/([0-9])/, "Au minimum un entier")
-      .min(8, "Le mot de passe doit avoir 8 caratères"),
+      .required("* Le mot de passe est le mot de passe est obligatoire")
+      .matches(/([A-Z])/, "*Au minimum une lettre majuscule!")
+      .matches(/([0-9])/, "*Au minimum un entier")
+      .min(8, "*Le mot de passe doit avoir 8 caratères"),
   });
 
   const {
@@ -55,8 +53,8 @@ function SignIn() {
   return (
     <div
       className="flex flex-col 
-                    items-center
-                    max-h-screen"
+                  items-center
+                  max-h-screen"
     >
       <div
         className="w-[90%] 
@@ -67,10 +65,15 @@ function SignIn() {
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="flex 
-                    flex-col 
-                    mt-[4%]"
+                      flex-col"
         >
-          <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <div
+            className="flex 
+                        flex-col 
+                        items-center 
+                        justify-center 
+                        min-h-[400px]"
+          >
             <div className="mb-[5%] w-full">
               <fieldset
                 className="w-full

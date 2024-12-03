@@ -1,14 +1,12 @@
+import React from "react";
 import { useState } from "react";
 import ToggleInput from "../../components/inputs/ToggleInput";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import userApi from "../../services/userApi";
-import HeaderText from "../../components/texts/HeaderText";
-import TextInput from "../../components/inputs/TextInput";
-import NavigationButton from "../../components/buttons/NavigationButton";
-import React from "react";
+import { HeaderText } from "../../components/texts/HeaderText";
 
 function SignUp() {
   const [error, setError] = useState("");
@@ -27,18 +25,36 @@ function SignUp() {
   const schema = yup.object({
     name: yup
       .string()
-      .required("* Le nom est requis")
-      .min(3, "Le nom doit contenir au moins 3 caratères"),
+      .required("* Le nom est obligatoire !")
+      .min(3, "* Le nom doit contenir au moins 3 caratères !"),
     email: yup
       .string()
-      .email("L'email doit être valide")
-      .required("* L'email est requis"),
+      .email("* L'email doit être valide")
+      .required("* L'email est obligatoire"),
     password: yup
       .string()
-      .required("* Le mot de passe est requis")
-      .matches(/([A-Z])/, "Doit contenir au moins une majuscule")
-      .matches(/([0-9])/, "Doit contenir au moins un chiffre")
-      .min(8, "Le mot de passe doit au moins faire 8 caractères"),
+      .required("* Le mot de passe est obligatoire !")
+      .matches(
+        /([A-Z])/,
+        "* Le mot de passe Doit contenir au moins une majuscule !"
+      )
+      .matches(
+        /([0-9])/,
+        "* Le mot de passe Doit contenir au moins un chiffre !"
+      )
+      .min(8, "* Le mot de passe doit au moins faire 8 caractères !"),
+    confirmPassword: yup
+      .string()
+      .required("* La vérification du mot de passe est obligatoire !")
+      .matches(
+        /([A-Z])/,
+        "* Le mot de passe Doit contenir au moins une majuscule !"
+      )
+      .matches(
+        /([0-9])/,
+        "* Le mot de passe Doit contenir au moins un chiffre !"
+      )
+      .min(8, "* Le mot de passe doit au moins faire 8 caractères !"),
   });
 
   const {
@@ -54,105 +70,172 @@ function SignUp() {
     console.log(data);
   };
 
+  const data = {
+    title: "Inscription",
+    subtitle: "Crée ton compte",
+  };
+
   return (
-    <div className="flex flex-col justify-evenly">
-      <HeaderText
-        props={{
-          title: "Inscription",
-          subtitle: "Crée ton compte",
-        }}
-      />
-
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-        <div>
-          <fieldset
-            className={`
-                w-5/6 
-                my-2 mx-auto 
-                rounded-full 
-                border 
-                px-8 
-            `}
+    <div
+      className="flex flex-col 
+                  items-center
+                  max-h-screen"
+    >
+      <div
+        className="w-[90%] 
+                      max-w-[400px] 
+                      p-[5%]"
+      >
+        <HeaderText props={data} />
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+          <div
+            className="flex 
+                        flex-col 
+                        items-center 
+                        justify-center 
+                        min-h-[400px]"
           >
-            <legend className={`px-2`}>E-mail</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="email"
-              id="email"
-              placeholder="marie.dupont@gmail.com"
-              {...register("email")}
-            />
-          </fieldset>
-          <p className="text-red-600 px-[10%]">{errors.email?.message}</p>
-        </div>
+            <div className="mb-[5%] w-full">
+              <fieldset
+                className="w-full
+                        mx-auto
+                        rounded-lg
+                        border
+                        border-homa-beige
+                        p-[4%]"
+              >
+                <legend className="text-sm text-homa-beige">E-mail</legend>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="marie.dupont@gmail.com"
+                  {...register("email")}
+                  className="w-full focus:outline-none focus:ring-2 focus:ring-homa-beige"
+                />
+              </fieldset>
+              <p className="text-red mt-[2%]">{errors.email?.message}</p>
+            </div>
 
-        <div>
-          <fieldset
-            className={`
-                w-5/6 
-                my-2 mx-auto 
-                rounded-full 
-                border 
-                px-8 
-            `}
-          >
-            <legend className={`px-2`}>Nom d'utilisateur</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="text"
-              id="pseudo"
-              placeholder="marie_dupont"
-              {...register("name")}
-            />
-          </fieldset>
-          <p className="text-red-600 px-[10%]">{errors.name?.message}</p>
-        </div>
+            <div className="mb-[5%] w-full">
+              <fieldset
+                className="w-full
+                        mx-auto
+                        rounded-lg
+                        border
+                        border-homa-beige
+                        p-[4%]"
+              >
+                <legend className="text-sm text-homa-beige">
+                  Nom d'utilisateur
+                </legend>
+                <input
+                  type="text"
+                  id="pseudo"
+                  placeholder="marie_dupont"
+                  {...register("name")}
+                  className="w-full 
+                              focus:outline-none 
+                              focus:ring-2 
+                              focus:ring-homa-beige"
+                />
+              </fieldset>
+              <p className="text-red mt-[2%]">{errors.name?.message}</p>
+            </div>
 
-        <div>
-          <fieldset
-            className={`
-                w-5/6 
-                my-2 mx-auto 
-                rounded-full 
-                border 
-                px-8 
-            `}
-          >
-            <legend className={`px-2`}>Mot de passe</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="password"
-              id="password"
-              placeholder="...."
-              {...register("password")}
-            />
-          </fieldset>
-          <p className="text-red-600 px-[10%]">{errors.password?.message}</p>
-        </div>
+            <div
+              className="mb-[5%] 
+                          w-full"
+            >
+              <fieldset
+                className="w-full
+                        mx-auto
+                        rounded-lg
+                        border
+                        border-homa-beige
+                        p-[4%]"
+              >
+                <legend className="text-sm text-homa-beige">
+                  Mot de passe
+                </legend>
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="........"
+                  {...register("password")}
+                  className="w-full 
+                              focus:outline-none 
+                              focus:ring-2 
+                              focus:ring-homa-beige"
+                />
+              </fieldset>
+              <p className="text-red mt-[2%]">{errors.password?.message}</p>
+            </div>
 
-        <ToggleInput
-          props={{
-            text: "J'ai lu et j'accepte les CGU et la politique de confidentialité.",
-          }}
-        />
-        <input
-          className="bg-blue-500
-                hover:bg-blue-700
+            <div
+              className="mb-[5%] 
+                          w-full"
+            >
+              <fieldset
+                className="w-full
+                        mx-auto
+                        rounded-lg
+                        border
+                        border-homa-beige
+                        p-[4%]"
+              >
+                <legend className="text-sm text-homa-beige">
+                  Confirmes ton mot de passe
+                </legend>
+                <input
+                  type="confirmPassword"
+                  id="confirmPassword"
+                  placeholder="........"
+                  {...register("password")}
+                  className="w-full 
+                              focus:outline-none 
+                              focus:ring-2 
+                              focus:ring-homa-beige"
+                />
+              </fieldset>
+              <p className="text-red mt-[2%]">
+                {errors.confirmPassword?.message}
+              </p>
+            </div>
+
+            <ToggleInput text=" J'ai lu et j'accepte les CGU et la politique de confidentialité." />
+          </div>
+          <button
+            className="bg-sky-blue
+                hover:bg-sky-blue-hover
                 text-white
+                text-xl
                 font-bold
                 rounded-full
-                shadow-xl
+                shadow-lg
+                w-full 
+                p-[10px] 
                 py-5 w-80
-                mx-auto mt-6"
-          type="submit"
-        />
-        <Link
-          className="mx-auto mt-6 text-blue-700 underline text-lg"
-          to="/auth/signin"
-        >
-          Se connecter
-        </Link>
-      </form>
+                mx-auto
+                transition
+                duration-300
+                flex
+                items-center
+                justify-center"
+            type="submit"
+          >
+            <span className="mt-2">Suivant</span>
+            <span className="text-[40px] font-extrabold ml-1 align-middle">
+              {">"}
+            </span>
+          </button>
+          <Link
+            className="mx-auto mt-6 text-sky-blue underline text-2xl"
+            to="/auth/signin"
+          >
+            Se connecter
+          </Link>
+        </form>
+      </div>
     </div>
   );
 }

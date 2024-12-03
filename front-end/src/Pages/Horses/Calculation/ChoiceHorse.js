@@ -5,7 +5,7 @@ import HomeButton from "../../../components/buttons/HomeButton";
 import { Await, Link, Navigate, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import horseApi from "../../../services/horseApi";
-import HeaderText from "../../../components/texts/HeaderText";
+import { HeaderText } from "../../../components/texts/HeaderText";
 
 function ChoiceHorse() {
   let navigate = useNavigate();

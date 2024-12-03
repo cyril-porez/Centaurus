@@ -1,5 +1,5 @@
 import React from "react";
-import HeaderText from "../../components/texts/HeaderText";
+import { HeaderText } from "../../components/texts/HeaderText";
 import HomeButton from "../../components/buttons/HomeButton";
 import userApi from "../../services/userApi";
 import { useNavigate } from "react-router-dom";

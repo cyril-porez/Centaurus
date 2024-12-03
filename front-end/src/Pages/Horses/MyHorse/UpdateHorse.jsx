@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import HeaderText from "../../../components/texts/HeaderText";
+import { HeaderText } from "../../../components/texts/HeaderText";
 import HomeButton from "../../../components/buttons/HomeButton";
 import { useParams, useNavigate } from "react-router-dom";
 import horseApi from "../../../services/horseApi";

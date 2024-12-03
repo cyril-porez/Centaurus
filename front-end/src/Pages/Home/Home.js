@@ -4,7 +4,7 @@ import horseHead from "../../assets/icons/horseHead.png";
 import calcul from "../../assets/icons/calcul.png";
 import casque from "../../assets/icons/casque.png";
 import courbe from "../../assets/icons/courbe.png";
-import HeaderText from "../../components/texts/HeaderText";
+import { HeaderText } from "../../components/texts/HeaderText";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import userApi from "../../services/userApi";
@@ -49,19 +49,19 @@ function Home() {
   }, []);
 
   const goToWeightCalculation = () => {
-    navigate("/ChoiceHorse", { replace: false });
+    navigate("/horses/calculation/ChoiceHorse", { replace: false });
   };
 
   const goToFollowWeight = () => {
-    navigate("/FollowWeight", { replace: false });
+    navigate("/horses/follow/follow-weight", { replace: false });
   };
 
   const goToMyHorses = () => {
-    navigate("/MyHorses", { replace: false });
+    navigate("/horses/my-horse/my-horses", { replace: false });
   };
 
   const goToProfile = () => {
-    navigate("/Profile", { replace: false });
+    navigate("/users/profile", { replace: false });
   };
 
   return (

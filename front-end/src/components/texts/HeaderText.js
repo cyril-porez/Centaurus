@@ -1,5 +1,5 @@
 import React from "react";
-export default function HeaderText({ props }) {
+export const HeaderText = ({ props }) => {
   return (
     <div className="text-center">
       <h1 className="text-color-title text-4xl font-bold">{props.title}</h1>
@@ -8,4 +8,4 @@ export default function HeaderText({ props }) {
       </h3>
     </div>
   );
-}
+};
