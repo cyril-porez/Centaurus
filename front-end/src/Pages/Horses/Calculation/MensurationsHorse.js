@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { HeaderText } from "../../../components/texts/HeaderText";
-import ToggleInput from "../../../components/inputs/ToggleInput";
 import { useNavigate, useParams } from "react-router-dom";
 import horseApi from "../../../services/horseApi";
 import weightApi from "../../../services/weightApi";
@@ -110,11 +109,11 @@ export default function Mensurations() {
     <div className="flex flex-col h-screen justify-evenly">
       <HeaderText
         props={{
-          title: `${horse.name}`,
+          title: `${horse?.name}`,
           subtitle: "Nous avons besoin de ses nouvelles mensurations",
         }}
       />
-      {horse.race === "pure sang" ? (
+      {horse?.race === "pure sang" ? (
         <>
           <fieldset
             className={`
@@ -278,6 +277,7 @@ export default function Mensurations() {
         src="/images/cheval_lignes_mesure.png"
         width={150}
         className="mx-auto my-4"
+        alt=""
       />
       <input
         type="submit"
