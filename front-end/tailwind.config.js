@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "homa-brown": "#92502C",
+        "homa-brown": "#D9C2B5",
         "sky-blue": "#219BD0",
         "sky-blue-hover": "#166C92",
         "homa-black": "#312E2D",
@@ -12,6 +12,8 @@ module.exports = {
         "homa-white": "#FFF6EA",
         "Lavender-Blue": "#BCBBFC",
         "color-title": "#0E194D",
+        "green-apple": "#cdeeae",
+        orange: "#fbc361",
         red: "#DC2626",
       },
     },

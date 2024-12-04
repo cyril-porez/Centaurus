@@ -1,28 +1,27 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 export default function TextInput({ props }) {
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState("");
 
   const handleChange = (event) => {
     setValue(event.target.value);
   };
 
+  const fieldset = `w-full mx-auto rounded-lg p-[4%] border border-${props.color} `;
+
   return (
     <div className="mb-[5%] w-full">
-      <fieldset
-        className="w-full
-                mx-auto
-                rounded-lg
-                border
-                border-homa-beige
-                p-[4%]"
-      >
-        <legend className="text-sm text-homa-beige">{props.legend}</legend>
+      <fieldset className={fieldset}>
+        <legend className={"text-sm text-" + props.color}>
+          {props.legend}
+        </legend>
 
         <input
-          className="w-full focus:outline-none focus:ring-2 focus:ring-homa-beige"
+          className={
+            "w-full focus:outline-none focus:ring-2 focus:ring-" + props.color
+          }
           type={props.type}
-          value=""
+          value={value}
           onChange={handleChange}
           placeholder={props.placeholder}
           id=""

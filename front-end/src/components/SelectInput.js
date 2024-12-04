@@ -13,7 +13,10 @@ export default function SelectInput(params) {
       >
         <legend className="text-sm text-homa-beige">Catégorie</legend>
         <select
-          className="w-full focus:outline-none focus:ring-2 focus:ring-homa-beige"
+          className="w-full 
+                    focus:outline-none 
+                    focus:ring-2 
+                    focus:ring-homa-beige"
           // onChange={(e) => setCategory(e.target.value)}
         >
           <option selected disabled>

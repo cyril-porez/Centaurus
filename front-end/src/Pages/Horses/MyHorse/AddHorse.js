@@ -6,6 +6,7 @@ import { HeaderText } from "../../../components/texts/HeaderText";
 import HomeButton from "../../../components/buttons/HomeButton";
 import TextInput from "../../../components/inputs/TextInput";
 import SelectInput from "../../../components/SelectInput";
+import Button from "../../../components/buttons/Button";
 
 function AddHorse() {
   let navigate = useNavigate();
@@ -58,38 +59,36 @@ function AddHorse() {
   };
 
   return (
-    <div className="flex flex-col h-screen justify-evenly">
+    <div
+      className="flex flex-col 
+                  items-center
+                  max-h-screen"
+    >
       <img
         src="/icons/horseHead.png"
         width={50}
         className="absolute top-8 right-8"
         alt=""
       />
-      <HeaderText
-        props={{
-          title: "Création d'un profil cheval",
-          subtitle: "Nous allons avoir besoin de quelques informations.",
-        }}
-      />
+      <div
+        className="w-[90%] 
+                    max-w-[400px] 
+                    p-[5%]"
+      >
+        <HeaderText
+          props={{
+            title: "Création d'un profil cheval",
+            subtitle: "Nous allons avoir besoin de quelques informations.",
+          }}
+        />
 
-      <div className="flex flex-col">
-        <TextInput props={nameHorse} />
-        <TextInput props={ageHorse} />
-        <SelectInput />
+        <div className="flex flex-col">
+          <TextInput props={nameHorse} />
+          <TextInput props={ageHorse} />
+          <SelectInput />
+        </div>
+        <Button />
       </div>
-
-      <input
-        type="submit"
-        onClick={() => onSubmit()}
-        className="bg-blue-500
-                hover:bg-blue-700
-                text-white
-                font-bold
-                rounded-full
-                shadow-xl
-                py-5 w-80
-                mx-auto mt-2"
-      />
 
       <div className="mt-5">
         <HomeButton />

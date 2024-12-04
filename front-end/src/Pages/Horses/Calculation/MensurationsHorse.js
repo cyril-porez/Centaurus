@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import horseApi from "../../../services/horseApi";
 import weightApi from "../../../services/weightApi";
 import HomeButton from "../../../components/buttons/HomeButton";
+import TextInput from "../../../components/inputs/TextInput";
+import { Legend } from "chart.js";
 
 export default function Mensurations() {
   const [garrotHeight, setGarrotHeight] = useState("");
@@ -105,6 +107,38 @@ export default function Mensurations() {
     navigateResult();
   };
 
+  const hgarot = {
+    legend: "Hauteur au garrot",
+    color: "homa-beige",
+    placeholder: "... cm",
+    type: "text",
+  };
+
+  const lcorp = {
+    legend: "Longueur du corps",
+    color: "red",
+    placeholder: "... cm",
+    type: "text",
+  };
+
+  const circThoracique = {
+    legend: "Circonférence thoracique",
+    placeholder: "... cm",
+    type: "text",
+  };
+
+  const circEncolure = {
+    legend: "Circonférence de l'encolure",
+    placeholder: "... cm",
+    type: "text",
+  };
+
+  const dateMeasure = {
+    legend: "Date de la prise de mesure",
+    color: "blue-500",
+    type: "date",
+  };
+
   return (
     <div className="flex flex-col h-screen justify-evenly">
       <HeaderText
@@ -115,6 +149,7 @@ export default function Mensurations() {
       />
       {horse?.race === "pure sang" ? (
         <>
+          <TextInput props={hgarot} />
           <fieldset
             className={`
                         w-5/6 
@@ -174,24 +209,12 @@ export default function Mensurations() {
       ) : (
         <>
           {/* <div className="flex flex-col h-1/2"> */}
-          <fieldset
-            className={`
-                        w-5/6 
-                        my-2 mx-auto 
-                        rounded-full 
-                        border 
-                        px-8 
-                    `}
-          >
-            <legend className={`px-2`}>Hauteur au garrot</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="text"
-              id="garrotHeight"
-              placeholder="... cm"
-              onChange={(e) => setGarrotHeight(e.target.value)}
-            />
-          </fieldset>
+          <TextInput props={hgarot} />
+          <TextInput props={lcorp} />
+          <TextInput props={circThoracique} />
+          <TextInput props={circEncolure} />
+          <TextInput props={dateMeasure} />
+
           {/* </div> */}
           {/* <div> */}
           <fieldset
