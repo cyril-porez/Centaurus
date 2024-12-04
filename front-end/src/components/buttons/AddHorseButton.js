@@ -1,5 +1,5 @@
 import React from "react";
-import ajouter from "../../assets/icons/ajouter.png"
+import ajouter from "../../assets/icons/ajouter.png";
 
 export default function AddHorseButton({ onClick }) {
   return (
@@ -15,9 +15,9 @@ export default function AddHorseButton({ onClick }) {
                 mx-auto"
       onClick={onClick}
       type="submit"
-                    >
-        <img className="h-8 w-8" src={ajouter} />
-        Ajouter un cheval
+    >
+      <img className="h-8 w-8" src={ajouter} alt="" />
+      Ajouter un cheval
     </button>
-);
+  );
 }

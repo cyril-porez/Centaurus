@@ -4,6 +4,8 @@ import horseApi from "../../../services/horseApi";
 import { jwtDecode } from "jwt-decode";
 import { HeaderText } from "../../../components/texts/HeaderText";
 import HomeButton from "../../../components/buttons/HomeButton";
+import TextInput from "../../../components/inputs/TextInput";
+import SelectInput from "../../../components/SelectInput";
 
 function AddHorse() {
   let navigate = useNavigate();
@@ -43,12 +45,25 @@ function AddHorse() {
     navigate("/MyHorses", { replace: false });
   };
 
+  const nameHorse = {
+    legend: "Nom du cheval",
+    type: "text",
+    placeholder: "Horisse du chêne",
+  };
+
+  const ageHorse = {
+    legend: "Âge du cheval",
+    type: "number",
+    placeholder: "10",
+  };
+
   return (
     <div className="flex flex-col h-screen justify-evenly">
       <img
         src="/icons/horseHead.png"
         width={50}
         className="absolute top-8 right-8"
+        alt=""
       />
       <HeaderText
         props={{
@@ -58,71 +73,15 @@ function AddHorse() {
       />
 
       <div className="flex flex-col">
-        <fieldset
-          className={`
-                w-5/6 
-                my-2 mx-auto 
-                rounded-full 
-                border 
-                px-8 
-            `}
-        >
-          <legend className={`px-2`}>Nom</legend>
-          <input
-            className="mb-2 py-1 w-full"
-            type="text"
-            id="name"
-            placeholder="Horisse"
-            onChange={(e) => setName(e.target.value)}
-          />
-        </fieldset>
+        <TextInput props={nameHorse} />
+        <TextInput props={ageHorse} />
+        <SelectInput />
+      </div>
 
-        <fieldset
-          className={`
-                w-5/6 
-                my-2 mx-auto 
-                rounded-full 
-                border 
-                px-8 
-            `}
-        >
-          <legend className={`px-2`}>Âge</legend>
-          <input
-            className="mb-2 py-1 w-full"
-            type="number"
-            id="age"
-            placeholder="0"
-            onChange={(e) => setAge(e.target.value)}
-          />
-        </fieldset>
-
-        <fieldset
-          className={`
-                w-5/6 
-                my-2 mx-auto 
-                rounded-full 
-                border 
-                px-8 
-            `}
-        >
-          <legend className={`px-2`}>Catégorie</legend>
-          <select
-            className="mb-2 py-1 w-full"
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option selected disabled>
-              Sélectionner
-            </option>
-            <option>Pur Sang</option>
-            <option>Trait/Attelage</option>
-            <option>Autre</option>
-          </select>
-        </fieldset>
-
-        <input
-          type="submit"
-          onClick={() => onSubmit()}
-          className="bg-blue-500
+      <input
+        type="submit"
+        onClick={() => onSubmit()}
+        className="bg-blue-500
                 hover:bg-blue-700
                 text-white
                 font-bold
@@ -130,11 +89,10 @@ function AddHorse() {
                 shadow-xl
                 py-5 w-80
                 mx-auto mt-2"
-        />
+      />
 
-        <div className="mt-5">
-          <HomeButton />
-        </div>
+      <div className="mt-5">
+        <HomeButton />
       </div>
     </div>
   );
