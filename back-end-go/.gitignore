@@ -1,0 +1,33 @@
+# Les binaires générés
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+
+# Fichiers et répertoires spécifiques à Go
+/vendor/
+/bin/
+/pkg/
+
+# Fichiers de dépendances Go
+go.sum
+
+# Fichiers de configuration d'environnement
+.env
+
+# Les fichiers temporaires ou de sauvegarde de l'éditeur
+*.tmp
+*.swp
+*~
+
+# Fichiers de logs
+*.log
+
+# Paramètres spécifiques aux IDE
+.idea/
+.vscode/
+*.iml
+
+# Les modules téléchargés localement
+.mod
