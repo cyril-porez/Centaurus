@@ -7,19 +7,14 @@ export default function TextInput({ props }) {
     setValue(event.target.value);
   };
 
-  const fieldset = `w-full mx-auto rounded-lg p-[4%] border border-${props.color} `;
+  const fieldset = `w-full mx-auto rounded-lg p-[4%] border ${props.colorBorder} `;
 
   return (
     <div className="mb-[5%] w-full">
       <fieldset className={fieldset}>
-        <legend className={"text-sm text-" + props.color}>
-          {props.legend}
-        </legend>
-
+        <legend className={`text-sm ${props.textColor}`}>{props.legend}</legend>
         <input
-          className={
-            "w-full focus:outline-none focus:ring-2 focus:ring-" + props.color
-          }
+          className={`w-full focus:outline-none focus:ring-2 ${props.inputBoderColor}`}
           type={props.type}
           value={value}
           onChange={handleChange}

@@ -5,8 +5,7 @@ import horseApi from "../../../services/horseApi";
 import weightApi from "../../../services/weightApi";
 import HomeButton from "../../../components/buttons/HomeButton";
 import TextInput from "../../../components/inputs/TextInput";
-import { Legend } from "chart.js";
-
+import Button from "../../../components/buttons/Button";
 export default function Mensurations() {
   const [garrotHeight, setGarrotHeight] = useState("");
   const [bodyLength, setBodyLength] = useState("");
@@ -109,212 +108,86 @@ export default function Mensurations() {
 
   const hgarot = {
     legend: "Hauteur au garrot",
-    color: "homa-beige",
+    colorBorder: "border-homa-beige",
+    textColor: "text-homa-beige",
     placeholder: "... cm",
     type: "text",
   };
 
   const lcorp = {
     legend: "Longueur du corps",
-    color: "red",
+    colorBorder: "border-red",
+    textColor: "text-red",
     placeholder: "... cm",
     type: "text",
   };
 
   const circThoracique = {
     legend: "Circonférence thoracique",
+    colorBorder: "border-green-apple",
+    textColor: "text-green-apple",
     placeholder: "... cm",
     type: "text",
   };
 
   const circEncolure = {
     legend: "Circonférence de l'encolure",
+    colorBorder: "border-orange",
+    textColor: "text-orange",
     placeholder: "... cm",
     type: "text",
   };
 
   const dateMeasure = {
     legend: "Date de la prise de mesure",
-    color: "blue-500",
+    colorBorder: "border-homa-brown",
+    textColor: "text-homa-brown",
     type: "date",
   };
 
   return (
-    <div className="flex flex-col h-screen justify-evenly">
-      <HeaderText
-        props={{
-          title: `${horse?.name}`,
-          subtitle: "Nous avons besoin de ses nouvelles mensurations",
-        }}
-      />
-      {horse?.race === "pure sang" ? (
-        <>
-          <TextInput props={hgarot} />
-          <fieldset
-            className={`
-                        w-5/6 
-                        my-2 mx-auto 
-                        rounded-full 
-                        border 
-                        px-8 
-                    `}
-          >
-            <legend className={`px-2`}>Longueur du corps</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="text"
-              id="bodyLength"
-              placeholder="... cm"
-              onChange={(e) => setBodyLength(e.target.value)}
-            />
-          </fieldset>
+    <div
+      className="flex flex-col 
+                  items-center
+                  max-h-screen"
+    >
+      <div
+        className="w-[90%] 
+                    max-w-[400px] 
+                    p-[5%]"
+      >
+        <HeaderText
+          props={{
+            title: `${horse?.name}`,
+            subtitle: "Nous avons besoin de ses nouvelles mensurations",
+          }}
+        />
+        {horse?.race === "pure sang" ? (
+          <>
+            <TextInput props={lcorp} />
+            <TextInput props={circThoracique} />
+            <TextInput props={dateMeasure} />
+          </>
+        ) : (
+          <>
+            {/* <div className="flex flex-col h-1/2"> */}
+            <TextInput props={hgarot} />
+            <TextInput props={lcorp} />
+            <TextInput props={circThoracique} />
+            <TextInput props={circEncolure} />
+            <TextInput props={dateMeasure} />
+          </>
+        )}
+        <img
+          src="/images/cheval_lignes_mesure.png"
+          width={150}
+          className="mx-auto my-4"
+          alt=""
+        />
 
-          <fieldset
-            className={`
-                        w-5/6 
-                        my-2 mx-auto 
-                        rounded-full 
-                        border 
-                        px-8 
-                    `}
-          >
-            <legend className={`px-2`}>Circonférence thoracique</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="text"
-              id="chestSize"
-              placeholder="... cm"
-              onChange={(e) => setChestSize(e.target.value)}
-            />
-          </fieldset>
+        <Button />
+      </div>
 
-          <fieldset
-            className={`
-                        w-5/6 
-                        my-2 mx-auto 
-                        rounded-full 
-                        border 
-                        px-8 
-                    `}
-          >
-            <legend className={`px-2`}>Date de la prise de mesure</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="date"
-              id="date"
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </fieldset>
-        </>
-      ) : (
-        <>
-          {/* <div className="flex flex-col h-1/2"> */}
-          <TextInput props={hgarot} />
-          <TextInput props={lcorp} />
-          <TextInput props={circThoracique} />
-          <TextInput props={circEncolure} />
-          <TextInput props={dateMeasure} />
-
-          {/* </div> */}
-          {/* <div> */}
-          <fieldset
-            className={`
-                        w-5/6 
-                        my-2 mx-auto 
-                        rounded-full 
-                        border 
-                        px-8 
-                    `}
-          >
-            <legend className={`px-2`}>Longueur du corps</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="text"
-              id="bodyLength"
-              placeholder="... cm"
-              onChange={(e) => setBodyLength(e.target.value)}
-            />
-          </fieldset>
-          {/* </div> */}
-          {/* <div> */}
-          <fieldset
-            className={`
-                        w-5/6 
-                        my-2 mx-auto 
-                        rounded-full 
-                        border 
-                        px-8 
-                    `}
-          >
-            <legend className={`px-2`}>Circonférence thoracique</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="text"
-              id="chestSize"
-              placeholder="... cm"
-              onChange={(e) => setChestSize(e.target.value)}
-            />
-          </fieldset>
-          {/* </div>
-      <div> */}
-          <fieldset
-            className={`
-                        w-5/6 
-                        my-2 mx-auto 
-                        rounded-full 
-                        border 
-                        px-8 
-                    `}
-          >
-            <legend className={`px-2`}>Circonférence de l'encolure</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="text"
-              id="neckSize"
-              placeholder="... cm"
-              onChange={(e) => setNeckSize(e.target.value)}
-            />
-          </fieldset>
-          {/* </div> */}
-
-          <fieldset
-            className={`
-                        w-5/6 
-                        my-2 mx-auto 
-                        rounded-full 
-                        border 
-                        px-8 
-                    `}
-          >
-            <legend className={`px-2`}>Date de la prise de mesure</legend>
-            <input
-              className="mb-2 py-1 w-full"
-              type="date"
-              id="date"
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </fieldset>
-        </>
-      )}
-      <img
-        src="/images/cheval_lignes_mesure.png"
-        width={150}
-        className="mx-auto my-4"
-        alt=""
-      />
-      <input
-        type="submit"
-        onClick={() => handleSubmit()}
-        className="bg-blue-500
-                hover:bg-blue-700
-                text-white
-                font-bold
-                rounded-full
-                shadow-xl
-                py-5 w-80
-                mx-auto mt-2"
-        value="Calculons"
-      />
       <div className="flex flex-col justify-center items-center">
         <div className="mt-5">
           <HomeButton />

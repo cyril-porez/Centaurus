@@ -1,30 +1,18 @@
 import React from "react";
 
-export default function ContactText({ props }) {
+export default function ContactText() {
   return (
     <div className="flex flex-col">
-      <p
-        className="
-                text-sm
-                text-[#C6A77C]"
-      >
-        Si tu as des questions sur l'utilisation de ces données, tu peux nous
-        écrire :
+      <p className="ml-5 text-homa-beige">
+        Nous tenons à te rappeler que le suivi du poids de ton cheval est
+        essentiel au suivi de sa santé générale. Cet outil vise à te faciliter
+        l’accès à ces données. Si l’état de ton cheval évolue de manière
+        significative, contacte ton vétérinaire.
       </p>
-      <a
-        className="
-                text-sm
-                rounded-full
-                border
-                border-[#C6A77C]
-                text-[#312E2D]
-                p-3
-                mx-auto
-                w-fit"
-        href={`mailto:${props.mail}`}
-      >
-        {props.mail}
-      </a>
+      <p className="ml-5 mt-5 text-homa-beige">
+        Si tu as des questions sur l'utilisation de ces données, tu peux nous
+        écrire
+      </p>
     </div>
   );
 }

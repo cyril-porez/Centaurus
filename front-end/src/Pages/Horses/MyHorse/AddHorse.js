@@ -48,12 +48,18 @@ function AddHorse() {
 
   const nameHorse = {
     legend: "Nom du cheval",
+    colorBorder: "border-homa-beige",
+    textColor: "text-homa-beige",
+    inputBoderColor: "focus:ring-homa-beige",
     type: "text",
     placeholder: "Horisse du chêne",
   };
 
   const ageHorse = {
     legend: "Âge du cheval",
+    colorBorder: "border-homa-beige",
+    inputBoderColor: "focus:ring-homa-beige",
+    textColor: "text-homa-beige",
     type: "number",
     placeholder: "10",
   };

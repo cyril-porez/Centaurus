@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Button() {
+export default function Button(props) {
   return (
     <button
       className="bg-sky-blue
@@ -21,7 +21,7 @@ export default function Button() {
                 justify-center"
       type="submit"
     >
-      <span className="mt-2">Ajouter</span>
+      <span className="mt-2">{props.name}</span>
       <span className="text-[40px] font-extrabold ml-1 align-middle">
         {">"}
       </span>

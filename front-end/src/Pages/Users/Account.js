@@ -15,18 +15,27 @@ export default function Profile() {
 
   const email = {
     legend: "Email",
+    colorBorder: "border-homa-beige",
+    textColor: "text-homa-beige",
+    inputBoderColor: "focus:ring-homa-beige",
     type: "email",
     placeholder: "marie.dupont@gmail.com",
   };
 
   const Pseudo = {
     legend: "Pseudo",
+    colorBorder: "border-homa-beige",
+    textColor: "text-homa-beige",
+    inputBoderColor: "focus:ring-homa-beige",
     type: "text",
     placeholder: "marie_dupont",
   };
 
   const password = {
     legend: "Mot de passe",
+    colorBorder: "border-homa-beige",
+    textColor: "text-homa-beige",
+    inputBoderColor: "focus:ring-homa-beige",
     type: "password",
     placeholder: "************",
   };
