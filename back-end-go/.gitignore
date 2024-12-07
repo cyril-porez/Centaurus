@@ -31,3 +31,9 @@ go.sum
 
 # Les modules téléchargés localement
 .mod
+
+# Config auto-générée
+.air.toml
+
+# Logs temporaires d'Air
+tmp/
