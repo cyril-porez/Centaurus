@@ -1,37 +1,30 @@
 package main
 
 import (
+	"back-end-go/api/router"
+	"back-end-go/config"
 	_ "back-end-go/docs"
+	"log"
 
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "github.com/go-sql-driver/mysql"
 )
 
-//PingHandler
-//@Summary Ping
-// @Description Respond with "pong"
-// @Tags example
-// @Produce json
-// @Success 200 {string} string "pong"
-// @Router /ping [get]
-func PingHandler(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "pon",
-	})
-}
-
+// func register
+// @title User API
+// @version 1.0
+// @description Example of a user API with Swagger.
+// @host localhost:8080
+// @BasePath /
 func  main()  {
-	r := gin.Default();
+	
+	// Initialisation de la base de données
+	db, err := config.InitializeDatabase()
+	if err != nil {
+		log.Fatal("Erreur de connexion à la BDD : %v",err)
+	}
+	defer db.Close()
 
-	//route Swagger
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	//route api
-	r.GET("/ping", PingHandler)
-	r.GET("/user/:id", func(c *gin.Context) {
-
-	})
+	r := router.SetupRouter(db)
 
 	r.Run()
 }
