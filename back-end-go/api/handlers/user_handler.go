@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"back-end-go/model"
+	"back-end-go/service"
 	"database/sql"
 	"net/http"
 
@@ -21,16 +22,14 @@ import (
 //@Router /register [post]
 func RegisterHandler(c *gin.Context, db *sql.DB) {
 	var newUser model.User
-	var err error
-	if err = c.ShouldBindJSON(&newUser); err != nil {
+	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	query := "INSERT INTO users (username, password, email)	Values (?,?,?)"
-	_, err = db.Exec(query, newUser.Username, newUser.Password, newUser.Email)
+	err := service.CreateUser(db, &newUser)
 	if err !=nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de l'insersion dans la BDD"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la création de "})
 	}
 
 	c.JSON(http.StatusOK, gin.H {
