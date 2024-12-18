@@ -6,6 +6,10 @@ import (
 	"back-end-go/utils"
 	"database/sql"
 	"errors"
+	"net/http"
+	"regexp"
+
+	"github.com/gin-gonic/gin"
 )
 
 
@@ -24,9 +28,58 @@ func validateEmail(db *sql.DB, email string) error {
 	return nil
 }
 
-func CreateUser(db *sql.DB, user *model.User) error {
+func validatePassword(c *gin.Context, password string) error {
+	var details []utils.ErrorDetail
+	if len(password ) < 12 {
+		details = append(details, utils.ErrorDetail{
+			Field: "password",
+			Issue: "le mot de passe doit contenir au mois 12 caractères",
+		}) 
+	}
+
+	if !regexp.MustCompile(`[A-Z]`).MatchString(password) {
+		details = append(details, utils.ErrorDetail{
+			Field: "password",
+			Issue: "le mot de passe doit contenir au moins une majuscule",
+		})
+	}
+	
+	if !regexp.MustCompile(`[a-z]`).MatchString(password) {
+		details = append(details, utils.ErrorDetail{
+			Field: "password",
+			Issue: "le mot de passe doit contenir au moins une minuscule",
+		})
+	}
+
+	if !regexp.MustCompile(`\d`).MatchString(password) {
+		details = append(details, utils.ErrorDetail{
+			Field: "password",
+			Issue: "le mot de passe doit contenir au moins un chiffre",
+		})
+	}
+	
+	if !regexp.MustCompile(`[@$!%*?&]`).MatchString(password) {
+		details = append(details, utils.ErrorDetail{
+			Field: "password",
+			Issue: "le mot de passe doit contenir au moins un caractère spéciaux",
+		})
+	}
+
+	if len(details) > 0 {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error ", details)
+		return errors.New("invalid password format")
+	}
+
+	return nil
+}
+
+func CreateUser(c *gin.Context, db *sql.DB, user *model.User) error {
 
 	if err := validateEmail(db, user.Email); err != nil {
+		return err
+	}
+
+	if err := validatePassword(c, user.Password); err != nil {
 		return err
 	}
 

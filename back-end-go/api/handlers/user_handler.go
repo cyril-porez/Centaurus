@@ -3,6 +3,7 @@ package handlers
 import (
 	"back-end-go/model"
 	"back-end-go/service"
+	"back-end-go/utils"
 	"database/sql"
 	"net/http"
 
@@ -27,13 +28,18 @@ func RegisterHandler(c *gin.Context, db *sql.DB) {
 		return
 	}
 
-	err := service.CreateUser(db, &newUser)
+	err := service.CreateUser(c, db, &newUser)
 	if err !=nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la création de "})
+		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal Server Error", []utils.ErrorDetail{
+			{
+				Field: "unknown",
+				Issue: "erreur lors de la création de l'utilisateur",
+			},
+		})
+	}	else {
+		c.JSON(http.StatusOK, gin.H {
+			"message": "Utilisateur créé avec succès",
+			"user": newUser,
+		})
 	}
-
-	c.JSON(http.StatusOK, gin.H {
-		"message": "Utilisateur créé avec succès",
-		"user": newUser,
-	})
 }
