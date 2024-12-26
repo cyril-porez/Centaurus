@@ -11,9 +11,16 @@ func InsertUser(db *sql.DB, user *model.User) error {
 	return err
 }
 
-func IsEmailTaken (db *sql.DB, email string) (bool, error)  {
+func IsEmailTaken (db *sql.DB, email string) (bool, error) {
 	var exists bool
 	query := "SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)"
+	err := db.QueryRow(query, email).Scan(&exists)
+	return exists, err
+}
+
+func IsUsernameTaken (db *sql.DB, email string) (bool, error) {
+	var exists bool
+	query := "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)"
 	err := db.QueryRow(query, email).Scan(&exists)
 	return exists, err
 }

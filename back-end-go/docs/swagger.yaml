@@ -1,5 +1,6 @@
+basePath: /
 definitions:
-  main.User:
+  model.User:
     properties:
       email:
         type: string
@@ -12,23 +13,14 @@ definitions:
     - password
     - username
     type: object
+host: localhost:8080
 info:
   contact: {}
+  description: Example of a user API with Swagger.
+  title: User API
+  version: "1.0"
 paths:
-  /ping:
-    get:
-      description: Respond with "pong"
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: pong
-          schema:
-            type: string
-      summary: Ping
-      tags:
-      - example
-  /register:
+  /auth/register:
     post:
       consumes:
       - application/json
@@ -39,14 +31,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/main.User'
+          $ref: '#/definitions/model.User'
       produces:
       - application/json
       responses:
         "200":
           description: User created successfully
           schema:
-            $ref: '#/definitions/main.User'
+            $ref: '#/definitions/model.User'
         "400":
           description: Bad Request
           schema:
@@ -62,4 +54,17 @@ paths:
       summary: Register a new user
       tags:
       - Users
+  /ping:
+    get:
+      description: Respond with "pong"
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: pong
+          schema:
+            type: string
+      summary: Ping
+      tags:
+      - example
 swagger: "2.0"

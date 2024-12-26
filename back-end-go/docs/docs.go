@@ -15,27 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/ping": {
-            "get": {
-                "description": "Respond with \"pong\"",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "example"
-                ],
-                "summary": "Ping",
-                "responses": {
-                    "200": {
-                        "description": "pong",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/register": {
+        "/auth/register": {
             "post": {
                 "description": "Register a new user",
                 "consumes": [
@@ -55,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.User"
+                            "$ref": "#/definitions/model.User"
                         }
                     }
                 ],
@@ -63,7 +43,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User created successfully",
                         "schema": {
-                            "$ref": "#/definitions/main.User"
+                            "$ref": "#/definitions/model.User"
                         }
                     },
                     "400": {
@@ -86,10 +66,30 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/ping": {
+            "get": {
+                "description": "Respond with \"pong\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "example"
+                ],
+                "summary": "Ping",
+                "responses": {
+                    "200": {
+                        "description": "pong",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "main.User": {
+        "model.User": {
             "type": "object",
             "required": [
                 "email",
@@ -113,12 +113,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "User API",
+	Description:      "Example of a user API with Swagger.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
