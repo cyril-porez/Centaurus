@@ -6,6 +6,7 @@ import (
 	"back-end-go/utils"
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"regexp"
 
@@ -136,4 +137,25 @@ func CreateUser(c *gin.Context, db *sql.DB, user *model.User) error {
 	user.Password = string(hashedPAssword)
 	
 	return repository.InsertUser(db, user)
+}
+
+func AuthService(c *gin.Context, db *sql.DB, user *model.Credential) error {
+	if err := validateEmail(c, db, user.Email); err != nil {
+		return err
+	}
+
+	if err := validatePassword(c, user.Password); err != nil {
+		return err
+	}
+
+	exists, err := repository.SelectUserByCredential(db, user)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		return fmt.Errorf("invalid credential")
+	}
+
+	return nil
 }

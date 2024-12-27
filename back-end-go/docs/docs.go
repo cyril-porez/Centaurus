@@ -15,7 +15,68 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/register": {
+        "/auth/sign-in": {
+            "post": {
+                "description": "Signin  a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Credential"
+                ],
+                "summary": "Signin a user",
+                "parameters": [
+                    {
+                        "description": "Email and password",
+                        "name": "credential",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Credential"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User connected",
+                        "schema": {
+                            "$ref": "#/definitions/model.Credential"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/sign-up": {
             "post": {
                 "description": "Register a new user",
                 "consumes": [
@@ -25,12 +86,12 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Credential"
                 ],
                 "summary": "Register a new user",
                 "parameters": [
                     {
-                        "description": "User",
+                        "description": "Username, Email and Password",
                         "name": "user",
                         "in": "body",
                         "required": true,
@@ -89,6 +150,21 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.Credential": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "model.User": {
             "type": "object",
             "required": [

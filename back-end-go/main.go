@@ -10,7 +10,7 @@ import (
 )
 
 // func register
-// @title User API
+// @title API
 // @version 1.0
 // @description Example of a user API with Swagger.
 // @host localhost:8080
@@ -20,7 +20,7 @@ func  main()  {
 	// Initialisation de la base de données
 	db, err := config.InitializeDatabase()
 	if err != nil {
-		log.Fatal("Erreur de connexion à la BDD : %v",err)
+		log.Fatal("erreur de connexion à la BDD : ",err)
 	}
 	defer db.Close()
 

@@ -1,5 +1,15 @@
 basePath: /
 definitions:
+  model.Credential:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
   model.User:
     properties:
       email:
@@ -20,13 +30,53 @@ info:
   title: User API
   version: "1.0"
 paths:
-  /auth/register:
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Signin  a user
+      parameters:
+      - description: Email and password
+        in: body
+        name: credential
+        required: true
+        schema:
+          $ref: '#/definitions/model.Credential'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User connected
+          schema:
+            $ref: '#/definitions/model.Credential'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Signin a user
+      tags:
+      - Credential
+  /auth/sign-up:
     post:
       consumes:
       - application/json
       description: Register a new user
       parameters:
-      - description: User
+      - description: Username, Email and Password
         in: body
         name: user
         required: true
@@ -53,7 +103,7 @@ paths:
             type: object
       summary: Register a new user
       tags:
-      - Users
+      - Credential
   /ping:
     get:
       description: Respond with "pong"
