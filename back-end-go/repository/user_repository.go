@@ -25,9 +25,11 @@ func IsUsernameTaken (db *sql.DB, email string) (bool, error) {
 	return exists, err
 }
 
-func SelectUserByCredential (db *sql.DB, user *model.Credential) (bool, error) {
-	var exists bool
-	query := "SELECT EXIST(SELECT 1 FROM users WHERE email = cyril@gmail.com and password = 12346)"
-	err := db.QueryRow(query, user.Email, user.Password).Scan(&exists)
-	return exists, err	
+func SelectUserByCredential (db *sql.DB, user *model.Credential) (string, error) {
+	var	password string
+
+	query := "SELECT id, username, password FROM users WHERE email = ?"
+	err := db.QueryRow(query, user.Email).Scan(&user.Id, &user.Username, &password)
+
+	return password, err	
 }

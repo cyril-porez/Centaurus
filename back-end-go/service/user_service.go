@@ -6,11 +6,12 @@ import (
 	"back-end-go/utils"
 	"database/sql"
 	"errors"
-	"fmt"
+
 	"net/http"
 	"regexp"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 
@@ -55,7 +56,28 @@ func validateEmail(c *gin.Context,db *sql.DB, email string) error {
 		return err
 	}
 	if isTaken {
-		return errors.New("l'email est utilisé")
+		details = append(details, utils.ErrorDetail{
+			Field: "email",
+			Issue: "l'email est déjà utilisé",
+		})
+		
+	}
+
+	if len(details) > 0 {
+		utils.WriteErrorResponse(c, http.StatusBadRequest,"validation error", details)
+		return errors.New("invalid format email")
+	}
+
+	return nil
+}
+
+func validateEmailSignin(c *gin.Context, email string) error {
+	var details []utils.ErrorDetail
+	if !utils.IsValidateEmailFormat(email) {
+		details = append(details, utils.ErrorDetail{
+			Field: "email",
+			Issue: "le format de l'email est invalide",
+		})
 	}
 
 	if len(details) > 0 {
@@ -140,21 +162,29 @@ func CreateUser(c *gin.Context, db *sql.DB, user *model.User) error {
 }
 
 func AuthService(c *gin.Context, db *sql.DB, user *model.Credential) error {
-	if err := validateEmail(c, db, user.Email); err != nil {
+	if err := validateEmailSignin(c, user.Email); err != nil {
 		return err
 	}
 
 	if err := validatePassword(c, user.Password); err != nil {
 		return err
-	}
+	}	
 
-	exists, err := repository.SelectUserByCredential(db, user)
-	if err != nil {
+	password, err := repository.SelectUserByCredential(db, user)
+	if err != nil { 
 		return err
 	}
 
-	if !exists {
-		return fmt.Errorf("invalid credential")
+	err = bcrypt.CompareHashAndPassword([]byte(password),[]byte(user.Password))
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusUnauthorized, "Unauthorized", []utils.ErrorDetail {
+			{
+				Field: "field",
+				Issue: "invalid credentials",
+				
+			},
+		})
+		return errors.New("user not found or invalid credential")
 	}
 
 	return nil
