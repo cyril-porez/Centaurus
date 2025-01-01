@@ -56,9 +56,9 @@ func RegisterHandler(c *gin.Context, db *sql.DB) {
 //@Failure 500 {object} map[string]string
 //@Router /auth/sign-in [post]
 func SignInHandler(c *gin.Context, db *sql.DB) {
-	var signIn model.Credential
+	var user model.Credential
 
-	if err := c.ShouldBindJSON(&signIn); err != nil {
+	if err := c.ShouldBindJSON(&user); err != nil {
 		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid Request", []utils.ErrorDetail{
 			{
 				Field: "body",
@@ -67,20 +67,31 @@ func SignInHandler(c *gin.Context, db *sql.DB) {
 		})
 	}
 
-	if err := service.AuthService(c, db, &signIn); err != nil {
+	if err := service.AuthService(c, db, &user); err != nil {
+		return
+	}
+
+	acceptToken, err := utils.GenerateAccesToken(user.Id, user.Username)
+	if err != nil {
+		return
+	}
+
+	refreshToken, err:= utils.GenerateRefreshToken(user.Id, user.Username)
+	if err != nil {
 		return
 	}
 
 	utils.WriteSuccesResponse(c, http.StatusOK, "user connected with succes", gin.H {
 		"user": gin.H{
-			"id": signIn.Id,
-			"email": signIn.Email,
-			"username": signIn.Username,
+			"id": user.Id,
+			"email": user.Email,
+			"username": user.Username,
 		},
-		"token": "blablzabla...",
+		"acces_token": acceptToken,
+		"refresh_token": refreshToken,
 		"_links": gin.H{
 			"profile": gin.H{
-				"href": "/users/" + strconv.Itoa(signIn.Id),
+				"href": "/users/" + strconv.Itoa(user.Id),
 				"method": "GET",
 			},
 			
