@@ -6,6 +6,7 @@ import (
 	"back-end-go/utils"
 	"database/sql"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -70,7 +71,19 @@ func SignInHandler(c *gin.Context, db *sql.DB) {
 		return
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusFound, "user connected with succes", gin.H {
-		"user": signIn,
+	utils.WriteSuccesResponse(c, http.StatusOK, "user connected with succes", gin.H {
+		"user": gin.H{
+			"id": signIn.Id,
+			"email": signIn.Email,
+			"username": signIn.Username,
+		},
+		"token": "blablzabla...",
+		"_links": gin.H{
+			"profile": gin.H{
+				"href": "/users/" + strconv.Itoa(signIn.Id),
+				"method": "GET",
+			},
+			
+		},
 	})
 }
