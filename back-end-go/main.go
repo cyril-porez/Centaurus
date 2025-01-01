@@ -4,9 +4,12 @@ import (
 	"back-end-go/api/router"
 	"back-end-go/config"
 	_ "back-end-go/docs"
+	"fmt"
 	"log"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 // func register
@@ -16,7 +19,15 @@ import (
 // @host localhost:8080
 // @BasePath /
 func  main()  {
-	
+	// charger le fichier .env
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Errzue lors du chargement du fichier .env : %v", err)
+	}
+
+	jwtSecret := os.Getenv("JWT_SECRET_KEY")
+	fmt.Println("Clé secrète :", jwtSecret)
+
 	// Initialisation de la base de données
 	db, err := config.InitializeDatabase()
 	if err != nil {
