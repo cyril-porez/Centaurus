@@ -39,9 +39,9 @@ func RegisterHandler(c *gin.Context, db *sql.DB) {
 			},
 	
 			// Préparation des liens HATEOAS
-			Links : map[string]string{
+			Links : gin.H{
 				"self":   "/api/v1/auth/signin",
-				"signup": "/api/v1/auth/signup",
+				"Method": "POST",
 			},
 
 		}
@@ -101,10 +101,11 @@ func SignInHandler(c *gin.Context, db *sql.DB) {
 				"timestamp": "2025-01-03T15:45:00Z",
 			},
 	
-			// Préparation des liens HATEOAS
-			Links : map[string]string{
-				"self":   "/api/v1/auth/signin",
-				"signup": "/api/v1/auth/signup",
+			Links : gin.H{
+				"sign-in": gin.H{
+					"self":   "/api/v1/auth/signin",
+					"METHOD": "POST",
+				},
 			},
 
 		}

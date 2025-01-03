@@ -15,7 +15,7 @@ type ErrorHeader struct {
 type ErrorBody struct {
 	Details []ErrorDetail `json: "details"`
 	Meta map[string]string `json: "meta"`
-	Links map[string]string `json: "links`
+	Links interface{} `json: "links`
 }
 
 type ErrorDetail struct {
@@ -33,7 +33,7 @@ type ErrorResponseInput struct {
 	Message    string           `json:"message"`         // Message général de l'erreur
 	Details    []ErrorDetail    `json:"details"`         // Liste des détails d'erreur
 	Meta       map[string]string `json:"meta,omitempty"` // Métadonnées supplémentaires
-	Links      map[string]string `json:"links,omitempty"` // Liens HATEOAS
+	Links      interface{} `json:"links,omitempty"` // Liens HATEOAS
 }
 
 func WriteErrorResponse(c *gin.Context, statusCode int, message string, input ErrorResponseInput) {

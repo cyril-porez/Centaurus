@@ -37,10 +37,11 @@ func validateUsername(c *gin.Context ,db *sql.DB, username string) error {
 			"timestamp": "2025-01-03T15:45:00Z",
 		},
 
-		// Préparation des liens HATEOAS
-		Links : map[string]string{
-			"self":   "/api/v1/auth/signin",
-			"signup": "/api/v1/auth/signup",
+		Links : gin.H{
+			"sign-in": gin.H{
+				"self":   "/api/v1/auth/signin",
+				"METHOD": "POST",
+			},
 		},
 	}
 	if !utils.IsUsernameFormatValidate(username) {
@@ -86,10 +87,11 @@ func validateEmail(c *gin.Context,db *sql.DB, email string) error {
 			"timestamp": "2025-01-03T15:45:00Z",
 		},
 
-		// Préparation des liens HATEOAS
-		Links : map[string]string{
-			"self":   "/api/v1/auth/signin",
-			"signup": "/api/v1/auth/signup",
+		Links : gin.H{
+			"sign-in": gin.H{
+				"self":   "/api/v1/auth/signin",
+				"METHOD": "POST",
+			},
 		},
 	}
 
@@ -118,10 +120,11 @@ func validateEmailSignin(c *gin.Context, email string) error {
 			"timestamp": "2025-01-03T15:45:00Z",
 		},
 
-		// Préparation des liens HATEOAS
-		Links : map[string]string{
-			"self":   "/api/v1/auth/signin",
-			"signup": "/api/v1/auth/signup",
+		Links : gin.H{
+			"sign-in": gin.H{
+				"self":   "/api/v1/auth/signin",
+				"METHOD": "POST",
+			},
 		},
 	}
 
@@ -178,10 +181,11 @@ func validatePassword(c *gin.Context, password string) error {
 			"timestamp": "2025-01-03T15:45:00Z",
 		},
 
-		// Préparation des liens HATEOAS
-		Links : map[string]string{
-			"self":   "/api/v1/auth/signin",
-			"signup": "/api/v1/auth/signup",
+		Links : gin.H{
+			"sign-in": gin.H{
+				"self":   "/api/v1/auth/signin",
+				"METHOD": "POST",
+			},
 		},
 	}
 
@@ -221,9 +225,12 @@ func CreateUser(c *gin.Context, db *sql.DB, user *model.User) error {
 			Meta : map[string]string{
 				"timestamp": "2025-01-03T15:45:00Z",
 			},
-			Links : map[string]string{
-				"self":   "/api/v1/auth/signin",
-				"signup": "/api/v1/auth/signup",
+			
+			Links : gin.H{
+				"sign-in": gin.H{
+					"self":   "/api/v1/auth/signin",
+					"METHOD": "POST",
+				},
 			},
 		}
 		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal Server Error", body)			
@@ -254,20 +261,22 @@ func AuthService(c *gin.Context, db *sql.DB, user *model.Credential) error {
 		
 		details = append(details, utils.ErrorDetail{
 			Field: "field",
-			Issue: "invalid credentials",				
-	  })
-
-	  body := utils.ErrorResponseInput{
-		  Details : details,
-
-		  Meta : map[string]string{
-			  "timestamp": "2025-01-03T15:45:00Z",
-		  },
-
-		  Links : map[string]string{
-			  "self":   "/api/v1/auth/signin",
-			  "signup": "/api/v1/auth/signup",
-		  },
+			Issue: "invalid credentials",
+		})
+		
+		body := utils.ErrorResponseInput{
+			Details : details,
+			
+			Meta : map[string]string{
+				"timestamp": "2025-01-03T15:45:00Z",
+			},
+			
+			Links : gin.H{
+				"sign-in": gin.H{
+					"self":   "/api/v1/auth/signin",
+					"METHOD": "POST",
+				},
+			},
 	}
 		utils.WriteErrorResponse(c, http.StatusUnauthorized, "Unauthorized", body)
 
