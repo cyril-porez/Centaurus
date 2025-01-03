@@ -17,12 +17,7 @@ import (
 
 func validateUsername(c *gin.Context ,db *sql.DB, username string) error {
 	var details []utils.ErrorDetail
-	if !utils.IsUsernameFormatValidate(username) {
-		details = append(details, utils.ErrorDetail{
-			Field: "username",
-			Issue: "le username doit contenir au moins 3 caractère",
-		})
-	}
+	
 
 	isTaken, err := repository.IsUsernameTaken(db, username)
 	if err != nil {
@@ -35,8 +30,28 @@ func validateUsername(c *gin.Context ,db *sql.DB, username string) error {
 		})
 	}
 
+	body := utils.ErrorResponseInput{
+		Details : details,
+
+		Meta : map[string]string{
+			"timestamp": "2025-01-03T15:45:00Z",
+		},
+
+		// Préparation des liens HATEOAS
+		Links : map[string]string{
+			"self":   "/api/v1/auth/signin",
+			"signup": "/api/v1/auth/signup",
+		},
+	}
+	if !utils.IsUsernameFormatValidate(username) {
+		details = append(details, utils.ErrorDetail{
+			Field: "username",
+			Issue: "le username doit contenir au moins 3 caractère",
+		})
+	}
+
 	if len(details) > 0 {
-		utils.WriteErrorResponse(c, http.StatusBadRequest, "validation erro", details)
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "validation error", body)
 		return errors.New("invalid format username")
 	}
 	return nil
@@ -44,6 +59,7 @@ func validateUsername(c *gin.Context ,db *sql.DB, username string) error {
 
 func validateEmail(c *gin.Context,db *sql.DB, email string) error {
 	var details []utils.ErrorDetail
+
 	if !utils.IsValidateEmailFormat(email) {
 		details = append(details, utils.ErrorDetail{
 			Field: "email",
@@ -63,8 +79,22 @@ func validateEmail(c *gin.Context,db *sql.DB, email string) error {
 		
 	}
 
+	body := utils.ErrorResponseInput{
+		Details : details,
+
+		Meta : map[string]string{
+			"timestamp": "2025-01-03T15:45:00Z",
+		},
+
+		// Préparation des liens HATEOAS
+		Links : map[string]string{
+			"self":   "/api/v1/auth/signin",
+			"signup": "/api/v1/auth/signup",
+		},
+	}
+
 	if len(details) > 0 {
-		utils.WriteErrorResponse(c, http.StatusBadRequest,"validation error", details)
+		utils.WriteErrorResponse(c, http.StatusBadRequest,"validation error", body)
 		return errors.New("invalid format email")
 	}
 
@@ -73,6 +103,7 @@ func validateEmail(c *gin.Context,db *sql.DB, email string) error {
 
 func validateEmailSignin(c *gin.Context, email string) error {
 	var details []utils.ErrorDetail
+	
 	if !utils.IsValidateEmailFormat(email) {
 		details = append(details, utils.ErrorDetail{
 			Field: "email",
@@ -80,8 +111,22 @@ func validateEmailSignin(c *gin.Context, email string) error {
 		})
 	}
 
+	body := utils.ErrorResponseInput{
+		Details : details,
+
+		Meta : map[string]string{
+			"timestamp": "2025-01-03T15:45:00Z",
+		},
+
+		// Préparation des liens HATEOAS
+		Links : map[string]string{
+			"self":   "/api/v1/auth/signin",
+			"signup": "/api/v1/auth/signup",
+		},
+	}
+
 	if len(details) > 0 {
-		utils.WriteErrorResponse(c, http.StatusBadRequest,"validation error", details)
+		utils.WriteErrorResponse(c, http.StatusBadRequest,"validation error", body)
 		return errors.New("invalid format email")
 	}
 
@@ -90,6 +135,7 @@ func validateEmailSignin(c *gin.Context, email string) error {
 
 func validatePassword(c *gin.Context, password string) error {
 	var details []utils.ErrorDetail
+	
 	if len(password ) < 12 {
 		details = append(details, utils.ErrorDetail{
 			Field: "password",
@@ -125,15 +171,32 @@ func validatePassword(c *gin.Context, password string) error {
 		})
 	}
 
+	body := utils.ErrorResponseInput{
+		Details : details,
+
+		Meta : map[string]string{
+			"timestamp": "2025-01-03T15:45:00Z",
+		},
+
+		// Préparation des liens HATEOAS
+		Links : map[string]string{
+			"self":   "/api/v1/auth/signin",
+			"signup": "/api/v1/auth/signup",
+		},
+	}
+
 	if len(details) > 0 {
-		utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error ", details)
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error ", body)
 		return errors.New("invalid password format")
 	}
 
 	return nil
 }
 
+
 func CreateUser(c *gin.Context, db *sql.DB, user *model.User) error {
+	var details []utils.ErrorDetail
+	
 	if err := validateUsername(c, db, user.Username); err != nil {
 		return err
 	}
@@ -148,12 +211,22 @@ func CreateUser(c *gin.Context, db *sql.DB, user *model.User) error {
 
 	hashedPAssword, err := utils.HashPassword(user.Password)
 	if err != nil {
-		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal Server Error", []utils.ErrorDetail {
-			{
+		details = append(details, utils.ErrorDetail{			
 				Field: "pasword",
 				Issue: "erreur lors du hashage du mot de passe",
+		})
+		body := utils.ErrorResponseInput{
+			Details: details,
+	
+			Meta : map[string]string{
+				"timestamp": "2025-01-03T15:45:00Z",
 			},
-		}) 
+			Links : map[string]string{
+				"self":   "/api/v1/auth/signin",
+				"signup": "/api/v1/auth/signup",
+			},
+		}
+		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal Server Error", body)			
 		return err
 	}
 	user.Password = string(hashedPAssword)
@@ -162,6 +235,7 @@ func CreateUser(c *gin.Context, db *sql.DB, user *model.User) error {
 }
 
 func AuthService(c *gin.Context, db *sql.DB, user *model.Credential) error {
+	var details []utils.ErrorDetail
 	if err := validateEmailSignin(c, user.Email); err != nil {
 		return err
 	}
@@ -177,13 +251,27 @@ func AuthService(c *gin.Context, db *sql.DB, user *model.Credential) error {
 
 	err = bcrypt.CompareHashAndPassword([]byte(password),[]byte(user.Password))
 	if err != nil {
-		utils.WriteErrorResponse(c, http.StatusUnauthorized, "Unauthorized", []utils.ErrorDetail {
-			{
-				Field: "field",
-				Issue: "invalid credentials",
-				
-			},
-		})
+		
+		details = append(details, utils.ErrorDetail{
+			Field: "field",
+			Issue: "invalid credentials",				
+	  })
+
+	  body := utils.ErrorResponseInput{
+		  Details : details,
+
+		  Meta : map[string]string{
+			  "timestamp": "2025-01-03T15:45:00Z",
+		  },
+
+		  Links : map[string]string{
+			  "self":   "/api/v1/auth/signin",
+			  "signup": "/api/v1/auth/signup",
+		  },
+	}
+		utils.WriteErrorResponse(c, http.StatusUnauthorized, "Unauthorized", body)
+
+		
 		return errors.New("user not found or invalid credential")
 	}
 

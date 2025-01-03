@@ -4,8 +4,19 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	// "encoding/json"
 )
+
+type ErrorHeader struct {
+	Code int `json: "status"`
+	Status string `json: "error"`
+	Message string `json: "message"`
+}
+
+type ErrorBody struct {
+	Details []ErrorDetail `json: "details"`
+	Meta map[string]string `json: "meta"`
+	Links map[string]string `json: "links`
+}
 
 type ErrorDetail struct {
 	Field string `json: "field"`
@@ -13,18 +24,30 @@ type ErrorDetail struct {
 }
 
 type ErrorResponse struct {
-	Status int `json: "status"`
-	Error string `json: "error"`
-	Message string `json: "message"`
-	Details []ErrorDetail `json: "details"`
+	Header ErrorHeader `json: "header"`
+	Body ErrorBody `json: "body"`
 }
 
-func WriteErrorResponse(c *gin.Context, status int, message string, details []ErrorDetail) {
+type ErrorResponseInput struct {
+	StatusCode int              `json:"-"`               // Code HTTP (ex. 400, 500)
+	Message    string           `json:"message"`         // Message général de l'erreur
+	Details    []ErrorDetail    `json:"details"`         // Liste des détails d'erreur
+	Meta       map[string]string `json:"meta,omitempty"` // Métadonnées supplémentaires
+	Links      map[string]string `json:"links,omitempty"` // Liens HATEOAS
+}
+
+func WriteErrorResponse(c *gin.Context, statusCode int, message string, input ErrorResponseInput) {
 	errorResponse := ErrorResponse{
-		Status: status,
-		Error: http.StatusText(status),
-		Message: message,
-		Details: details,
+		Header: ErrorHeader{
+			Status: http.StatusText(statusCode),
+			Code: statusCode,
+			Message: message,
+		},
+		Body: ErrorBody{
+			Details: input.Details,
+			Meta: input.Meta,
+			Links: input.Links,
+		},
 	}
-	c.JSON(status, errorResponse)
+	c.JSON(statusCode, errorResponse)
 }

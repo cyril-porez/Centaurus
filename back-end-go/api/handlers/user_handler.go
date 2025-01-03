@@ -26,12 +26,26 @@ import (
 func RegisterHandler(c *gin.Context, db *sql.DB) {
 	var newUser model.User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
-		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid REquest", []utils.ErrorDetail {
-			{
-				Field: "body",
-				Issue: "les données fournies ne sont pas valide",
+		body := utils.ErrorResponseInput{
+			Details : []utils.ErrorDetail{
+				{
+					Field: "body",
+					Issue: "The provided data is not valid",
+				},
 			},
-		})
+	
+			Meta : map[string]string{
+				"timestamp": "2025-01-03T15:45:00Z",
+			},
+	
+			// Préparation des liens HATEOAS
+			Links : map[string]string{
+				"self":   "/api/v1/auth/signin",
+				"signup": "/api/v1/auth/signup",
+			},
+
+		}
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid REquest", body)
 		return
 	}
 
@@ -75,12 +89,28 @@ func SignInHandler(c *gin.Context, db *sql.DB) {
 	var user model.Credential
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid Request", []utils.ErrorDetail{
-			{
-				Field: "body",
-				Issue: "les données fournies ne sont pas valide",
+		body := utils.ErrorResponseInput{
+			Details : []utils.ErrorDetail{
+				{
+					Field: "body",
+					Issue: "The provided data is not valid",
+				},
 			},
-		})
+	
+			Meta : map[string]string{
+				"timestamp": "2025-01-03T15:45:00Z",
+			},
+	
+			// Préparation des liens HATEOAS
+			Links : map[string]string{
+				"self":   "/api/v1/auth/signin",
+				"signup": "/api/v1/auth/signup",
+			},
+
+		}
+		
+		
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid Request", body)
 	}
 
 	if err := service.AuthService(c, db, &user); err != nil {

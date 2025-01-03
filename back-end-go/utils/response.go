@@ -25,7 +25,5 @@ func WriteSuccesResponse(c *gin.Context, statusCode int, message string, body in
 
 		Body: body,
 	}
-	c.JSON(statusCode, response) 
-		
-	
+	c.JSON(statusCode, response)
 }
