@@ -5,15 +5,27 @@ import (
 )
 
 type Response struct {
-	Status string `json: "status"`
-	Message string `json: "message"`
-	Data interface{} `json: "data, omitempy"`
+  Header ResponseHeader `json: "header"`
+	Body interface{} `json:"body"`
 }
 
-func WriteSuccesResponse(c *gin.Context, statusCode int, message string, data interface{}) {
-	c.JSON(statusCode, Response {
-		Status: "succes",
-		Message: message,
-		Data: data,
-	})
+type ResponseHeader struct {
+	Status string `json: "status"`
+	Code int `json: "code"`
+	Message string `json: "message"`
+}
+
+func WriteSuccesResponse(c *gin.Context, statusCode int, message string, body interface{}) {
+	response := Response{
+		Header: ResponseHeader{
+			Status: "success",
+			Code: statusCode,
+			Message: message,
+		},
+
+		Body: body,
+	}
+	c.JSON(statusCode, response) 
+		
+	
 }

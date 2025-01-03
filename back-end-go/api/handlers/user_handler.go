@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +22,7 @@ import (
 //@Success 200 {object} model.User "User created successfully"
 //@Failure 400 {object} map[string]string
 //@Failure 500 {object} map[string]string
-//@Router /auth/sign-up [post]
+//@Router /api/auth/sign-up [post]
 func RegisterHandler(c *gin.Context, db *sql.DB) {
 	var newUser model.User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
@@ -38,9 +39,24 @@ func RegisterHandler(c *gin.Context, db *sql.DB) {
 		return
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusCreated, "Utilisateur créé avec succès", gin.H{
-		"user": newUser,
-	})
+	body := gin.H{
+    "user": gin.H{
+      "email": newUser.Email,
+			"username": newUser.Username,
+		},
+		"_links": gin.H{
+        "sign-in": gin.H{
+					"href":"/api/auth/sign-in",
+					"Method": "POST", 
+				},
+		},
+		"meta": gin.H{
+			"createdAt": newUser.CreatedAt,
+			"welcomeMessage": "Welcome to our community", 
+		},
+	}
+
+	utils.WriteSuccesResponse(c, http.StatusCreated, "Registration successful", body)
 }
 
 //SignInHandler godoc
@@ -54,7 +70,7 @@ func RegisterHandler(c *gin.Context, db *sql.DB) {
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /auth/sign-in [post]
+//@Router /api/auth/sign-in [post]
 func SignInHandler(c *gin.Context, db *sql.DB) {
 	var user model.Credential
 
@@ -81,20 +97,25 @@ func SignInHandler(c *gin.Context, db *sql.DB) {
 		return
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusOK, "user connected with succes", gin.H {
+	body := gin.H{
 		"user": gin.H{
 			"id": user.Id,
 			"email": user.Email,
 			"username": user.Username,
 		},
-		"acces_token": acceptToken,
-		"refresh_token": refreshToken,
+		"meta": gin.H{
+			"acces_token": acceptToken,
+			"refresh_token": refreshToken,
+			"createdAt": time.Now(),
+			"message": "You have successfully logged in",
+		},
 		"_links": gin.H{
 			"profile": gin.H{
-				"href": "/users/" + strconv.Itoa(user.Id),
+				"href": "/api/user/" + strconv.Itoa(user.Id),
 				"method": "GET",
 			},
-			
 		},
-	})
+	}
+
+	utils.WriteSuccesResponse(c, http.StatusOK, "login successful", body)
 }
