@@ -3,11 +3,13 @@ package repository
 import (
 	"back-end-go/model"
 	"database/sql"
+	"time"
 )
 
 func InsertUser(db *sql.DB, user *model.User) error {
-	query := "INSERT INTO users (username, password, email)	Values (?,?,?)"
-	_, err := db.Exec(query, user.Username, user.Password, user.Email)
+	user.CreatedAt = time.Now()
+	query := "INSERT INTO users (username, password, email, created_at)	Values (?,?,?,?)"
+	_, err := db.Exec(query, user.Username, user.Password, user.Email, user.CreatedAt)
 	return err
 }
 
