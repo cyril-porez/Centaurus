@@ -38,7 +38,7 @@ info:
   title: API
   version: "1.0"
 paths:
-  /api/auth/sign-in:
+  /api/v1/auth/sign-in:
     post:
       consumes:
       - application/json
@@ -78,7 +78,7 @@ paths:
       summary: Signin a user
       tags:
       - Credential
-  /api/auth/sign-up:
+  /api/v1/auth/sign-up:
     post:
       consumes:
       - application/json

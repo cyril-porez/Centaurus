@@ -32,4 +32,4 @@ func SelectUserByCredential (db *sql.DB, user *model.Credential) (string, error)
 	query := "SELECT id, username, password FROM users WHERE email = ?"
 	err := db.QueryRow(query, user.Email).Scan(&user.Id, &user.Username, &password)
 	return password, err	
-}
+} 
