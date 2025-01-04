@@ -33,23 +33,45 @@ func RegisterHandler(c *gin.Context, db *sql.DB) {
 					Issue: "The provided data is not valid",
 				},
 			},
-	
 			Meta : map[string]string{
 				"timestamp": "2025-01-03T15:45:00Z",
 			},
-	
-			// Préparation des liens HATEOAS
 			Links : gin.H{
 				"self":   "/api/v1/auth/signin",
 				"Method": "POST",
 			},
-
 		}
 		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid REquest", body)
 		return
 	}
 
-	if err := service.CreateUser(c, db, &newUser); err != nil {
+	if details, err := service.CreateUser(c, db, &newUser); err != nil || len(details) > 0 {
+		if len(details) > 0 {
+			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
+				Details: details,
+				Meta: map[string]string{
+					"timestamp": time.Now().Format(time.RFC3339),
+				},
+				Links : gin.H{
+					"sign-in": gin.H{
+						"self":   "/api/v1/auth/signin",
+						"METHOD": "POST",
+					},
+				},
+			})
+		} else {
+			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
+				Meta: map[string]string{
+					"timestamp": time.Now().Format(time.RFC3339),
+				},
+				Links : gin.H{
+					"sign-in": gin.H{
+						"self":   "/api/v1/auth/signin",
+						"METHOD": "POST",
+					},
+				},
+			})
+		}
 		return
 	}
 
@@ -95,12 +117,10 @@ func SignInHandler(c *gin.Context, db *sql.DB) {
 					Field: "body",
 					Issue: "The provided data is not valid",
 				},
-			},
-	
+			},	
 			Meta : map[string]string{
 				"timestamp": "2025-01-03T15:45:00Z",
-			},
-	
+			},	
 			Links : gin.H{
 				"sign-in": gin.H{
 					"self":   "/api/v1/auth/signin",
@@ -109,12 +129,36 @@ func SignInHandler(c *gin.Context, db *sql.DB) {
 			},
 
 		}
-		
-		
 		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid Request", body)
 	}
 
-	if err := service.AuthService(c, db, &user); err != nil {
+	if details, err := service.AuthService(c, db, &user); err != nil || len(details) > 0 {
+		if len(details) > 0 {
+			utils.WriteErrorResponse(c, http.StatusUnauthorized, "Unauthorized", utils.ErrorResponseInput{
+				Details: details,
+				Meta: map[string]string{
+					"timestamp": time.Now().Format(time.RFC3339),
+				},
+				Links : gin.H{
+					"sign-up": gin.H{
+						"self":   "/api/v1/auth/signup",
+						"METHOD": "POST",
+					},
+				},
+			})
+		} else {
+			utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal server", utils.ErrorResponseInput{
+				Meta: map[string]string{
+					"timestamp": time.Now().Format(time.RFC3339),
+				},
+				Links : gin.H{
+					"sign-up": gin.H{
+						"self":   "/api/v1/auth/signup",
+						"METHOD": "POST",
+					},
+				},
+			})
+		}
 		return
 	}
 

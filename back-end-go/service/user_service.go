@@ -7,7 +7,6 @@ import (
 	"database/sql"
 	"errors"
 
-	"net/http"
 	"regexp"
 
 	"github.com/gin-gonic/gin"
@@ -15,274 +14,145 @@ import (
 )
 
 
-func validateUsername(c *gin.Context ,db *sql.DB, username string) error {
+
+
+func validateUsername(db *sql.DB, username string) ([]utils.ErrorDetail ,error) {
 	var details []utils.ErrorDetail
 	
-
 	isTaken, err := repository.IsUsernameTaken(db, username)
 	if err != nil {
-		return err
+		return nil,err
 	}
 	if isTaken {
-		details = append(details, utils.ErrorDetail{
-			Field: "username",
-			Issue: "le username est déjà pris",
-		})
+		utils.AddErrorDetail(&details, "username", "le username est déjà pris")
 	}
 
-	body := utils.ErrorResponseInput{
-		Details : details,
-
-		Meta : map[string]string{
-			"timestamp": "2025-01-03T15:45:00Z",
-		},
-
-		Links : gin.H{
-			"sign-in": gin.H{
-				"self":   "/api/v1/auth/signin",
-				"METHOD": "POST",
-			},
-		},
-	}
 	if !utils.IsUsernameFormatValidate(username) {
-		details = append(details, utils.ErrorDetail{
-			Field: "username",
-			Issue: "le username doit contenir au moins 3 caractère",
-		})
+		utils.AddErrorDetail(&details, "username", "le username doit contenir au moins 3 caractère")
 	}
 
 	if len(details) > 0 {
-		utils.WriteErrorResponse(c, http.StatusBadRequest, "validation error", body)
-		return errors.New("invalid format username")
+		return details, errors.New("invalid format username")
 	}
-	return nil
+	return nil, nil
 }
 
-func validateEmail(c *gin.Context,db *sql.DB, email string) error {
+func validateEmail(db *sql.DB, email string) ([]utils.ErrorDetail ,error) {
 	var details []utils.ErrorDetail
 
 	if !utils.IsValidateEmailFormat(email) {
-		details = append(details, utils.ErrorDetail{
-			Field: "email",
-			Issue: "le format de l'email est invalide",
-		})
+		utils.AddErrorDetail(&details, "email", "le format de l'email est invalide")
 	}
 
 	isTaken, err := repository.IsEmailTaken(db, email)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if isTaken {
-		details = append(details, utils.ErrorDetail{
-			Field: "email",
-			Issue: "l'email est déjà utilisé",
-		})
-		
-	}
-
-	body := utils.ErrorResponseInput{
-		Details : details,
-
-		Meta : map[string]string{
-			"timestamp": "2025-01-03T15:45:00Z",
-		},
-
-		Links : gin.H{
-			"sign-in": gin.H{
-				"self":   "/api/v1/auth/signin",
-				"METHOD": "POST",
-			},
-		},
+		utils.AddErrorDetail(&details, "email", "l'email est déjà utilisé")
 	}
 
 	if len(details) > 0 {
-		utils.WriteErrorResponse(c, http.StatusBadRequest,"validation error", body)
-		return errors.New("invalid format email")
+		return details, errors.New("invalid format email")
 	}
 
-	return nil
+	return nil, nil
 }
 
-func validateEmailSignin(c *gin.Context, email string) error {
+func validateEmailSignin(email string) ([]utils.ErrorDetail, error) {
 	var details []utils.ErrorDetail
 	
 	if !utils.IsValidateEmailFormat(email) {
-		details = append(details, utils.ErrorDetail{
-			Field: "email",
-			Issue: "le format de l'email est invalide",
-		})
-	}
-
-	body := utils.ErrorResponseInput{
-		Details : details,
-
-		Meta : map[string]string{
-			"timestamp": "2025-01-03T15:45:00Z",
-		},
-
-		Links : gin.H{
-			"sign-in": gin.H{
-				"self":   "/api/v1/auth/signin",
-				"METHOD": "POST",
-			},
-		},
+		utils.AddErrorDetail(&details, "email", "le format de l'email est invalide")
 	}
 
 	if len(details) > 0 {
-		utils.WriteErrorResponse(c, http.StatusBadRequest,"validation error", body)
-		return errors.New("invalid format email")
+		return details, errors.New("invalid format email")
 	}
 
-	return nil
+	return nil, nil
 }
 
-func validatePassword(c *gin.Context, password string) error {
+func validatePassword(password string) ([]utils.ErrorDetail, error) {
 	var details []utils.ErrorDetail
 	
-	if len(password ) < 12 {
-		details = append(details, utils.ErrorDetail{
-			Field: "password",
-			Issue: "le mot de passe doit contenir au mois 12 caractères",
-		}) 
+	if len(password ) < 12 { 
+		utils.AddErrorDetail(&details, "password", "le mot de passe doit contenir au mois 12 caractères")
 	}
 
 	if !regexp.MustCompile(`[A-Z]`).MatchString(password) {
-		details = append(details, utils.ErrorDetail{
-			Field: "password",
-			Issue: "le mot de passe doit contenir au moins une majuscule",
-		})
+		utils.AddErrorDetail(&details, "password", "le mot de passe doit contenir au mois 12 caractères")
 	}
 	
 	if !regexp.MustCompile(`[a-z]`).MatchString(password) {
-		details = append(details, utils.ErrorDetail{
-			Field: "password",
-			Issue: "le mot de passe doit contenir au moins une minuscule",
-		})
+		utils.AddErrorDetail(&details, "password", "le mot de passe doit contenir au moins une minuscule")
 	}
 
 	if !regexp.MustCompile(`\d`).MatchString(password) {
-		details = append(details, utils.ErrorDetail{
-			Field: "password",
-			Issue: "le mot de passe doit contenir au moins un chiffre",
-		})
+		utils.AddErrorDetail(&details, "password", "le mot de passe doit contenir au moins un chiffre")
 	}
 	
 	if !regexp.MustCompile(`[@$!%*?&]`).MatchString(password) {
-		details = append(details, utils.ErrorDetail{
-			Field: "password",
-			Issue: "le mot de passe doit contenir au moins un caractère spéciaux",
-		})
-	}
-
-	body := utils.ErrorResponseInput{
-		Details : details,
-
-		Meta : map[string]string{
-			"timestamp": "2025-01-03T15:45:00Z",
-		},
-
-		Links : gin.H{
-			"sign-in": gin.H{
-				"self":   "/api/v1/auth/signin",
-				"METHOD": "POST",
-			},
-		},
+		utils.AddErrorDetail(&details, "password", "le mot de passe doit contenir au moins spéciaux")
 	}
 
 	if len(details) > 0 {
-		utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error ", body)
-		return errors.New("invalid password format")
+		return details, errors.New("invalid password format")
 	}
 
-	return nil
+	return nil, nil
 }
 
 
-func CreateUser(c *gin.Context, db *sql.DB, user *model.User) error {
+func CreateUser(c *gin.Context, db *sql.DB, user *model.User) ([]utils.ErrorDetail, error) {
 	var details []utils.ErrorDetail
 	
-	if err := validateUsername(c, db, user.Username); err != nil {
-		return err
+	if det, err := validateUsername(db, user.Username); err != nil || len(det) > 0 {
+		return append(details, det...), err
 	}
 
-	if err := validateEmail(c, db, user.Email); err != nil {
-		return err
+	if det, err := validateEmail(db, user.Email); err != nil || len(det) > 0 {
+		return append(details, det...), err
 	}
 
-	if err := validatePassword(c, user.Password); err != nil {
-		return err
+	if det, err := validatePassword(user.Password); err != nil || len(det) > 0 {
+		return append(details, det...),err
 	}
 
 	hashedPAssword, err := utils.HashPassword(user.Password)
 	if err != nil {
-		details = append(details, utils.ErrorDetail{			
-				Field: "pasword",
-				Issue: "erreur lors du hashage du mot de passe",
-		})
-		body := utils.ErrorResponseInput{
-			Details: details,
-	
-			Meta : map[string]string{
-				"timestamp": "2025-01-03T15:45:00Z",
-			},
-			
-			Links : gin.H{
-				"sign-in": gin.H{
-					"self":   "/api/v1/auth/signin",
-					"METHOD": "POST",
-				},
-			},
-		}
-		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal Server Error", body)			
-		return err
+		utils.AddErrorDetail(&details, "password", "erreur lors du hashage du mot de passe")
+		return details, err
 	}
-	user.Password = string(hashedPAssword)
+	user.Password = hashedPAssword
 	
-	return repository.InsertUser(db, user)
+	if err := repository.InsertUser(db, user); err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }
 
-func AuthService(c *gin.Context, db *sql.DB, user *model.Credential) error {
+func AuthService(c *gin.Context, db *sql.DB, user *model.Credential) ([]utils.ErrorDetail, error) {
 	var details []utils.ErrorDetail
-	if err := validateEmailSignin(c, user.Email); err != nil {
-		return err
+	if det, err := validateEmailSignin(user.Email); err != nil || len(det) > 0 {
+		return append(details, det...), err
 	}
 
-	if err := validatePassword(c, user.Password); err != nil {
-		return err
+	if det, err := validatePassword(user.Password); err != nil || len(det) > 0 {
+		return append(details, det...), err
 	}	
 
 	password, err := repository.SelectUserByCredential(db, user)
 	if err != nil { 
-		return err
+		return nil, err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(password),[]byte(user.Password))
 	if err != nil {
-		
-		details = append(details, utils.ErrorDetail{
-			Field: "field",
-			Issue: "invalid credentials",
-		})
-		
-		body := utils.ErrorResponseInput{
-			Details : details,
-			
-			Meta : map[string]string{
-				"timestamp": "2025-01-03T15:45:00Z",
-			},
-			
-			Links : gin.H{
-				"sign-in": gin.H{
-					"self":   "/api/v1/auth/signin",
-					"METHOD": "POST",
-				},
-			},
-	}
-		utils.WriteErrorResponse(c, http.StatusUnauthorized, "Unauthorized", body)
-
-		
-		return errors.New("user not found or invalid credential")
+		utils.AddErrorDetail(&details, "field", "invalid credentials")		
+		return nil, errors.New("user not found or invalid credential")
 	}
 
-	return nil
+	return nil, nil
 }

@@ -7,33 +7,33 @@ import (
 )
 
 type ErrorHeader struct {
-	Code int `json: "status"`
-	Status string `json: "error"`
-	Message string `json: "message"`
+	Code 		int 		`json:"status"`
+	Status 	string	`json:"error"`
+	Message string 	`json:"message"`
 }
 
 type ErrorBody struct {
-	Details []ErrorDetail `json: "details"`
-	Meta map[string]string `json: "meta"`
-	Links interface{} `json: "links`
+	Details	[]ErrorDetail 		`json:"details"`
+	Meta 		map[string]string `json:"meta"`
+	Links 	interface{} 			`json:"links"`
 }
 
 type ErrorDetail struct {
-	Field string `json: "field"`
-	Issue string `json: "issue"`
+	Field string `json:"field"`
+	Issue string `json:"issue"`
 }
 
 type ErrorResponse struct {
-	Header ErrorHeader `json: "header"`
-	Body ErrorBody `json: "body"`
+	Header	ErrorHeader	`json:"header"`
+	Body		ErrorBody		`json:"body"`
 }
 
 type ErrorResponseInput struct {
-	StatusCode int              `json:"-"`               // Code HTTP (ex. 400, 500)
-	Message    string           `json:"message"`         // Message général de l'erreur
-	Details    []ErrorDetail    `json:"details"`         // Liste des détails d'erreur
-	Meta       map[string]string `json:"meta,omitempty"` // Métadonnées supplémentaires
-	Links      interface{} `json:"links,omitempty"` // Liens HATEOAS
+	StatusCode	int								`json:"-"`
+	Message			string						`json:"message"`
+	Details			[]ErrorDetail			`json:"details"`
+	Meta				map[string]string	`json:"meta,omitempty"`
+	Links				interface{} 			`json:"links,omitempty"`
 }
 
 func WriteErrorResponse(c *gin.Context, statusCode int, message string, input ErrorResponseInput) {
@@ -50,4 +50,11 @@ func WriteErrorResponse(c *gin.Context, statusCode int, message string, input Er
 		},
 	}
 	c.JSON(statusCode, errorResponse)
+}
+
+func AddErrorDetail(details *[]ErrorDetail, field string, issue string) {
+  *details = append(*details, ErrorDetail{
+		Field: field,
+		Issue: issue,
+	})
 }

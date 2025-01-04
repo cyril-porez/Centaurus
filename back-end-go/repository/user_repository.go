@@ -29,9 +29,7 @@ func IsUsernameTaken (db *sql.DB, email string) (bool, error) {
 
 func SelectUserByCredential (db *sql.DB, user *model.Credential) (string, error) {
 	var	password string
-
 	query := "SELECT id, username, password FROM users WHERE email = ?"
 	err := db.QueryRow(query, user.Email).Scan(&user.Id, &user.Username, &password)
-
 	return password, err	
 }
