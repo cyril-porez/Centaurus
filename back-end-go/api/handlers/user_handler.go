@@ -22,7 +22,7 @@ import (
 //@Success 200 {object} model.User "User created successfully"
 //@Failure 400 {object} map[string]string
 //@Failure 500 {object} map[string]string
-//@Router /api/auth/sign-up [post]
+//@Router /api/v1/auth/sign-up [post]
 func RegisterHandler(c *gin.Context, db *sql.DB) {
 	var newUser model.User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
@@ -82,7 +82,7 @@ func RegisterHandler(c *gin.Context, db *sql.DB) {
 		},
 		"_links": gin.H{
         "sign-in": gin.H{
-					"href":"/api/auth/sign-in",
+					"href":"/api/v1/auth/sign-in",
 					"Method": "POST", 
 				},
 		},
@@ -106,7 +106,7 @@ func RegisterHandler(c *gin.Context, db *sql.DB) {
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /api/auth/sign-in [post]
+//@Router /api/v1/auth/sign-in [post]
 func SignInHandler(c *gin.Context, db *sql.DB) {
 	var user model.Credential
 

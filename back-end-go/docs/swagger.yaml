@@ -4,7 +4,11 @@ definitions:
     properties:
       email:
         type: string
+      id:
+        type: integer
       password:
+        type: string
+      username:
         type: string
     required:
     - email
@@ -12,9 +16,13 @@ definitions:
     type: object
   model.User:
     properties:
+      createdAt:
+        type: string
       email:
         type: string
       password:
+        type: string
+      updatedAt:
         type: string
       username:
         type: string
@@ -27,10 +35,10 @@ host: localhost:8080
 info:
   contact: {}
   description: Example of a user API with Swagger.
-  title: User API
+  title: API
   version: "1.0"
 paths:
-  /auth/sign-in:
+  /api/auth/sign-in:
     post:
       consumes:
       - application/json
@@ -70,7 +78,7 @@ paths:
       summary: Signin a user
       tags:
       - Credential
-  /auth/sign-up:
+  /api/auth/sign-up:
     post:
       consumes:
       - application/json

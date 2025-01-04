@@ -2,14 +2,14 @@
     "swagger": "2.0",
     "info": {
         "description": "Example of a user API with Swagger.",
-        "title": "User API",
+        "title": "API",
         "contact": {},
         "version": "1.0"
     },
     "host": "localhost:8080",
     "basePath": "/",
     "paths": {
-        "/auth/sign-in": {
+        "/api/auth/sign-in": {
             "post": {
                 "description": "Signin  a user",
                 "consumes": [
@@ -70,7 +70,7 @@
                 }
             }
         },
-        "/auth/sign-up": {
+        "/api/auth/sign-up": {
             "post": {
                 "description": "Register a new user",
                 "consumes": [
@@ -154,7 +154,13 @@
                 "email": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "integer"
+                },
                 "password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -167,10 +173,16 @@
                 "username"
             ],
             "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                },
+                "updatedAt": {
                     "type": "string"
                 },
                 "username": {
