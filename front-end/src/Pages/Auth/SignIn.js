@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -10,13 +10,19 @@ function SignIn() {
   const [error, setError] = useState("");
   let navigate = useNavigate();
 
+  useEffect(() => {
+    console.log("test");
+  });
+
   const authUser = async (data) => {
+    console.log(data);
+
     const login = await userApi.login(data.email, data.password);
     console.log(login);
     if (!login.response) {
-      navigate("/", { replace: true });
+      // navigate("/", { replace: true });
     } else {
-      setError(login.response.data.error.message);
+      // setError();
     }
   };
 
@@ -42,6 +48,8 @@ function SignIn() {
   });
 
   const onSubmit = (data) => {
+    console.log("test");
+
     console.log(data);
     authUser(data);
   };
@@ -104,7 +112,7 @@ function SignIn() {
                         border-homa-beige
                         p-[4%]"
               >
-                <legend className="tesxt-sm text-homa-beige">
+                <legend className="text-sm text-homa-beige">
                   Mot de passe
                 </legend>
                 <input
@@ -129,7 +137,7 @@ function SignIn() {
                 shadow-lg
                 w-full 
                 p-[10px] 
-                py-5 w-80
+                py-5
                 mx-auto
                 transition
                 duration-300

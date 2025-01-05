@@ -1,5 +1,6 @@
 import axios from "axios";
 import { URL_LOGIN, URL_REGISTER, URL } from "../config/url_api";
+import { date } from "yup";
 
 async function register(email, password, pseudo) {
   try {
@@ -17,20 +18,18 @@ async function register(email, password, pseudo) {
 }
 
 async function login(email, password) {
-  return await axios
-    .post(URL_LOGIN, {
-      identifier: email,
+  try {
+    const response = await axios.post(URL_LOGIN, {
+      email: email,
       password: password,
-    })
-    .then((response) => response.data)
-    .then((data) => {
-      window.localStorage.setItem("user", data.jwt);
-      return data;
-    })
-    .catch((error) => {
-      console.log("error", error.response);
-      return error;
     });
+    console.log(response);
+
+    return response;
+  } catch (error) {
+    console.log("error", error.response);
+    return error;
+  }
 }
 
 async function getuser(userId) {

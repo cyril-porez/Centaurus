@@ -127,7 +127,6 @@ func SignInHandler(c *gin.Context, db *sql.DB) {
 					"METHOD": "POST",
 				},
 			},
-
 		}
 		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid Request", body)
 	}
