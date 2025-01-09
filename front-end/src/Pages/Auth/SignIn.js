@@ -10,19 +10,12 @@ function SignIn() {
   const [error, setError] = useState("");
   let navigate = useNavigate();
 
-  useEffect(() => {
-    console.log("test");
-  });
-
   const authUser = async (data) => {
-    console.log(data);
-
-    const login = await userApi.login(data.email, data.password);
-    console.log(login);
-    if (!login.response) {
-      // navigate("/", { replace: true });
+    const response = await userApi.login(data.email, data.password);
+    if (response.header.code === 200) {
+      navigate("/", { replace: true });
     } else {
-      // setError();
+      setError(response?.body?.details?.[0]?.issue);
     }
   };
 
@@ -48,9 +41,6 @@ function SignIn() {
   });
 
   const onSubmit = (data) => {
-    console.log("test");
-
-    console.log(data);
     authUser(data);
   };
 
@@ -124,6 +114,9 @@ function SignIn() {
                 />
               </fieldset>
               <p className="text-red mt-[2%]">{errors.password?.message}</p>
+              <p className="text-red mt-[2%]">
+                {error !== "" ? "*".concat(" ", error) : null}
+              </p>
             </div>
           </div>
 
@@ -154,7 +147,7 @@ function SignIn() {
 
           <Link
             className="mx-auto mt-6 text-sky-blue underline text-2xl"
-            to="/auth/signup"
+            to="/auth/sign-up"
           >
             S'inscrire
           </Link>

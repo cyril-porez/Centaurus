@@ -1,6 +1,5 @@
 import axios from "axios";
 import { URL_LOGIN, URL_REGISTER, URL } from "../config/url_api";
-import { date } from "yup";
 
 async function register(email, password, pseudo) {
   try {
@@ -9,11 +8,13 @@ async function register(email, password, pseudo) {
       email: email,
       password: password,
     });
+    console.log(response.data);
 
-    return response;
+    return response.data;
   } catch (error) {
-    console.log("error", error.response);
-    return error;
+    console.log(error.response.data);
+
+    return error.response.data;
   }
 }
 
@@ -23,12 +24,12 @@ async function login(email, password) {
       email: email,
       password: password,
     });
-    console.log(response);
-
-    return response;
+    console.log(response.data);
+    return response.data;
   } catch (error) {
-    console.log("error", error.response);
-    return error;
+    console.log(error.response.data);
+
+    return error.response.data;
   }
 }
 
