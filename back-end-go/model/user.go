@@ -6,8 +6,8 @@ type User struct {
 	Email     string `json:"email" binding:"required,email"`
 	Username  string `json:"username" binding:"required"`
 	Password  string `json:"password" binding:"required"`
-	CreatedAt time.Time `json: "createdAt"`
-	UpdatedAt time.Time `json: "updatedAt"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type Credential struct {
