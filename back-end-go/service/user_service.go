@@ -5,7 +5,6 @@ import (
 	"back-end-go/repository"
 	"back-end-go/utils"
 	"database/sql"
-	"errors"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -52,13 +51,14 @@ func AuthService(c *gin.Context, db *sql.DB, user *model.Credential) ([]utils.Er
 
 	password, err := repository.SelectUserByCredential(db, user)
 	if err != nil { 
-		return nil, err
+		utils.AddErrorDetail(&details, "field", "invalid credentials")		
+		return details, err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(password),[]byte(user.Password))
 	if err != nil {
 		utils.AddErrorDetail(&details, "field", "invalid credentials")		
-		return nil, errors.New("user not found or invalid credential")
+		return details, err
 	}
 
 	return nil, nil

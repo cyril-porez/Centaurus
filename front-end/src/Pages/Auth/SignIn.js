@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -11,12 +11,11 @@ function SignIn() {
   let navigate = useNavigate();
 
   const authUser = async (data) => {
-    const login = await userApi.login(data.email, data.password);
-    console.log(login);
-    if (!login.response) {
+    const response = await userApi.login(data.email, data.password);
+    if (response.header.code === 200) {
       navigate("/", { replace: true });
     } else {
-      setError(login.response.data.error.message);
+      setError(response?.body?.details?.[0]?.issue);
     }
   };
 
@@ -42,7 +41,6 @@ function SignIn() {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
     authUser(data);
   };
 
@@ -104,7 +102,7 @@ function SignIn() {
                         border-homa-beige
                         p-[4%]"
               >
-                <legend className="tesxt-sm text-homa-beige">
+                <legend className="text-sm text-homa-beige">
                   Mot de passe
                 </legend>
                 <input
@@ -116,6 +114,9 @@ function SignIn() {
                 />
               </fieldset>
               <p className="text-red mt-[2%]">{errors.password?.message}</p>
+              <p className="text-red mt-[2%]">
+                {error !== "" ? "*".concat(" ", error) : null}
+              </p>
             </div>
           </div>
 
@@ -129,7 +130,7 @@ function SignIn() {
                 shadow-lg
                 w-full 
                 p-[10px] 
-                py-5 w-80
+                py-5
                 mx-auto
                 transition
                 duration-300
@@ -146,7 +147,7 @@ function SignIn() {
 
           <Link
             className="mx-auto mt-6 text-sky-blue underline text-2xl"
-            to="/auth/signup"
+            to="/auth/sign-up"
           >
             S'inscrire
           </Link>

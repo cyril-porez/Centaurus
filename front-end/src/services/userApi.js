@@ -8,29 +8,29 @@ async function register(email, password, pseudo) {
       email: email,
       password: password,
     });
+    console.log(response.data);
 
-    return response;
+    return response.data;
   } catch (error) {
-    console.log("error", error.response);
-    return error;
+    console.log(error.response.data);
+
+    return error.response.data;
   }
 }
 
 async function login(email, password) {
-  return await axios
-    .post(URL_LOGIN, {
-      identifier: email,
+  try {
+    const response = await axios.post(URL_LOGIN, {
+      email: email,
       password: password,
-    })
-    .then((response) => response.data)
-    .then((data) => {
-      window.localStorage.setItem("user", data.jwt);
-      return data;
-    })
-    .catch((error) => {
-      console.log("error", error.response);
-      return error;
     });
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error.response.data);
+
+    return error.response.data;
+  }
 }
 
 async function getuser(userId) {

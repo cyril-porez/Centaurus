@@ -31,7 +31,7 @@ function Home() {
         if (decoded && typeof decoded === "object" && "id" in decoded) {
           getUser(decoded.id)
             .then((response) => {
-              setUsername(response.username);
+              // setUsername(response.username);
             })
             .catch((error) => {
               console.error(error);

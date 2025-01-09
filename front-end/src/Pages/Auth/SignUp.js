@@ -13,12 +13,15 @@ function SignUp() {
   let navigate = useNavigate();
 
   const createUser = async (data) => {
-    const regist = await userApi.register(data.email, data.password, data.name);
-    console.log(regist.status);
-    if (regist.status === 200) {
-      navigate("/SignIn", { replace: false });
+    const fetchData = await userApi.register(
+      data.email,
+      data.password,
+      data.name
+    );
+    if (fetchData.header.code === 201) {
+      navigate("/auth/sign-in", { replace: false });
     } else {
-      setError(regist.response.data.error.message);
+      setError(fetchData.body.details[0].issue);
     }
   };
 
@@ -67,7 +70,6 @@ function SignUp() {
 
   const onSubmit = (data) => {
     createUser(data);
-    console.log(data);
   };
 
   const data = {
@@ -187,10 +189,10 @@ function SignUp() {
                   Confirmes ton mot de passe
                 </legend>
                 <input
-                  type="confirmPassword"
+                  type="password"
                   id="confirmPassword"
                   placeholder="........"
-                  {...register("password")}
+                  {...register("confirmPassword")}
                   className="w-full 
                               focus:outline-none 
                               focus:ring-2 
@@ -199,6 +201,9 @@ function SignUp() {
               </fieldset>
               <p className="text-red mt-[2%]">
                 {errors.confirmPassword?.message}
+              </p>
+              <p className="text-red mt-[2%]">
+                {error !== "" ? error.concat(" ", "*") : null}
               </p>
             </div>
 
@@ -230,7 +235,7 @@ function SignUp() {
           </button>
           <Link
             className="mx-auto mt-6 text-sky-blue underline text-2xl"
-            to="/auth/signin"
+            to="/auth/sign-in"
           >
             Se connecter
           </Link>

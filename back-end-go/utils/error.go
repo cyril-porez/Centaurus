@@ -7,8 +7,8 @@ import (
 )
 
 type ErrorHeader struct {
-	Code 		int 		`json:"status"`
-	Status 	string	`json:"error"`
+	Code 		int 		`json:"code"`
+	Status 	string	`json:"status"`
 	Message string 	`json:"message"`
 }
 

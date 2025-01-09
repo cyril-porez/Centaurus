@@ -37,8 +37,8 @@ function App() {
       <Header />
       <Router>
         <Routes>
-          <Route path="/auth/signin" element={<SignIn />} />
-          <Route path="/auth/signup" element={<SignUp />} />
+          <Route path="/auth/sign-in" element={<SignIn />} />
+          <Route path="/auth/sign-up" element={<SignUp />} />
           <Route
             path="/"
             element={

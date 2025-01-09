@@ -33,7 +33,7 @@ func ValidatePassword(password string) ([]ErrorDetail, error) {
 	}
 	
 	if !regexp.MustCompile(`[@$!%*?&]`).MatchString(password) {
-		AddErrorDetail(&details, "password", "le mot de passe doit contenir au moins spéciaux")
+		AddErrorDetail(&details, "password", "le mot de passe doit contenir au moins un caractère spéciaux")
 	}
 
 	if len(details) > 0 {
