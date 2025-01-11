@@ -38,15 +38,16 @@ func  main()  {
 	query := `CREATE TABLE IF NOT EXISTS horses (
 		id INT AUTO_INCREMENT PRIMARY KEY,
 		name VARCHAR(255) NOT NULL,
+		age INT NOT NULL,
 		race VARCHAR(255) NOT NULL,
 		fk_user_id INT NOT NULL,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (fk_user_id) REFERENCES users(id) ON DELETE CASCADE
 	)`
 
-	_, err2 := db.Exec(query)
-	if err2 != nil {
-		// return log.Fatalf("error lors de la creation de la table horses %v", err2)
+	_, err = db.Exec(query)
+	if err != nil {
+		log.Fatalf("error lors de la creation de la table horses : %v", err)
 	}
 	fmt.Println("Table horses créé avec succès")
 
