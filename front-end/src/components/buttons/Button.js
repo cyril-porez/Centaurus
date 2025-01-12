@@ -20,6 +20,7 @@ export default function Button(props) {
                 items-center
                 justify-center"
       type="submit"
+      onClick={props.onSubmit}
     >
       <span className="mt-2">{props.name}</span>
       <span className="text-[40px] font-extrabold ml-1 align-middle">

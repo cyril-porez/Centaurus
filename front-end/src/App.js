@@ -48,7 +48,7 @@ function App() {
             }
           />
           <Route
-            path="horses/my-horse/my-horses"
+            path="/horses/my-horse/my-horses"
             element={
               <PrivateRoute>
                 <MyHorses />
@@ -56,7 +56,7 @@ function App() {
             }
           />
           <Route
-            path="horses/my-horse/add-horse"
+            path="/horses/my-horse/add-horse"
             element={
               <PrivateRoute>
                 <AddHorse />
@@ -64,7 +64,7 @@ function App() {
             }
           />
           <Route
-            path="horses/calculation/ChoiceHorse"
+            path="/horses/calculation/ChoiceHorse"
             element={
               <PrivateRoute>
                 <ChoiceHorse />
@@ -72,7 +72,7 @@ function App() {
             }
           />
           <Route
-            path="horses/my-horse/update-horse/:id"
+            path="/horses/my-horse/update-horse/:id"
             element={
               <PrivateRoute>
                 <UpdateHorse />
@@ -80,7 +80,7 @@ function App() {
             }
           />
           <Route
-            path="horses/follow/follow-weight"
+            path="/horses/follow/follow-weight"
             element={
               <PrivateRoute>
                 <FollowWeight />
@@ -88,7 +88,7 @@ function App() {
             }
           />
           <Route
-            path="users/profile"
+            path="/users/profile"
             element={
               <PrivateRoute>
                 <Account />
@@ -96,7 +96,7 @@ function App() {
             }
           />
           <Route
-            path="horses/follow/evolution/weight/table/:id"
+            path="/horses/follow/evolution/weight/table/:id"
             element={
               <PrivateRoute>
                 <WeightTable />
@@ -104,7 +104,7 @@ function App() {
             }
           />
           <Route
-            path="horses/follow/evolution/weight/graph/:id"
+            path="/horses/follow/evolution/weight/graph/:id"
             element={
               <PrivateRoute>
                 <WeightGraph />
@@ -112,7 +112,7 @@ function App() {
             }
           />
           <Route
-            path="horses/calculation/mensurations/:id"
+            path="/horses/calculation/mensurations/:id"
             element={
               <PrivateRoute>
                 <Mensurations />
@@ -120,7 +120,7 @@ function App() {
             }
           />
           <Route
-            path="horses/calculation/ResultWeight/:id"
+            path="/horses/calculation/ResultWeight/:id"
             element={
               <PrivateRoute>
                 <ResultWeight />

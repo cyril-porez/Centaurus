@@ -1,20 +1,21 @@
 import axios from "axios";
-import { URL_HORSES, URL } from "../config/url_api";
+import { URL_ADD_HORSE, URL } from "../config/url_api";
 
 async function AddHorse(name, age, race, userId) {
-  try {
-    const response = await axios.post(URL_HORSES, {
-      data: {
-        age: age,
-        name: name,
-        race: race,
-        users_permissions_user: userId,
-      },
-    });
+  console.log(
+    `name => ${name}\nage => ${age}\nrace => ${race}\nuserId => ${userId}`
+  );
 
-    return response;
+  try {
+    const response = await axios.post(URL_ADD_HORSE, {
+      name: name,
+      age: parseInt(age, 10),
+      race: race,
+      fk_user_id: userId,
+    });
+    return response.data;
   } catch (error) {
-    console.log("error", error.response);
+    console.log("error", error);
     return error;
   }
 }

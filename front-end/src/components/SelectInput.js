@@ -1,6 +1,10 @@
 import React from "react";
 
-export default function SelectInput(params) {
+export default function SelectInput({ value, onValueChange }) {
+  const handleChange = (event) => {
+    const newValue = event.target.value;
+    if (onValueChange) onValueChange(newValue);
+  };
   return (
     <div className="mb-[5%] w-full">
       <fieldset
@@ -17,7 +21,7 @@ export default function SelectInput(params) {
                     focus:outline-none 
                     focus:ring-2 
                     focus:ring-homa-beige"
-          // onChange={(e) => setCategory(e.target.value)}
+          onChange={handleChange}
         >
           <option selected disabled>
             Sélectionner

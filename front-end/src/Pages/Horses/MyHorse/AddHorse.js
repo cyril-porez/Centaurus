@@ -9,13 +9,11 @@ import SelectInput from "../../../components/SelectInput";
 import Button from "../../../components/buttons/Button";
 
 function AddHorse() {
-  let navigate = useNavigate();
-
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [category, setCategory] = useState("");
-  const [userDetails, setUserDetails] = useState("");
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState("");
+  let navigate = useNavigate();
 
   useEffect(() => {
     var token = localStorage.getItem("user");
@@ -35,15 +33,27 @@ function AddHorse() {
     }
   }, []);
 
+  const handleNameChange = (newName) => {
+    setName(newName);
+  };
+
+  const handleAgeChange = (newAge) => {
+    setAge(newAge);
+  };
+
+  const handleCategoryChange = (newCategory) => {
+    setCategory(newCategory);
+  };
+
   const createHorse = async () => {
-    const AddHorse = await horseApi.AddHorse(name, age, category, userId);
     console.log(AddHorse);
   };
 
   const onSubmit = async () => {
-    await createHorse();
-
-    navigate("/MyHorses", { replace: false });
+    const AddHorse = await horseApi.AddHorse(name, age, category, userId);
+    if (AddHorse.header.code === 201) {
+      navigate("/MyHorses", { replace: false });
+    }
   };
 
   const nameHorse = {
@@ -89,11 +99,19 @@ function AddHorse() {
         />
 
         <div className="flex flex-col">
-          <TextInput props={nameHorse} />
-          <TextInput props={ageHorse} />
-          <SelectInput />
+          <TextInput
+            props={nameHorse}
+            value={name}
+            onValueChange={handleNameChange}
+          />
+          <TextInput
+            props={ageHorse}
+            value={age}
+            onValueChange={handleAgeChange}
+          />
+          <SelectInput value={category} onValueChange={handleCategoryChange} />
         </div>
-        <Button />
+        <Button name="Ajouter" onSubmit={() => onSubmit()} />
       </div>
 
       <div className="mt-5">
