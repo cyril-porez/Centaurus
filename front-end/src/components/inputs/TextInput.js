@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 
-export default function TextInput({ props }) {
-  const [value, setValue] = useState("");
-
+export default function TextInput({ props, value, onValueChange }) {
   const handleChange = (event) => {
-    setValue(event.target.value);
+    const newValue = event.target.value;
+    if (onValueChange) onValueChange(newValue);
   };
 
   const fieldset = `w-full mx-auto rounded-lg p-[4%] border ${props.colorBorder} `;
