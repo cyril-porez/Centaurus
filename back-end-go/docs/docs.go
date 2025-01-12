@@ -128,6 +128,67 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/horses/add-horse": {
+            "post": {
+                "description": "add a profil user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Horses"
+                ],
+                "summary": "add a horse",
+                "parameters": [
+                    {
+                        "description": "Name, Age and Race",
+                        "name": "addhorse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Horses"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Horse created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Horses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/ping": {
             "get": {
                 "description": "Respond with \"pong\"",
@@ -167,6 +228,34 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Horses": {
+            "type": "object",
+            "required": [
+                "age",
+                "name",
+                "race"
+            ],
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "race": {
+                    "type": "string"
+                },
+                "updatedAt": {
                     "type": "string"
                 }
             }

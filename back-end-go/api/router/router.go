@@ -25,6 +25,9 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 	r.POST("api/v1/auth/sign-in", func(c *gin.Context) {
 		handlers.SignInHandler(c, db)
 	})
+	r.POST("api/v1/horses/add-horse", func(c *gin.Context) {
+		handlers.AddHorseHandler(c, db)
+	})
 	
 	//route de teste
 	r.GET("api/ping", handlers.PingHandler)
