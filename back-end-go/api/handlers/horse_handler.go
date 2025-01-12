@@ -61,19 +61,19 @@ func AddHorseHandler(c *gin.Context, db *sql.DB) {
 					},
 				},
 			})
-		}
-	} else {
-		utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-			Meta: map[string]string{
-				"timestamp": time.Now().Format(time.RFC3339),
-			},
-			Links : gin.H{
-				"sign-in": gin.H{
-					"self":   "/api/v1/auth/signin",
-					"METHOD": "POST",
+		} else {
+			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
+				Meta: map[string]string{
+					"timestamp": time.Now().Format(time.RFC3339),
 				},
-			},
-		})
+				Links : gin.H{
+					"sign-in": gin.H{
+						"self":   "/api/v1/auth/signin",
+						"METHOD": "POST",
+					},
+				},
+			})
+		} 
 		return
 	}	
 
