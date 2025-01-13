@@ -28,10 +28,14 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 	r.POST("api/v1/horses/add-horse", func(c *gin.Context) {
 		handlers.AddHorseHandler(c, db)
 	})
+	r.PUT("api/v1/horse/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		handlers.UpdateHorseHandler(c, db, id)
+	}) 
 	
 	//route de teste
 	r.GET("api/ping", handlers.PingHandler)
 
 	return r
-
+ 
 }
