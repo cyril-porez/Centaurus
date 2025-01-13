@@ -45,10 +45,6 @@ function AddHorse() {
     setCategory(newCategory);
   };
 
-  const createHorse = async () => {
-    console.log(AddHorse);
-  };
-
   const onSubmit = async () => {
     const AddHorse = await horseApi.AddHorse(name, age, category, userId);
     if (AddHorse.header.code === 201) {

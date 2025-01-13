@@ -12,32 +12,40 @@ function UpdateHorse() {
   const [horse, setHorse] = useState({ name: "", age: 0, race: "" });
   let navigate = useNavigate();
 
+  // const fetchData = async () => {
+  //   // const response = await horseApi.getHorse(id);
+  //   // setHorse(response);
+  //   // console.log(response);
+  // };
+  // console.log(horse.name);
+
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await horseApi.getHorse(id);
-      setHorse(response);
-      console.log(response);
-    };
-    console.log(horse.name);
-    fetchData();
+    // fetchData();
   }, []);
 
-  const handleNameChange = (e) => {
-    setHorse({ ...horse, name: e.target.value });
+  const handleNameChange = (newName) => {
+    setHorse((prevHorse) => ({ ...prevHorse, name: newName }));
   };
 
-  const handleAgeChange = (e) => {
-    const newAge = e.target.value === "" ? 0 : Number(e.target.value);
-    setHorse({ ...horse, age: newAge });
+  const handleAgeChange = (newAge) => {
+    setHorse((prevHorse) => ({ ...prevHorse, age: newAge }));
   };
 
-  const handleRaceChange = (e) => {
-    setHorse({ ...horse, race: e.target.value });
+  const handleRaceChange = (newRace) => {
+    setHorse((prevHorse) => ({ ...prevHorse, race: newRace }));
   };
 
   const handleSubmit = async () => {
-    await horseApi.UpdateHorse(horse.name, horse.age, horse.race, id);
-    navigate(`/MyHorses`, { replace: true });
+    const response = await horseApi.UpdateHorse(
+      horse.name,
+      horse.age,
+      horse.race,
+      id
+    );
+    console.log(response);
+    if (response.header.code === 201) {
+      navigate(`/horses/my-horse/my-horses`, { replace: true });
+    }
   };
 
   const nameHorse = {
@@ -83,10 +91,18 @@ function UpdateHorse() {
         />
 
         <div className="flex flex-col">
-          <TextInput props={nameHorse} />
-          <TextInput props={ageHorse} />
-          <SelectInput />
-          <Button />
+          <TextInput
+            props={nameHorse}
+            value={horse.name}
+            onValueChange={handleNameChange}
+          />
+          <TextInput
+            props={ageHorse}
+            value={horse.age}
+            onValueChange={handleAgeChange}
+          />
+          <SelectInput value={horse.race} onValueChange={handleRaceChange} />
+          <Button name="Modifier" onSubmit={() => handleSubmit()} />
         </div>
         <div className="flex flex-col justify-center items-center">
           <div className="mt-5">
