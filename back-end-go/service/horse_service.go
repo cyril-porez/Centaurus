@@ -16,3 +16,13 @@ func CreateHorse(db *sql.DB, horse *model.Horses) ([]utils.ErrorDetail, error) {
 	}
 	return nil, nil
 }
+
+func UpdateHorse(db *sql.DB, horse *model.Horses, id string) ([]utils.ErrorDetail, error) {
+	var details []utils.ErrorDetail
+
+	if err := repository.UpdateHorse(db, horse, id); err != nil {
+		utils.AddErrorDetail(&details, "test", "test")
+		return details, nil
+	}
+	return nil, nil
+}

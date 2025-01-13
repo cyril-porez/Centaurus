@@ -52,7 +52,7 @@ function AddHorse() {
   const onSubmit = async () => {
     const AddHorse = await horseApi.AddHorse(name, age, category, userId);
     if (AddHorse.header.code === 201) {
-      navigate("/MyHorses", { replace: false });
+      navigate("/horses/my-horse/my-horses", { replace: false });
     }
   };
 
