@@ -22,16 +22,15 @@ async function AddHorse(name, age, race, userId) {
 
 async function UpdateHorse(name, age, race, horseId) {
   try {
-    const response = await axios.put(`${URL}/api/horses/${horseId}`, {
-      data: {
-        age: age,
-        name: name,
-        race: race,
-      },
+    const response = await axios.put(`${URL}/horse/${horseId}`, {
+      name: name,
+      age: parseInt(age, 10),
+      race: race,
+      fk_user_id: 68,
     });
-    return response;
+    return response.data;
   } catch (error) {
-    return error;
+    return error.response.data;
   }
 }
 
