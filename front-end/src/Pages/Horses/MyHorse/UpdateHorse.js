@@ -12,15 +12,18 @@ function UpdateHorse() {
   const [horse, setHorse] = useState({ name: "", age: 0, race: "" });
   let navigate = useNavigate();
 
-  // const fetchData = async () => {
-  //   // const response = await horseApi.getHorse(id);
-  //   // setHorse(response);
-  //   // console.log(response);
-  // };
-  // console.log(horse.name);
+  const fetchData = async () => {
+    const response = await horseApi.getHorse(id);
+    setHorse((prevHorse) => ({
+      ...prevHorse,
+      name: response.body.horse.name,
+      age: response.body.horse.age,
+      race: response.body.horse.race,
+    }));
+  };
 
   useEffect(() => {
-    // fetchData();
+    fetchData();
   }, []);
 
   const handleNameChange = (newName) => {

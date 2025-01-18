@@ -1,5 +1,5 @@
 import axios from "axios";
-import { URL_ADD_HORSE, URL } from "../config/url_api";
+import { URL_ADD_HORSE, URL, URL_HORSE } from "../config/url_api";
 
 async function AddHorse(name, age, race, userId) {
   console.log(
@@ -47,11 +47,12 @@ async function getHorseByUser(id) {
 }
 
 async function getHorse(id) {
+  console.log(id);
   try {
-    const response = await axios.get(`${URL}/api/horses/${id}`);
-    return response.data.data.attributes;
+    const response = await axios.get(`${URL_HORSE}/${id}`);
+    return response.data;
   } catch (error) {
-    return error;
+    return error.response.data;
   }
 }
 
