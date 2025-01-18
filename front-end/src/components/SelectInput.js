@@ -21,6 +21,7 @@ export default function SelectInput({ value, onValueChange }) {
                     focus:outline-none 
                     focus:ring-2 
                     focus:ring-homa-beige"
+          value={value}
           onChange={handleChange}
         >
           <option selected disabled>

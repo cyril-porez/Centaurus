@@ -128,9 +128,70 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/horse/:id": {
+            "put": {
+                "description": "add a profil user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Horses"
+                ],
+                "summary": "Update a horse",
+                "parameters": [
+                    {
+                        "description": "Name, Age and Race",
+                        "name": "addhorse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Horses"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Horse created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Horses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/horses/add-horse": {
             "post": {
-                "description": "add a profil user",
+                "description": "add a  horse",
                 "consumes": [
                     "application/json"
                 ],
@@ -236,6 +297,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "age",
+                "fk_user_id",
                 "name",
                 "race"
             ],
@@ -245,6 +307,9 @@ const docTemplate = `{
                 },
                 "createdAt": {
                     "type": "string"
+                },
+                "fk_user_id": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
