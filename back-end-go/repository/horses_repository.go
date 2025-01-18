@@ -27,8 +27,12 @@ func UpdateHorse (db *sql.DB, horse *model.Horses, id string) error {
 	return err
 }
 
-func getHorse (db *sql.DB, horse *model.Horses, id string) error{
-	query := "SELECT name, age, race, FROM horses WHERE id = ?"
-	err := db.QueryRow(query, id).Scan(horse.Name, horse.Age, horse.Race)
+func GetHorse (db *sql.DB, horse *model.Horses, id string) error{
+	num, er := strconv.Atoi(id)
+	if er != nil {
+		fmt.Println("errur : ", er)
+	}
+	query := "SELECT name, age, race FROM horses WHERE id = ?"
+	err := db.QueryRow(query, num).Scan(&horse.Name, &horse.Age, &horse.Race)
 	return err
 } 
