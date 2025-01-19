@@ -1,5 +1,5 @@
 import axios from "axios";
-import { URL_ADD_HORSE, URL, URL_HORSE } from "../config/url_api";
+import { URL_ADD_HORSE, URL, URL_HORSE, URL_HORSES } from "../config/url_api";
 
 async function AddHorse(name, age, race, userId) {
   console.log(
@@ -34,20 +34,16 @@ async function UpdateHorse(name, age, race, horseId) {
   }
 }
 
-async function getHorseByUser(id) {
+async function getHorsesByUser(id) {
   try {
-    const response = await axios.get(
-      `${URL}/api/users/${id}?populate[0]=horses`
-    );
+    const response = await axios.get(`${URL_HORSES}/${id}`);
     return response.data;
   } catch (error) {
-    console.log("error", error.response.data);
-    return error;
+    return error.response.data;
   }
 }
 
 async function getHorse(id) {
-  console.log(id);
   try {
     const response = await axios.get(`${URL_HORSE}/${id}`);
     return response.data;
@@ -92,7 +88,7 @@ async function getWeightHorseForGraph(id) {
 export default {
   AddHorse,
   UpdateHorse,
-  getHorseByUser,
+  getHorsesByUser,
   getHorse,
   getWeightHorse,
   getWeightHorseForTable,

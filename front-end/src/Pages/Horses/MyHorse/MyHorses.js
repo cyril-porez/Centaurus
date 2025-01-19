@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { HeaderText } from "../../../components/texts/HeaderText";
 import AddHorseButton from "../../../components/buttons/AddHorseButton";
 import HomeButton from "../../../components/buttons/HomeButton";
@@ -9,17 +9,19 @@ import Button from "../../../components/buttons/ButtonCenter";
 
 function MyHorses() {
   let navigate = useNavigate();
-  const [userId, setUserId] = useState(null);
+  // const [userId, setUserId] = useState(null);
   const [userHorses, setUserHorses] = useState([]);
-  const [nbrHorses, setNbrHorses] = useState();
+  // const [nbrHorses, setNbrHorses] = useState();
 
   const goToUpdateHorse = (horseId) => {
-    navigate(`/UpdateHorse/${horseId}`, { replace: false });
+    navigate(`/horses/my-horse/update-horse/${horseId}`, { replace: false });
   };
 
   const getHorseByUser = async (id) => {
     try {
-      const getHorsesByUser = await horseApi.getHorseByUser(id);
+      const getHorsesByUser = await horseApi.getHorsesByUser(id);
+      setUserHorses(getHorsesByUser.body.horse.data);
+
       return getHorsesByUser;
     } catch (error) {
       console.error(error);
@@ -28,28 +30,8 @@ function MyHorses() {
 
   useEffect(() => {
     var token = localStorage.getItem("user");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        if (decoded && typeof decoded === "object" && "id" in decoded) {
-          setUserId(decoded.id);
-          getHorseByUser(decoded.id)
-            .then((ressponse) => {
-              setUserHorses(ressponse.horses);
-            })
-            .catch((error) => {
-              console.error(error);
-              console.log(decoded.id);
-            });
-        } else {
-          console.log("Le token JWT n'a pas la propriété 'id'");
-        }
-      } catch (error) {
-        console.error("Erreur de décodage du token :", error);
-      }
-    } else {
-      console.log("Aucun token trouvé");
-    }
+    const decoded = jwtDecode(token);
+    getHorseByUser(decoded.id);
   }, []);
 
   const handleClick = () => {
@@ -62,6 +44,7 @@ function MyHorses() {
         src="/icons/horseHead.png"
         width={50}
         className="absolute top-8 right-8"
+        alt="head horse"
       />
       <div className="flex flex-col h-1/2 justify-between">
         <HeaderText
@@ -71,12 +54,9 @@ function MyHorses() {
           }}
         />
         {userHorses.map((horse) => (
-          // <button key={horse.id} onClick={goToWeightPage} title={horse.name}>
-          //   {horse.name}
-          // </button>
           <Button
+            key={horse.id}
             props={{
-              key: horse.id,
               title: horse.name,
               onClick: () => goToUpdateHorse(horse.id),
             }}

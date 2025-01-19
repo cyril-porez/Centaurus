@@ -24,12 +24,12 @@ export default function SelectInput({ value, onValueChange }) {
           value={value}
           onChange={handleChange}
         >
-          <option selected disabled>
+          <option value="" disabled>
             Sélectionner
           </option>
-          <option>Pur Sang</option>
-          <option>Trait/Attelage</option>
-          <option>Autre</option>
+          <option value="Pur Sang">Pur Sang</option>
+          <option value="Trait/Attelage">Trait/Attelage</option>
+          <option value="Autre">Autre</option>
         </select>
       </fieldset>
     </div>
