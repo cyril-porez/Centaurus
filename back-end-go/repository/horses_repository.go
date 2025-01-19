@@ -43,7 +43,7 @@ func GetHorsesByUserId (db *sql.DB, id string) (*sql.Rows,error) {
 		fmt.Println("errur : ", er)
 	}
 
-	query := "SELECT name, age, race FROM horses WHERE fk_user_id = ?";
+	query := "SELECT id, name, age, race FROM horses WHERE fk_user_id = ?";
 	rows, err := db.Query(query, num);
 	if err != nil {
 		return nil, fmt.Errorf("erreur lors de l'exécution de la requête : %w", err)
