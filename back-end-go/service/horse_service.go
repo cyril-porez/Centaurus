@@ -51,7 +51,7 @@ func GetHorsesByUserId(db *sql.DB, id string) ([]model.Horses, []utils.ErrorDeta
 
 	for rows.Next() {
 		var horse model.Horses;
-		if err := rows.Scan(&horse.Name, &horse.Age, &horse.Race); err != nil {
+		if err := rows.Scan(&horse.Id, &horse.Name, &horse.Age, &horse.Race); err != nil {
 			utils.AddErrorDetail(&details, "repsitory error", "Error lors de la récupération des données");
 			return nil, details, err;
 		}

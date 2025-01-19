@@ -28,7 +28,7 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 	r.POST("api/v1/horses/add-horse", func(c *gin.Context) {
 		handlers.AddHorseHandler(c, db);
 	})
-	r.GET("api/v1/horses/get-horses/:id", func(c *gin.Context) {
+	r.GET("api/v1/horses/:id", func(c *gin.Context) {
 		id := c.Param("id") 
 		handlers.GetHorsesByUserHanndler(c, db, id);
 	})

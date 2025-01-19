@@ -187,17 +187,17 @@ func UpdateHorseHandler(c *gin.Context, db *sql.DB, id string) {
 }
 
 //UpdateHorseHandler godoc
-//@Summary Update a horse
-//@Description add a profil user
+//@Summary Get a horse
+//@Description Retrieve a horse for a specific user
 //@Tags Horses
 //@Accept json
 //@Produce json
-//@Param addhorse body model.Horses true "Name, Age and Race"
-//@Success 201 {object} model.Horses "Horse created"
+//@Param id path int true "Horse Id"
+//@Success 201 {object} model.Horses "Horse retrieved"
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /api/v1/horse/:id [put]
+//@Router /api/v1/horse/{id} [get]
 func GetHorseHandler(c *gin.Context, db *sql.DB, id string) {
 	var horse model.Horses
 	
@@ -254,17 +254,17 @@ func GetHorseHandler(c *gin.Context, db *sql.DB, id string) {
 }
 
 // GetHorsesByUserHanndler godoc
-//@Summary get a horses 
-//@Description get a horse list by user
+//@Summary get a list of horses 
+//@Description Retrieve a list of horses for a specific user
 //@Tags Horses
 //@Accept json
 //@Produce json
-//@Param getHorses body model.Horses true "Name, Age and Race"
+//@Param id path int true "User ID"
 //@Success 200 {object} model.Horses "Horses récupéré"
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router api/v1/horses/get-horses/:id [get]
+//@Router /api/v1/horses/{id} [get]
 func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, id string ) {
 	
 	horses, details, err := service.GetHorsesByUserId(db, id);
