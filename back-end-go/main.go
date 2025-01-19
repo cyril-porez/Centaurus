@@ -51,7 +51,7 @@ func  main()  {
 	}
 	fmt.Println("Table horses créé avec succès")
 
-	r := router.SetupRouter(db)
+ 	r := router.SetupRouter(db)
 
 	r.Run()
 }
