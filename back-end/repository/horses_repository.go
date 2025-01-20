@@ -51,3 +51,27 @@ func GetHorsesByUserId (db *sql.DB, id string) (*sql.Rows,error) {
 
 	return rows, nil; 
 }
+
+func DeleteHorse (db *sql.DB, id string) error {
+	num, err := strconv.Atoi(id);
+	if err != nil {
+		fmt.Println("errur : ", err)
+	}
+
+	query := "DELETE FROM `horses` WHERE id = ?"
+	result, err := db.Exec(query, num);
+	if err != nil {
+		return fmt.Errorf("erreur lors de l'execution de la requête : %w", err);
+	}
+
+	rowsAffected, err := result.RowsAffected();
+	if err != nil {
+		return fmt.Errorf("erreur lors de la récupération du nombre de lignes affectées : %w", err)
+	}
+
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("aucun cheval trouvé avec l'id %d", num);
+	}
+	return nil;
+}

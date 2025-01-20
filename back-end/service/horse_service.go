@@ -65,3 +65,13 @@ func GetHorsesByUserId(db *sql.DB, id string) ([]model.Horses, []utils.ErrorDeta
 
 	return horses, details, nil;
 }
+
+func DeleteHorse(db *sql.DB, id string) ([]utils.ErrorDetail, error) {
+	var details []utils.ErrorDetail
+
+	if err := repository.DeleteHorse(db, id); err != nil {
+		utils.AddErrorDetail(&details, "test", "test")
+		return details, nil
+	}
+	return nil, nil
+}

@@ -25,6 +25,7 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 	r.POST("api/v1/auth/sign-in", func(c *gin.Context) {
 		handlers.SignInHandler(c, db);
 	})
+
 	r.POST("api/v1/horses/add-horse", func(c *gin.Context) {
 		handlers.AddHorseHandler(c, db);
 	})
@@ -35,16 +36,18 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 	r.PUT("api/v1/horse/:id", func(c *gin.Context) {
 		id := c.Param("id");
 		handlers.UpdateHorseHandler(c, db, id);
-	}) 
-
+	})  
 	r.GET("api/v1/horse/:id", func(c *gin.Context) {
 		id := c.Param("id");
 		handlers.GetHorseHandler(c, db, id);
+	})
+	r.DELETE("api/v1/horse/:id", func(c *gin.Context) {
+			id := c.Param("id")
+			handlers.DeleteHorseHandler(c, db, id);
 	})
 	
 	//route de teste
 	r.GET("api/ping", handlers.PingHandler);
 
 	return r
- 
 }
