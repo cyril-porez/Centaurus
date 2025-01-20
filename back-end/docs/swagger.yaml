@@ -135,6 +135,44 @@ paths:
       tags:
       - Credential
   /api/v1/horse/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Delete horse
+      parameters:
+      - description: Horse ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Horses récupéré
+          schema:
+            $ref: '#/definitions/model.Horses'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: delete a horse
+      tags:
+      - Horses
     put:
       consumes:
       - application/json
