@@ -45,6 +45,11 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 			id := c.Param("id")
 			handlers.DeleteHorseHandler(c, db, id);
 	})
+
+	r.POST("api/v1/weight/:id", func(c *gin.Context) {
+		id := c.Param("id");
+		handlers.AddWeight(c, db, id);
+	})
 	
 	//route de teste
 	r.GET("api/ping", handlers.PingHandler);

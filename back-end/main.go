@@ -51,6 +51,21 @@ func  main()  {
 	}
 	fmt.Println("Table horses créé avec succès")
 
+	queryWeight := `CREATE TABLE IF NOT EXISTS weights (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		weight INT NOT NULL,
+		fk_horse_id INT NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (fk_horse_id) REFERENCES horses(id) ON DELETE CASCADE
+	)`
+
+	_, err = db.Exec(queryWeight)
+	if err != nil {
+		log.Fatalf("error lors de la creation de la table weights : %v", err)
+	}
+	fmt.Println("Table weifhts créé avec succès")
+
  	r := router.SetupRouter(db)
 
 	r.Run()
