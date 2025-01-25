@@ -7,11 +7,6 @@ import HomeButton from "../../../components/buttons/HomeButton";
 import TextInput from "../../../components/inputs/TextInput";
 import Button from "../../../components/buttons/Button";
 export default function Mensurations() {
-  const [garrotHeight, setGarrotHeight] = useState("");
-  const [bodyLength, setBodyLength] = useState("");
-  const [chestSize, setChestSize] = useState("");
-  const [neckSize, setNeckSize] = useState("");
-  const [date, setDate] = useState("");
   const { id } = useParams();
   const [horse, sethorse] = useState({ name: "", age: 0, race: "" });
   const [horseMesure, setHorseMesure] = useState({
@@ -41,7 +36,7 @@ export default function Mensurations() {
   };
 
   const navigateResult = () => {
-    navigate(`/ResultWeight/${id}`, { replace: false });
+    navigate(`/horses/calculation/ResultWeight/${id}`, { replace: false });
   };
 
   async function fetchData() {
@@ -102,17 +97,17 @@ export default function Mensurations() {
     switch (horse?.race) {
       case "pure sang":
         const weight = Math.ceil((G ** 2 * L) / 11877);
-        return await addWeight(weight, id, date);
+        return await addWeight(weight, id, horseMesure.date);
       case "Trait/Attelage":
         const weightTraitAttelage = Math.ceil(
           (G ** 1.486 * L ** 0.554 * H ** 0.599 * N ** 0.173) / 3441
         );
-        return await addWeight(weightTraitAttelage, id, date);
+        return await addWeight(weightTraitAttelage, id, horseMesure.date);
       case "Autre":
         const weightAutre = Math.ceil(
           (G ** 1.486 * L ** 0.554 * H ** 0.599 * N ** 0.173) / 3596
         );
-        return await addWeight(weightAutre, id, date);
+        return await addWeight(weightAutre, id, horseMesure.date);
       default:
         break;
     }
