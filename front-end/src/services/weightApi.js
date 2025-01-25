@@ -1,23 +1,14 @@
 import axios from "axios";
-import { URL } from "../config/url_api";
-import { Await } from "react-router-dom";
+import { URL_WEIGHTS } from "../config/url_api";
 
 async function addHorseWeihgt(weight, horseId, date) {
-  console.log(weight);
-  console.log(horseId);
-  console.log(date);
   try {
-    const response = await axios.post(`${URL}/api/weights/`, {
-      data: {
-        weight: weight,
-        date: date,
-        horse: horseId,
-      },
+    const response = await axios.post(`${URL_WEIGHTS}/${horseId}`, {
+      weight: weight,
     });
-    return response;
+    return response.data;
   } catch (error) {
-    console.log("error", error.response);
-    return error;
+    return error.response.data;
   }
 }
 
