@@ -26,15 +26,15 @@ function UpdateHorse() {
     fetchData();
   }, []);
 
-  const handleNameChange = (newName) => {
+  const handleNameChange = (/** @type {any} */ newName) => {
     setHorse((prevHorse) => ({ ...prevHorse, name: newName }));
   };
 
-  const handleAgeChange = (newAge) => {
+  const handleAgeChange = (/** @type {any} */ newAge) => {
     setHorse((prevHorse) => ({ ...prevHorse, age: newAge }));
   };
 
-  const handleRaceChange = (newRace) => {
+  const handleRaceChange = (/** @type {any} */ newRace) => {
     setHorse((prevHorse) => ({ ...prevHorse, race: newRace }));
   };
 

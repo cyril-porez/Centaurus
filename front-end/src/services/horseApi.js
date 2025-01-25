@@ -48,7 +48,7 @@ async function getHorse(id) {
     const response = await axios.get(`${URL_HORSE}/${id}`);
     return response.data;
   } catch (error) {
-    return error.response.data;
+    return error;
   }
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { HeaderText } from "../../../components/texts/HeaderText";
-import { useNavigate, useParams } from "react-router-dom";
+import { Await, useNavigate, useParams } from "react-router-dom";
 import horseApi from "../../../services/horseApi";
 import weightApi from "../../../services/weightApi";
 import HomeButton from "../../../components/buttons/HomeButton";
@@ -13,26 +13,54 @@ export default function Mensurations() {
   const [neckSize, setNeckSize] = useState("");
   const [date, setDate] = useState("");
   const { id } = useParams();
-  const [horse, sethorse] = useState("");
+  const [horse, sethorse] = useState({ name: "", age: 0, race: "" });
+  const [horseMesure, setHorseMesure] = useState({
+    garrot: 0,
+    body: 0,
+    chest: 0,
+    neck: 0,
+    date: new Date(),
+  });
 
   let navigate = useNavigate();
+
+  const handleGarrotChange = (/** @type {any} */ newGarot) => {
+    setHorseMesure((prevHorse) => ({ ...prevHorse, garrot: newGarot }));
+  };
+  const handleBodyChange = (/** @type {any} */ newBody) => {
+    setHorseMesure((prevHorse) => ({ ...prevHorse, body: newBody }));
+  };
+  const handleChestChange = (/** @type {any} */ newChest) => {
+    setHorseMesure((prevHorse) => ({ ...prevHorse, chest: newChest }));
+  };
+  const handleNeckChange = (/** @type {any} */ newNeck) => {
+    setHorseMesure((prevHorse) => ({ ...prevHorse, neck: newNeck }));
+  };
+  const handleDateChange = (/** @type {any} */ newDate) => {
+    setHorseMesure((prevHorse) => ({ ...prevHorse, date: newDate }));
+  };
 
   const navigateResult = () => {
     navigate(`/ResultWeight/${id}`, { replace: false });
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const horse = await horseApi.getHorse(id);
-        sethorse(horse);
-        console.log(horse);
-      } catch (error) {
-        console.error("Erreur lors de la récupération du cheval:", error);
-      }
+  async function fetchData() {
+    try {
+      const horseData = await horseApi.getHorse(id);
+      sethorse((prevHorse) => ({
+        ...prevHorse,
+        name: horseData.body.horse.name,
+        age: horseData.body.horse.age,
+        race: horseData.body.horse.race,
+      }));
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération du cheval:",
+        error.response
+      );
     }
-
-    // Appel de la fonction asynchrone
+  }
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -41,7 +69,6 @@ export default function Mensurations() {
       const addWeight = await weightApi.addHorseWeihgt(weight, horseId, date);
       return addWeight;
     } catch (error) {
-      console.log(error);
       return error;
     }
   };
@@ -67,43 +94,35 @@ export default function Mensurations() {
     - N = la circonférence de l’encolure (en cm)
    */
   const calculateWeightHorse = async () => {
-    let G = parseInt(chestSize, 10);
-    let L = parseInt(bodyLength, 10);
-    let H = parseInt(garrotHeight, 10);
-    let N = parseInt(neckSize, 10);
+    let G = horseMesure.chest;
+    let L = horseMesure.body;
+    let H = horseMesure.garrot;
+    let N = horseMesure.neck;
 
     switch (horse?.race) {
       case "pure sang":
         const weight = Math.ceil((G ** 2 * L) / 11877);
-        console.log("pur sang");
-        console.log("G => ", G);
-        console.log("L =>", L);
-        console.log("longueur corp =>", bodyLength);
-        console.log("circonférence du corp =>", chestSize);
-        console.log("date =>", date);
-        console.log("result =>", weight);
-        await addWeight(weight, id, date);
-        break;
+        return await addWeight(weight, id, date);
       case "Trait/Attelage":
         const weightTraitAttelage = Math.ceil(
           (G ** 1.486 * L ** 0.554 * H ** 0.599 * N ** 0.173) / 3441
         );
-        await addWeight(weightTraitAttelage, id, date);
-        break;
+        return await addWeight(weightTraitAttelage, id, date);
       case "Autre":
         const weightAutre = Math.ceil(
           (G ** 1.486 * L ** 0.554 * H ** 0.599 * N ** 0.173) / 3596
         );
-        await addWeight(weightAutre, id, date);
-        break;
+        return await addWeight(weightAutre, id, date);
       default:
         break;
     }
   };
 
-  const handleSubmit = () => {
-    calculateWeightHorse();
-    navigateResult();
+  const handleSubmit = async () => {
+    const response = await calculateWeightHorse();
+    if (response.header.code === 201) {
+      navigateResult();
+    }
   };
 
   const hgarot = {
@@ -164,18 +183,50 @@ export default function Mensurations() {
         />
         {horse?.race === "pure sang" ? (
           <>
-            <TextInput props={lcorp} />
-            <TextInput props={circThoracique} />
-            <TextInput props={dateMeasure} />
+            <TextInput
+              props={lcorp}
+              value={horseMesure.body}
+              onValueChange={handleBodyChange}
+            />
+            <TextInput
+              props={circThoracique}
+              value={horseMesure.chest}
+              onValueChange={handleChestChange}
+            />
+            <TextInput
+              props={dateMeasure}
+              value={horseMesure}
+              onValueChange={handleDateChange}
+            />
           </>
         ) : (
           <>
             {/* <div className="flex flex-col h-1/2"> */}
-            <TextInput props={hgarot} />
-            <TextInput props={lcorp} />
-            <TextInput props={circThoracique} />
-            <TextInput props={circEncolure} />
-            <TextInput props={dateMeasure} />
+            <TextInput
+              props={hgarot}
+              value={horseMesure.garrot}
+              onValueChange={handleGarrotChange}
+            />
+            <TextInput
+              props={lcorp}
+              value={horseMesure.body}
+              onValueChange={handleBodyChange}
+            />
+            <TextInput
+              props={circThoracique}
+              value={horseMesure.chest}
+              onValueChange={handleChestChange}
+            />
+            <TextInput
+              props={circEncolure}
+              value={horseMesure.neck}
+              onValueChange={handleNeckChange}
+            />
+            <TextInput
+              props={dateMeasure}
+              value={horseMesure.date}
+              onValueChange={handleDateChange}
+            />
           </>
         )}
         <img
@@ -185,7 +236,7 @@ export default function Mensurations() {
           alt=""
         />
 
-        <Button />
+        <Button name={"Calculons"} onSubmit={() => handleSubmit()} />
       </div>
 
       <div className="flex flex-col justify-center items-center">
