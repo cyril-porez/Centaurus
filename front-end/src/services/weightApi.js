@@ -5,6 +5,7 @@ async function addHorseWeihgt(weight, horseId, date) {
   try {
     const response = await axios.post(`${URL_WEIGHTS}/${horseId}`, {
       weight: weight,
+      date: date,
     });
     return response.data;
   } catch (error) {

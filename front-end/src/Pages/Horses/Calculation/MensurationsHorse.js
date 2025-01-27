@@ -93,21 +93,25 @@ export default function Mensurations() {
     let L = horseMesure.body;
     let H = horseMesure.garrot;
     let N = horseMesure.neck;
+    const dateIso =
+      horseMesure.date instanceof Date
+        ? horseMesure.date.toISOString()
+        : new Date(horseMesure.date).toISOString();
 
     switch (horse?.race) {
       case "pure sang":
         const weight = Math.ceil((G ** 2 * L) / 11877);
-        return await addWeight(weight, id, horseMesure.date);
+        return await addWeight(weight, id, dateIso);
       case "Trait/Attelage":
         const weightTraitAttelage = Math.ceil(
           (G ** 1.486 * L ** 0.554 * H ** 0.599 * N ** 0.173) / 3441
         );
-        return await addWeight(weightTraitAttelage, id, horseMesure.date);
+        return await addWeight(weightTraitAttelage, id, dateIso);
       case "Autre":
         const weightAutre = Math.ceil(
           (G ** 1.486 * L ** 0.554 * H ** 0.599 * N ** 0.173) / 3596
         );
-        return await addWeight(weightAutre, id, horseMesure.date);
+        return await addWeight(weightAutre, id, dateIso);
       default:
         break;
     }
@@ -117,6 +121,8 @@ export default function Mensurations() {
     const response = await calculateWeightHorse();
     if (response.header.code === 201) {
       navigateResult();
+    } else {
+      console.error(response);
     }
   };
 
