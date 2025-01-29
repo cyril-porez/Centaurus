@@ -96,3 +96,73 @@ func AddWeight(c *gin.Context, db *sql.DB, id string) {
 	utils.WriteSuccesResponse(c, http.StatusCreated, "Registration new successful", body)
 
 }
+
+
+//GetLastWeight godoc
+//@Summary get last a weight horse 
+//@Description get last weight horse and date
+//@Tags Weights
+//@Accept json
+//@Produce json
+//@Param id path int true "Horse Id"
+//@Success 200 {object} model.Weights "Weight add"
+//@Failure 400 {object} map[string]string
+//@Failure 401 {object} map[sting]string
+//@Failure 500 {object} map[string]string
+//@Router /api/v1/horse/:id [get]
+func GetLastWeightHorse(c *gin.Context, db *sql.DB, id string) {
+	var newWeight model.Weights ;
+
+	if details, err := service.GetLastWeightHorse(db, &newWeight, id); err != nil || len(details) > 0 {
+		if len(details) > 0 {
+			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
+				Details: details,
+				Meta: map[string]string{
+					"timestamp": time.Now().Format(time.RFC3339),
+				},
+				Links : gin.H{
+					"sign-in": gin.H{
+						"self":   "/api/v1/Weight/:id",
+						"METHOD": "POST",
+					},
+				},
+			})
+		} else {
+			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
+				Meta: map[string]string{
+					"timestamp": time.Now().Format(time.RFC3339),
+				},
+				Links : gin.H{
+					"sign-in": gin.H{
+						"self":   "/api/v1/auth/signin",
+						"METHOD": "POST",
+					},
+				},
+			})
+		} 
+		return
+	}	
+
+	body := gin.H{
+    "horse": gin.H{
+      "weight": newWeight.Weight,
+			"last_weight" : newWeight.LastWeight,
+			"difference_weight": newWeight.DifferenceWeight,
+			"date": newWeight.Date,
+			"fk_horse_id": newWeight.FkHorseId,
+		},
+		"_links": gin.H{
+        "sign-in": gin.H{
+					"href":"/api/v1/horses/update",
+					"Method": "POST", 
+				},
+		},
+		"meta": gin.H{
+			"createdAt": newWeight.CreatedAt,
+			"welcomeMessage": "You add a weight of a horse", 
+		},
+	}
+
+	utils.WriteSuccesResponse(c, http.StatusOK, "get data successful", body)
+
+}

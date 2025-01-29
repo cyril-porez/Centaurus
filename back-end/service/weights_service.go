@@ -16,3 +16,13 @@ func AddWeightHorse(db *sql.DB, weight *model.Weights, id string) ([]utils.Error
   }
   return nil, nil;
 }
+
+func GetLastWeightHorse(db *sql.DB, weight *model.Weights, id string) ([]utils.ErrorDetail, error) {
+  var details []utils.ErrorDetail;
+
+  if err := repository.GetLastWeightHorse(db, weight, id); err != nil {
+    utils.AddErrorDetail(&details,"test", "test");
+    return details, nil;
+  }
+  return nil, nil
+}
