@@ -112,8 +112,9 @@ func AddWeight(c *gin.Context, db *sql.DB, id string) {
 //@Router /api/v1/horse/:id [get]
 func GetLastWeightHorse(c *gin.Context, db *sql.DB, id string) {
 	var newWeight model.Weights ;
+	var horse model.Horses;
 
-	if details, err := service.GetLastWeightHorse(db, &newWeight, id); err != nil || len(details) > 0 {
+	if details, err := service.GetLastWeightHorse(db, &newWeight, &horse,id); err != nil || len(details) > 0 {
 		if len(details) > 0 {
 			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
 				Details: details,
@@ -145,10 +146,12 @@ func GetLastWeightHorse(c *gin.Context, db *sql.DB, id string) {
 
 	body := gin.H{
     "horse": gin.H{
+			"name": horse.Name,
       "weight": newWeight.Weight,
 			"last_weight" : newWeight.LastWeight,
 			"difference_weight": newWeight.DifferenceWeight,
 			"date": newWeight.Date,
+			"previous_date": newWeight.LastDate,
 			"fk_horse_id": newWeight.FkHorseId,
 		},
 		"_links": gin.H{

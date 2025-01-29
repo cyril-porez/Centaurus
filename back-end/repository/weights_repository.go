@@ -19,27 +19,32 @@ func AddWeightHorse(db *sql.DB, weight *model.Weights, id string) error {
 	return err
 }
 
-func GetLastWeightHorse(db *sql.DB, weight *model.Weights, id string) error {
+func GetLastWeightHorse(db *sql.DB, weight *model.Weights, horse *model.Horses,id string) error {
 	query := `
 			SELECT 
-				t1.weight AS weight,
-				t2.weight AS LastWeight,
-				t1.weight - t2.weight AS DifferenceWeight,
-				t1.date, 
-				t1.fk_horse_id 
-			FROM weights AS t1
-			JOIN weights AS t2 
-					ON t1.fk_horse_id = t2.fk_horse_id
-					AND t1.date > t2.date
-			WHERE t1.fk_horse_id = ?
-			ORDER BY t1.date DESC 
+				h.name,
+				w1.weight AS weight,
+				w2.weight AS LastWeight,
+				w1.weight - w2.weight AS DifferenceWeight,
+				w1.date As date,
+				w2.date As LastDate
+				
+			FROM horses AS h
+			INNER JOIN weights AS w1
+					ON h.id = w1.fk_horse_id
+			LEFT JOIN weights AS w2
+					ON w1.fk_horse_id = w2.fk_horse_id
+					AND w1.date > w2.date
+			WHERE h.id = ?
+			ORDER BY w1.date DESC 
 			LIMIT 1`;
 	err := db.QueryRow(query, id).Scan(
+				&horse.Name,
 				&weight.Weight,
 				&weight.LastWeight,
 				&weight.DifferenceWeight, 
 				&weight.Date, 
-				&weight.FkHorseId,
+				&weight.LastDate,
 			);
 	return err;
 }
