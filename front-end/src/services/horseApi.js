@@ -1,5 +1,11 @@
 import axios from "axios";
-import { URL_ADD_HORSE, URL, URL_HORSE, URL_HORSES } from "../config/url_api";
+import {
+  URL_ADD_HORSE,
+  URL,
+  URL_HORSE,
+  URL_HORSES,
+  URL_WEIGHTS,
+} from "../config/url_api";
 
 async function AddHorse(name, age, race, userId) {
   console.log(
@@ -54,12 +60,10 @@ async function getHorse(id) {
 
 async function getWeightHorse(id) {
   try {
-    const response = await axios.get(
-      `${URL}/api/horses/${id}?populate[weights][sort]=date:desc&populate[weights][limit]=2`
-    );
-    return response.data.data.attributes;
+    const response = await axios.get(`${URL_WEIGHTS}/${id}`);
+    return response.data;
   } catch (error) {
-    return error;
+    return error.response.data;
   }
 }
 

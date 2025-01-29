@@ -6,44 +6,46 @@ import { useNavigate, useParams } from "react-router-dom";
 
 function ResultWeight() {
   const { id } = useParams();
-  const [horse, sethorse] = useState({ weights: { data: [] } });
+  const [horse, sethorse] = useState({});
 
   let navigate = useNavigate();
 
   const navigateResult = () => {
-    console.log("test");
-    navigate(`/WeightTable/${id}`, { replace: false });
+    navigate(`/horses/follow/evolution/weight/table/${id}`, { replace: false });
   };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("fr-FR");
+  };
+
+  async function fetchData() {
+    try {
+      const horse = await horseApi.getWeightHorse(id);
+      horse.body.horse.date = formatDate(horse?.body?.horse.date);
+      horse.body.horse.previous_date = formatDate(
+        horse.body.horse.previous_date
+      );
+      sethorse(horse);
+      console.log(horse);
+    } catch (error) {
+      console.error("Erreur lors de la récupération du cheval:", error);
+    }
+  }
+
+  function signResult() {
+    let sign = "";
+    if (horse?.body?.horse.weight > horse?.body?.horse.last_weight) {
+      sign = "+";
+    } else {
+      sign = "-";
+    }
+    return sign;
+  }
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const horse = await horseApi.getWeightHorse(id);
-        sethorse(horse);
-        console.log(horse);
-      } catch (error) {
-        console.error("Erreur lors de la récupération du cheval:", error);
-      }
-    }
     fetchData();
   }, []);
-
-  const splitDate = (dateApi) => {
-    if (!dateApi) {
-      return "Date non disponible"; // ou toute autre valeur par défaut que vous souhaitez retourner
-    }
-    const date = dateApi;
-    const splitDate = date.split("-");
-    const finalDate = `${splitDate[2]}/${splitDate[1]}/${splitDate[0]}`;
-    return finalDate;
-  };
-
-  const calculateDifferenceWeight = () => {
-    const weight =
-      horse.weights.data[0]?.attributes.weight -
-      horse.weights.data[1]?.attributes.weight;
-    return weight;
-  };
 
   return (
     <div className="flex flex-col justify-evenly h-full">
@@ -51,24 +53,22 @@ function ResultWeight() {
         src="/icons/calcul.png"
         width={50}
         className="absolute top-8 right-8"
+        alt="Calculator"
       />
       <h1 className="text-blue-900 text-4xl font-bold text-center">
-        <strong>{horse.name}</strong>
+        <strong>{horse?.body?.horse.name}</strong>
       </h1>
       <h3 className="ml-5 mr-3 text-blue-900 text-3xl italic text-center">
         Son poids le{" "}
-        <span className="text-blue-600">
-          [{splitDate(horse.weights.data[0]?.attributes.date)}]
-        </span>
+        <span className="text-blue-600">{horse?.body?.horse.date + " "}</span>
         est de :
       </h3>
 
-      <DisplayWeight
-        props={{ title: horse.weights.data[0]?.attributes.weight + "kg" }}
-      />
+      <DisplayWeight props={{ title: horse?.body?.horse.weight + " kg" }} />
       <h3 className="ml-5 text-2xl text-center">
-        Soit {calculateDifferenceWeight()} depuis la dernière fois (
-        {splitDate(horse.weights.data[1]?.attributes.date)})
+        Soit {signResult()}
+        {horse?.body?.horse.difference_weight} Kg depuis la dernière fois (
+        {horse?.body?.horse.previous_date})
       </h3>
       <p className="ml-5">
         En terme de fréquence, pour un cheval “sain” nous recommandons de
