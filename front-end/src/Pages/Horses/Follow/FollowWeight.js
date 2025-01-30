@@ -63,6 +63,7 @@ function FollowWeight() {
         src="/icons/courbe.png"
         width={50}
         className="absolute top-8 right-8"
+        alt=""
       />
 
       <HeaderText
