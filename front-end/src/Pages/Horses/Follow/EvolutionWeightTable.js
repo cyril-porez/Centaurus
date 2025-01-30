@@ -9,7 +9,7 @@ import MailFieldset from "../../../components/texts/ContactMailFieldset";
 
 function WeightTable() {
   const { id } = useParams();
-  const [horse, sethorse] = useState([]);
+  const [horse, sethorse] = useState({ weight: [], name: "" });
   let navigate = useNavigate();
 
   const handleSubmit = () => {
@@ -19,7 +19,11 @@ function WeightTable() {
   async function fetchData() {
     try {
       const horse = await weightApi.getWeightHorseForTable(id);
-      sethorse(horse.body.horse.data);
+      sethorse((prevHorse) => ({
+        ...prevHorse,
+        weight: horse.body.horse.data,
+        name: horse.body.horse.name,
+      }));
       console.log(horse);
     } catch (error) {
       console.error("Erreur lors de la récupération du cheval:", error);
@@ -33,7 +37,7 @@ function WeightTable() {
   return (
     <div className="flex flex-col justify-evenly h-screen">
       <h1 className="text-blue-900 text-4xl font-bold text-center">
-        {/* <strong>{horse.name}</strong> */}
+        <strong>{horse?.name}</strong>
       </h1>
       <h3 className="ml-5 mr-3 text-blue-900 text-3xl italic text-center">
         Comment a évolué <span className="text-blue-600">son poids </span>?
@@ -42,7 +46,7 @@ function WeightTable() {
       <div className="mx-auto p-4">
         <table className="border border-black">
           <tbody>
-            {horse.map((weightEntry) => {
+            {horse.weight.map((weightEntry) => {
               return (
                 <tr key={/*weightEntry.id*/ 1}>
                   <td className="border p-2 border-black w-1/2">
