@@ -48,3 +48,9 @@ func GetLastWeightHorse(db *sql.DB, weight *model.Weights, horse *model.Horses,i
 			);
 	return err;
 }
+
+func GetLastSixWeightsHorse(db *sql.DB, id string) (*sql.Rows, error) {
+	query := `SELECT date, weight FROM weights WHERE fk_horse_id = ? ORDER BY date DESC LIMIT 6`;
+	rows, err := db.Query(query, id);
+	return rows, err;
+}

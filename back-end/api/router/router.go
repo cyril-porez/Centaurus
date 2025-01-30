@@ -53,7 +53,11 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 	r.GET("api/v1/weight/:id", func(c *gin.Context) {
 		id := c.Param("id");
 		handlers.GetLastWeightHorse(c, db, id);
-	}) 
+	})
+	r.GET("api/v1/weights/:id", func(c *gin.Context) {
+		id := c.Param("id");
+		handlers.GetLastSixWeightsHorse(c, db, id);
+	})
 	
 	//route de teste
 	r.GET("api/ping", handlers.PingHandler);
