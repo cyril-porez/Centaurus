@@ -63,29 +63,9 @@ async function getWeightHorse(id) {
     const response = await axios.get(`${URL_WEIGHTS}/${id}`);
     return response.data;
   } catch (error) {
+    console.log(error);
+
     return error.response.data;
-  }
-}
-
-async function getWeightHorseForTable(id) {
-  try {
-    const response = await axios.get(
-      `${URL}/api/horses/${id}?populate[weights][sort]=date:desc&populate[weights][limit]=6`
-    );
-    return response.data.data.attributes;
-  } catch (error) {
-    return error;
-  }
-}
-
-async function getWeightHorseForGraph(id) {
-  try {
-    const response = await axios.get(
-      `${URL}/api/horses/${id}?populate[weights][sort]=date:asc`
-    );
-    return response.data.data.attributes;
-  } catch (error) {
-    return error;
   }
 }
 
@@ -95,6 +75,4 @@ export default {
   getHorsesByUser,
   getHorse,
   getWeightHorse,
-  getWeightHorseForTable,
-  getWeightHorseForGraph,
 };

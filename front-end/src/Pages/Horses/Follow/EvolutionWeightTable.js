@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import HomeButton from "../../../components/buttons/HomeButton";
-import horseApi from "../../../services/horseApi";
+import weightApi from "../../../services/weightApi";
 import { useNavigate, useParams } from "react-router";
 import Button from "../../../components/buttons/Button";
 import ContactText from "../../../components/texts/ContactText";
@@ -9,25 +9,26 @@ import MailFieldset from "../../../components/texts/ContactMailFieldset";
 
 function WeightTable() {
   const { id } = useParams();
-  // const [horse, sethorse] = useState({ weights: { data: [] } });
+  const [horse, sethorse] = useState([]);
   let navigate = useNavigate();
 
   const handleSubmit = () => {
     navigate(`horses/follow/evolution/weight/table/${id}`, { replace: false });
   };
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const horse = await horseApi.getWeightHorseForTable(id);
-  //       sethorse(horse);
-  //     } catch (error) {
-  //       console.error("Erreur lors de la récupération du cheval:", error);
-  //     }
-  //   }
+  async function fetchData() {
+    try {
+      const horse = await weightApi.getWeightHorseForTable(id);
+      sethorse(horse.body.horse.data);
+      console.log(horse);
+    } catch (error) {
+      console.error("Erreur lors de la récupération du cheval:", error);
+    }
+  }
 
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div className="flex flex-col justify-evenly h-screen">
@@ -41,16 +42,18 @@ function WeightTable() {
       <div className="mx-auto p-4">
         <table className="border border-black">
           <tbody>
-            {/* {horse.weights.data.map((weightEntry) => ( */}
-            <tr key={/*weightEntry.id*/ 1}>
-              <td className="border p-2 border-black w-1/2">
-                {/* {new Date(weightEntry.attributes.date).toLocaleDateString()} */}
-              </td>
-              <td className="border p-2 border-black w-1/2">
-                {/* {weightEntry.attributes.weight} kg */}
-              </td>
-            </tr>
-            {/* ))} */}
+            {horse.map((weightEntry) => {
+              return (
+                <tr key={/*weightEntry.id*/ 1}>
+                  <td className="border p-2 border-black w-1/2">
+                    {weightEntry?.date}
+                  </td>
+                  <td className="border p-2 border-black w-1/2">
+                    {weightEntry?.weight} kg
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
