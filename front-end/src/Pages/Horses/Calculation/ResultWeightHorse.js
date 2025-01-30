@@ -14,7 +14,7 @@ function ResultWeight() {
     navigate(`/horses/follow/evolution/weight/table/${id}`, { replace: false });
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (/** @type {string | number | Date} */ dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("fr-FR");
   };
