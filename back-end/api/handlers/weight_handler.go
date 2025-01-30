@@ -172,7 +172,7 @@ func GetLastWeightHorse(c *gin.Context, db *sql.DB, id string) {
 
 
 func GetLastSixWeightsHorse(c *gin.Context, db *sql.DB, id string) {
-	weights ,details, err := service.GetLastSixWeightsHorse(db, id)
+	name,weights ,details, err := service.GetLastSixWeightsHorse(db, id)
 	if  err != nil || len(details) > 0 {
 		if len(details) > 0 {
 			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
@@ -205,6 +205,7 @@ func GetLastSixWeightsHorse(c *gin.Context, db *sql.DB, id string) {
 
 	body := gin.H{
     "horse": gin.H{
+			"name": name.Name,
       "data": weights,
 		},
 		"_links": gin.H{
