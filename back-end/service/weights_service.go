@@ -57,3 +57,34 @@ func GetLastSixWeightsHorse(db *sql.DB, id string) (*model.Horses, []model.Weigh
 
   return &horse, weights, details, nil
 }
+
+func GetWeightsHorse(db *sql.DB, id string) (*model.Horses, []model.Weights, []utils.ErrorDetail, error) {
+  var details []utils.ErrorDetail
+	rows, err := repository.GetWeightsHorse(db, id);
+	if err != nil {
+		utils.AddErrorDetail(&details, "test", "test");
+		return  nil, nil, details, err;
+	}
+
+  defer rows.Close();
+
+  var weights []model.Weights
+  var horse model.Horses;
+
+  for rows.Next() {
+    var weight model.Weights;
+    
+    if err = rows.Scan(&horse.Name, &weight.Date, &weight.Weight); err != nil {
+      utils.AddErrorDetail(&details, "repsitory error", "Error lors de la récupération des données");
+			return nil, nil, details, err;
+    }
+    weights = append(weights, weight);
+  }
+
+  if err := rows.Err(); err != nil {
+    utils.AddErrorDetail(&details, "repsitory error", "Error lors de la résultats");
+    return nil, nil, details, err;
+  }
+
+  return &horse, weights, details, nil
+}
