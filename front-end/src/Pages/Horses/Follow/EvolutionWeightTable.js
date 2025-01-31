@@ -13,7 +13,7 @@ function WeightTable() {
   let navigate = useNavigate();
 
   const handleSubmit = () => {
-    navigate(`horses/follow/evolution/weight/table/${id}`, { replace: false });
+    navigate(`/horses/follow/evolution/weight/graph/${id}`, { replace: false });
   };
 
   const formatDate = (/** @type {string | number | Date} */ dateString) => {
@@ -69,7 +69,7 @@ function WeightTable() {
       <MailFieldset />
       <div className="flex flex-col justify-center items-center">
         <div className="mt-6">
-          <Button name="Tracer le graphique" />
+          <Button name="Tracer le graphique" onSubmit={() => handleSubmit()} />
         </div>
         <div className="mt-5">
           <HomeButton />
