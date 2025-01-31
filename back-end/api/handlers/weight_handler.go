@@ -22,7 +22,7 @@ import (
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /api/v1/horse/:id [post]
+//@Router /api/v1/weight/:id [post]
 func AddWeight(c *gin.Context, db *sql.DB, id string) {
 	var newWeight model.Weights ;
 
@@ -109,7 +109,7 @@ func AddWeight(c *gin.Context, db *sql.DB, id string) {
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /api/v1/horse/:id [get]
+//@Router /api/v1/weight/:id [get]
 func GetLastWeightHorse(c *gin.Context, db *sql.DB, id string) {
 	var newWeight model.Weights ;
 	var horse model.Horses;
@@ -170,7 +170,18 @@ func GetLastWeightHorse(c *gin.Context, db *sql.DB, id string) {
 
 }
 
-
+//GetLastSixWeightsHorse godoc
+//@Summary get last six weights horse 
+//@Description get last six weights horse and date
+//@Tags Weights
+//@Accept json
+//@Produce json
+//@Param id path int true "Horse Id"
+//@Success 200 {object} model.Weights "Weight add"
+//@Failure 400 {object} map[string]string
+//@Failure 401 {object} map[sting]string
+//@Failure 500 {object} map[string]string
+//@Router /api/v1/last-weights/:id [get]
 func GetLastSixWeightsHorse(c *gin.Context, db *sql.DB, id string) {
 	name,weights ,details, err := service.GetLastSixWeightsHorse(db, id)
 	if  err != nil || len(details) > 0 {
@@ -223,6 +234,18 @@ func GetLastSixWeightsHorse(c *gin.Context, db *sql.DB, id string) {
 	utils.WriteSuccesResponse(c, http.StatusOK, "get data horses successful", body)
 }
 
+//GetxWeightsHorse godoc
+//@Summary get weights horse 
+//@Description get weights horse and date
+//@Tags Weights
+//@Accept json
+//@Produce json
+//@Param id path int true "Horse Id"
+//@Success 200 {object} model.Weights "Weight add"
+//@Failure 400 {object} map[string]string
+//@Failure 401 {object} map[sting]string
+//@Failure 500 {object} map[string]string
+//@Router /api/v1/weights/:id [get]
 func GetWeightsHorse(c *gin.Context, db *sql.DB, id string) {
 	name,weights ,details, err := service.GetWeightsHorse(db, id)
 	if  err != nil || len(details) > 0 {
