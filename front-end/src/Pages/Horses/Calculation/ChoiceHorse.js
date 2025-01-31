@@ -63,6 +63,7 @@ function ChoiceHorse() {
         src="/icons/calcul.png"
         width={50}
         className="absolute top-8 right-8"
+        alt="Calculator"
       />
       <HeaderText
         props={{

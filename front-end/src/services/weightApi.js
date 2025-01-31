@@ -16,8 +16,6 @@ async function addHorseWeihgt(weight, horseId, date) {
 async function getWeightHorseForTable(id) {
   try {
     const response = await axios.get(`${URL_WEIGHTSS}/${id}`);
-    console.log(response.data);
-
     return response.data;
   } catch (error) {
     return error;

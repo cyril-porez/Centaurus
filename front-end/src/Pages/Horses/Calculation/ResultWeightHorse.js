@@ -27,7 +27,6 @@ function ResultWeight() {
         horse.body.horse.previous_date
       );
       sethorse(horse);
-      console.log(horse);
     } catch (error) {
       console.error("Erreur lors de la récupération du cheval:", error);
     }
