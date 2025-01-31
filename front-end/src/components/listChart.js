@@ -3,20 +3,20 @@ import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 
 const LineChart = (props) => {
-  const formatLabel = (dateString) => {
+  const formatDate = (/** @type {string | number | Date} */ dateString) => {
     const date = new Date(dateString);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    return date.toLocaleDateString("fr-FR");
   };
 
   const data = {
-    labels: props.date.map((date) => formatLabel(date)),
+    labels: props.date.map((date) => formatDate(date)),
     datasets: [
       {
         label: "Poid du cheval",
         data: props.weights,
         fill: false,
-        backgroundColor: "Lavender-Blue",
-        borderColor: "Lavender-Blue",
+        backgroundColor: "text-Lavender-Blue",
+        borderColor: "text-Lavender-Blue",
       },
     ],
   };
