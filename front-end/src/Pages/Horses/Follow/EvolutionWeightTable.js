@@ -24,7 +24,6 @@ function WeightTable() {
         weight: horse.body.horse.data,
         name: horse.body.horse.name,
       }));
-      console.log(horse);
     } catch (error) {
       console.error("Erreur lors de la récupération du cheval:", error);
     }
@@ -48,7 +47,7 @@ function WeightTable() {
           <tbody>
             {horse.weight.map((weightEntry) => {
               return (
-                <tr key={/*weightEntry.id*/ 1}>
+                <tr key={weightEntry?.date}>
                   <td className="border p-2 border-black w-1/2">
                     {weightEntry?.date}
                   </td>
