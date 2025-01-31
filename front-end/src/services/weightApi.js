@@ -1,5 +1,5 @@
 import axios from "axios";
-import { URL_WEIGHTS, URL_WEIGHTSS } from "../config/url_api";
+import { URL_WEIGHTS, URL_WEIGHTSS, URL_WEIGHTSSS } from "../config/url_api";
 
 async function addHorseWeihgt(weight, horseId, date) {
   try {
@@ -24,12 +24,10 @@ async function getWeightHorseForTable(id) {
 
 async function getWeightHorseForGraph(id) {
   try {
-    const response = await axios.get(
-      `${URL}/api/horses/${id}?populate[weights][sort]=date:asc`
-    );
-    return response.data.data.attributes;
+    const response = await axios.get(`${URL_WEIGHTSSS}/${id}`);
+    return response.data;
   } catch (error) {
-    return error;
+    return error.response.data;
   }
 }
 
