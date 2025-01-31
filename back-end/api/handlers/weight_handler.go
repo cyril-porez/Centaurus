@@ -222,3 +222,55 @@ func GetLastSixWeightsHorse(c *gin.Context, db *sql.DB, id string) {
 
 	utils.WriteSuccesResponse(c, http.StatusOK, "get data horses successful", body)
 }
+
+func GetWeightsHorse(c *gin.Context, db *sql.DB, id string) {
+	name,weights ,details, err := service.GetWeightsHorse(db, id)
+	if  err != nil || len(details) > 0 {
+		if len(details) > 0 {
+			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
+				Details: details,
+				Meta: map[string]string{
+					"timestamp": time.Now().Format(time.RFC3339),
+				},
+				Links : gin.H{
+					"sign-in": gin.H{
+						"self":   "/api/v1/Weight/:id",
+						"METHOD": "POST",
+					},
+				},
+			})
+		} else {
+			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
+				Meta: map[string]string{
+					"timestamp": time.Now().Format(time.RFC3339),
+				},
+				Links : gin.H{
+					"sign-in": gin.H{
+						"self":   "/api/v1/auth/signin",
+						"METHOD": "POST",
+					},
+				},
+			})
+		} 
+		return
+	}
+
+	body := gin.H{
+    "horse": gin.H{
+			"name": name.Name,
+      "data": weights,
+		},
+		"_links": gin.H{
+        "sign-in": gin.H{
+					"href":"/api/v1/horses/update",
+					"Method": "PUT", 
+				},
+		},
+		"meta": gin.H{
+			"count": len(weights),
+			"welcomeMessage": "You get data a horses for a user", 
+		},
+	}
+
+	utils.WriteSuccesResponse(c, http.StatusOK, "get data horses successful", body)
+}

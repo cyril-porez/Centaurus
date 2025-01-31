@@ -54,9 +54,14 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 		id := c.Param("id");
 		handlers.GetLastWeightHorse(c, db, id);
 	})
-	r.GET("api/v1/weights/:id", func(c *gin.Context) {
+	r.GET("api/v1/last-weights/:id", func(c *gin.Context) {
 		id := c.Param("id");
 		handlers.GetLastSixWeightsHorse(c, db, id);
+	})
+
+	r.GET("api/v1/weights/:id", func(c *gin.Context) {
+		id := c.Param("id");
+		handlers.GetWeightsHorse(c, db, id);
 	})
 	
 	//route de teste
