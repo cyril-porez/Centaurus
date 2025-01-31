@@ -67,6 +67,8 @@ definitions:
         type: integer
       id:
         type: integer
+      last_date:
+        type: string
       lastWeight:
         type: integer
       weight:
@@ -195,83 +197,6 @@ paths:
       summary: delete a horse
       tags:
       - Horses
-    get:
-      consumes:
-      - application/json
-      description: get last weight horse and date
-      parameters:
-      - description: Horse Id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Weight add
-          schema:
-            $ref: '#/definitions/model.Weights'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: get last a weight horse
-      tags:
-      - Weights
-    post:
-      consumes:
-      - application/json
-      description: add a weight horse
-      parameters:
-      - description: Weight, fk_horse_id
-        in: body
-        name: addhorse
-        required: true
-        schema:
-          $ref: '#/definitions/model.Weights'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Weight add
-          schema:
-            $ref: '#/definitions/model.Weights'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: add a weight horse
-      tags:
-      - Weights
     put:
       consumes:
       - application/json
@@ -429,6 +354,162 @@ paths:
       summary: add a horse
       tags:
       - Horses
+  /api/v1/last-weights/:id:
+    get:
+      consumes:
+      - application/json
+      description: get last six weights horse and date
+      parameters:
+      - description: Horse Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Weight add
+          schema:
+            $ref: '#/definitions/model.Weights'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: get last six weights horse
+      tags:
+      - Weights
+  /api/v1/weight/:id:
+    get:
+      consumes:
+      - application/json
+      description: get last weight horse and date
+      parameters:
+      - description: Horse Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Weight add
+          schema:
+            $ref: '#/definitions/model.Weights'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: get last a weight horse
+      tags:
+      - Weights
+    post:
+      consumes:
+      - application/json
+      description: add a weight horse
+      parameters:
+      - description: Weight, fk_horse_id
+        in: body
+        name: addhorse
+        required: true
+        schema:
+          $ref: '#/definitions/model.Weights'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Weight add
+          schema:
+            $ref: '#/definitions/model.Weights'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: add a weight horse
+      tags:
+      - Weights
+  /api/v1/weights/:id:
+    get:
+      consumes:
+      - application/json
+      description: get weights horse and date
+      parameters:
+      - description: Horse Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Weight add
+          schema:
+            $ref: '#/definitions/model.Weights'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: get weights horse
+      tags:
+      - Weights
   /ping:
     get:
       description: Respond with "pong"
