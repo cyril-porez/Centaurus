@@ -16,6 +16,11 @@ function WeightTable() {
     navigate(`horses/follow/evolution/weight/table/${id}`, { replace: false });
   };
 
+  const formatDate = (/** @type {string | number | Date} */ dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("fr-FR");
+  };
+
   async function fetchData() {
     try {
       const horse = await weightApi.getWeightHorseForTable(id);
@@ -49,7 +54,7 @@ function WeightTable() {
               return (
                 <tr key={weightEntry?.date}>
                   <td className="border p-2 border-black w-1/2">
-                    {weightEntry?.date}
+                    {formatDate(weightEntry?.date)}
                   </td>
                   <td className="border p-2 border-black w-1/2">
                     {weightEntry?.weight} kg
