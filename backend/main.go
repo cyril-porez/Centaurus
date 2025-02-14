@@ -20,9 +20,9 @@ import (
 // @BasePath /
 func  main()  {
 	// charger le fichier .env
-	err := godotenv.Load()
+	err := godotenv.Load("/app/.env") /* docker : "/app/.env" sinon vide */
 	if err != nil {
-		log.Fatalf("Errzue lors du chargement du fichier .env : %v", err)
+		log.Fatalf("Erreur lors du chargement du fichier .env : %v", err)
 	}
 
 	jwtSecret := os.Getenv("JWT_SECRET_KEY")
@@ -35,6 +35,21 @@ func  main()  {
 	}
 	defer db.Close()
 
+	queryUsers := `CREATE TABLE IF NOT EXISTS users (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		username VARCHAR(255) NOT NULL,
+		password VARCHAR(255) NOT NULL,
+		email VARCHAR(255) NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	) DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;` 
+
+	_,err = db.Exec(queryUsers)
+	if err != nil {
+		log.Fatalf("error lors de la creation de la table users : %v", err)
+	}
+	fmt.Println("Table users créé avec succès")
+
 	query := `CREATE TABLE IF NOT EXISTS horses (
 		id INT AUTO_INCREMENT PRIMARY KEY,
 		name VARCHAR(255) NOT NULL,
@@ -42,8 +57,9 @@ func  main()  {
 		race VARCHAR(255) NOT NULL,
 		fk_user_id INT NOT NULL,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (fk_user_id) REFERENCES users(id) ON DELETE CASCADE
-	)`
+	)  DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;`
 
 	_, err = db.Exec(query)
 	if err != nil {
@@ -58,7 +74,7 @@ func  main()  {
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (fk_horse_id) REFERENCES horses(id) ON DELETE CASCADE
-	)`
+	) DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;`
 
 	_, err = db.Exec(queryWeight)
 	if err != nil {
@@ -68,5 +84,5 @@ func  main()  {
 
  	r := router.SetupRouter(db)
 
-	r.Run()
+	r.Run("0.0.0.0:8080")
 }
