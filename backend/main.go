@@ -19,21 +19,52 @@ import (
 // @host localhost:8080
 // @BasePath /
 func  main()  {
-	// charger le fichier .env
-	err := godotenv.Load("/app/.env") /* docker : "/app/.env" sinon vide */
-	if err != nil {
-		log.Fatalf("Erreur lors du chargement du fichier .env : %v", err)
+
+	envFile := ".env";
+
+	appEnv := os.Getenv("APP_ENV");
+
+	if appEnv == "docker" {
+		envFile = "/app/.env";
 	}
 
-	jwtSecret := os.Getenv("JWT_SECRET_KEY")
+	err := godotenv.Load(envFile)
+	if err != nil {
+		log.Printf("⚠️ Impossible de charger le fichier %s : %v", envFile, err)
+	}
+
+	appEnv = os.Getenv("APP_ENV");
+	databaseUrl := os.Getenv("DATABASE_URL");
+	localeDataBaseUrl := os.Getenv("LOCAL_DATABASE_URL");
+	jwtSecret := os.Getenv("JWT_SECRET_KEY");
+	port := os.Getenv("PORT");
+
+	fmt.Println("appEnv : ", appEnv)
+	fmt.Println("docker : ", databaseUrl);
+	fmt.Println("local : ", localeDataBaseUrl);
 	fmt.Println("Clé secrète :", jwtSecret)
+	fmt.Println("port :", port)
+
+	var dns string
+	if appEnv == "docker" {
+		dns = databaseUrl
+	} else {
+		dns = localeDataBaseUrl
+	}
 
 	// Initialisation de la base de données
-	db, err := config.InitializeDatabase()
+	db, err := config.InitializeDatabase(dns)
 	if err != nil {
 		log.Fatal("erreur de connexion à la BDD : ",err)
 	}
 	defer db.Close()
+
+	queryDB := `CREATE DATABASE IF NOT EXISTS centaurus`
+	_, err = db.Exec(queryDB);
+	if err != nil {
+		log.Fatalf("error lors de la creation de la BDD centaurus : %v", err)
+	}
+	fmt.Println("BDD centaurus créé avec succès")
 
 	queryUsers := `CREATE TABLE IF NOT EXISTS users (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -59,7 +90,7 @@ func  main()  {
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (fk_user_id) REFERENCES users(id) ON DELETE CASCADE
-	)  DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;`
+	) DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;`
 
 	_, err = db.Exec(query)
 	if err != nil {
@@ -84,5 +115,5 @@ func  main()  {
 
  	r := router.SetupRouter(db)
 
-	r.Run("0.0.0.0:8080")
+	r.Run(":" + port)
 }
