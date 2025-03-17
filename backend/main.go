@@ -20,7 +20,7 @@ import (
 // @BasePath /
 func  main()  {
 
-	envFile := ".env";
+	envFile := "../.env";
 
 	appEnv := os.Getenv("APP_ENV");
 
