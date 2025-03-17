@@ -26,15 +26,8 @@ RUN apk add --no-cache mysql-client
 COPY --from=builder /app/main .
 RUN chmod +x /root/main
 
-# Copier l'entrypoint et Donner les permissions d'execution à entrypoint.sh
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-
 #Exposer le port 
 EXPOSE 8080
-
-#Utilser l'entrypoint pour attendre MySql
-ENTRYPOINT [ "/app/entrypoint.sh" ]
 
 # Lancer l'application
 CMD ["/app/main"]
