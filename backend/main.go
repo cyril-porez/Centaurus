@@ -30,7 +30,7 @@ func  main()  {
 
 	err := godotenv.Load(envFile)
 	if err != nil {
-		log.Printf("⚠️ Impossible de charger le fichier %s : %v", envFile, err)
+		log.Printf("Impossible de charger le fichier %s : %v", envFile, err)
 	}
 
 	appEnv = os.Getenv("APP_ENV");
