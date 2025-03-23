@@ -30,7 +30,9 @@ services:
       - ./.env:/app/.env
     command:
       - "/root/main"
-
+    restart: always
+    environment:
+      - DATABASE_URL=root:root@tcp(mysql_container:3306)/centaurus?charset=utf8mb4&parseTime=True&loc=Local
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: phpmyadmin_container
@@ -45,20 +47,19 @@ services:
       PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
 
   frontend-pwa:
+    container_name: frontend_pwa
     build:
       context: ./front-end-PWA
       dockerfile: Dockerfile
       args:
-        api_url: "http://localhost:5000" # EN LOCAL
+        REACT_APP_API_HOST: "http://localhost:8080" # EN LOCAL
         # api_url: "https://api-preprod.example.com" EN PREPROD
         # api_url: "https://api.example.com" EN PROD
     ports:
       - "3000:80"
     restart: always
-
-networks:
-  backend_network:
-    driver: bridge
+    environment:
+      - REACT_APP_API_HOST=/api
 
 volumes:
   mysql_data:

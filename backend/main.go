@@ -39,6 +39,8 @@ func  main()  {
 	jwtSecret := os.Getenv("JWT_SECRET_KEY");
 	port := os.Getenv("PORT");
 
+	
+
 	fmt.Println("appEnv : ", appEnv)
 	fmt.Println("docker : ", databaseUrl);
 	fmt.Println("local : ", localeDataBaseUrl);

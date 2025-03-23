@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    volumes:
+      - ./backend:/app
+    command: ["air"]
+    environment:
+      - DATABASE_URL=root:root@tcp(mysql_container:3306)/centaurus?charset=utf8mb4&parseTime=True&loc=Local
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend-pwa:
+    build:
+      target: dev
+    command: ["npm", "start"]
+    volumes:
+      - ./front-end-PWA:/app
+      - /app/node_modules
+    ports:
+      - "3001:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_HOST=http://localhost::8080

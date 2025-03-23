@@ -1,0 +1,53 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      target: runtime
+    image: backend:latest
+    restart: always
+    environment:
+      - DATABASE_URL=root:root@tcp(mysql_container:3306)/centaurus?charset=utf8mb4&parseTime=True&loc=Local
+    networks:
+      - app_network
+    command: ["/root/main"]
+
+  frontend-pwa:
+    build:
+      context: ./front-end-pwa
+      target: prod
+      args:
+        REACT_APP_API_HOST: /api
+    image: frontend-pwa:latest
+    restart: always
+    environment:
+      - REACT_APP_API_URL=https://api.example.command
+    networks:
+      - app_network
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app_network
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
