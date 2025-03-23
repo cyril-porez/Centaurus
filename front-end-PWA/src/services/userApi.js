@@ -12,7 +12,7 @@ async function register(email, password, pseudo) {
 
     return response.data;
   } catch (error) {
-    console.log(error.response.data);
+    console.log(error.response);
 
     return error.response.data;
   }
