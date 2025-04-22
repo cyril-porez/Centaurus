@@ -4,7 +4,7 @@ FRONTEND_PORT ?= 3001
 .PHONY: dev
 dev:
 	@echo "🚀 Lancement DEV sur le port $(FRONTEND_PORT)"
-	FRONTEND_PORT=$(FRONTEND_PORT) docker-compose -f docker-compose.dev.yml up --build
+	FRONTEND_PORT=$(FRONTEND_PORT) docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.dev.yml up --build
 
 ## Lancer sans rebuild (conteneurs déjà créés)
 .PHONY: up
