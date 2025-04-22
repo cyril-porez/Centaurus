@@ -17,6 +17,6 @@ func PingHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status" : "ok",
 		"code" : 200,
-		"message": "pong",
+		"message": "pong V3",
 	})
 }

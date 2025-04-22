@@ -1,28 +1,28 @@
 FRONTEND_PORT ?= 3001
 
-## Lancer l'app en mode développement avec hot reload React
+## Lancer l'app en mode développement avec hot reload (backend Air + React)
 .PHONY: dev
 dev:
-	@echo "🚀 Lancement en mode DEV sur le port $(FRONTEND_PORT)"
-	FRONTEND_PORT=$(FRONTEND_PORT) docker-compose up --build
+	@echo "🚀 Lancement DEV sur le port $(FRONTEND_PORT)"
+	FRONTEND_PORT=$(FRONTEND_PORT) docker-compose -f docker-compose.dev.yml up --build
 
 ## Lancer sans rebuild (conteneurs déjà créés)
 .PHONY: up
 up:
 	@echo "🔄 Démarrage sans rebuild"
-	FRONTEND_PORT=$(FRONTEND_PORT) docker-compose up -d
+	FRONTEND_PORT=$(FRONTEND_PORT) docker-compose -f docker-compose.dev.yml up -d
 
 ## Arrêter les conteneurs
 .PHONY: stop
 stop:
 	@echo "🛑 Arrêt des conteneurs"
-	docker-compose down
+	docker-compose -f docker-compose.dev.yml down
 
 ## Nettoyer tout (conteneurs, volumes, réseaux orphelins)
 .PHONY: clean
 clean:
 	@echo "🧹 Nettoyage complet"
-	docker-compose down -v --remove-orphans
+	docker-compose -f docker-compose.dev.yml down -v --remove-orphans
 
 ## Lancer l'environnement de production (frontend + backend + nginx)
 .PHONY: prod
@@ -34,7 +34,7 @@ prod:
 .PHONY: logs
 logs:
 	@echo "📡 Logs de tous les services"
-	docker-compose logs -f
+	docker-compose -f docker-compose.dev.yml logs -f
 
 ## Rebuild complet sans cache
 .PHONY: rebuild

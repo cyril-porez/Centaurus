@@ -32,7 +32,8 @@ services:
       - "/root/main"
     restart: always
     environment:
-      - DATABASE_URL=root:root@tcp(mysql_container:3306)/centaurus?charset=utf8mb4&parseTime=True&loc=Local
+      - ENV_FILE=/env/.env
+      - DATABASE_URL=root:root@tcp(mysql:3306)/centaurus?charset=utf8mb4&parseTime=True&loc=Local
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: phpmyadmin_container

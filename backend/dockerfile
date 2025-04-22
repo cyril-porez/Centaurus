@@ -5,6 +5,7 @@ FROM golang:1.23-alpine AS builder
 WORKDIR /app
 
 # Installer air pour le hot-reload
+ENV AIR_POLL=true
 RUN apk add --no-cache curl && \
     curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b /usr/local/bin
 
@@ -49,6 +50,7 @@ RUN apk add --no-cache git curl gcc g++ musl-dev && \
 
 #Copier le code Source
 COPY . .
+COPY .air.toml .air.toml
 
 #Expose les port
 EXPOSE 8080

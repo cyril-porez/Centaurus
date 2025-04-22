@@ -1,21 +1,35 @@
 services:
   backend:
-    restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
     volumes:
       - ./backend:/app
+      - ./.env:/env/.env
+      - /app/tmp # pour éviter les conflits avec le binaire `tmp/main`
     environment:
       - LOG_LEVEL=debug
-      - DATABASE_URL=root:root@tcp(mysql_container:3306)/centaurus?charset=utf8mb4&parseTime=True&loc=Local
-
+      - DATABASE_URL=root:root@tcp(mysql:3306)/centaurus?charset=utf8mb4&parseTime=True&loc=Local
+      - AIR_POLL=true
+    ports:
+      - "8080:8080"
+    working_dir: /app
+    command: ["air"]
+    depends_on:
+      - mysql
+    restart: unless-stopped
   frontend-pwa:
     build:
       target: dev
+      context: ./front-end-PWA
+      dockerfile: Dockerfile
     command: ["npm", "start"]
     volumes:
       - ./front-end-PWA:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-5173}:3000"
     environment:
       - CHOKIDAR_USEPOLLING=true
       - REACT_APP_API_HOST=http://localhost:8080
@@ -24,6 +38,7 @@ services:
     #   - ./front-end-PWA:/usr/share/nginx/html
 
   mysql:
+    image: mysql:8
     ports:
       - "3306:3306"
     environment:
@@ -35,4 +50,12 @@ services:
       - mysql_data:/var/lib/mysql
 
   phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=mysql
     restart: unless-stopped
+volumes:
+  mysql_data:
