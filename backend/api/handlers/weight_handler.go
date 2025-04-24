@@ -12,8 +12,8 @@ import (
 )
 
 //AddWeight godoc
-//@Summary add a weight horse
-//@Description add a weight horse
+//@Summary A  dd a weight horse
+//@Description Add a weight horse
 //@Tags Weights
 //@Accept json
 //@Produce json

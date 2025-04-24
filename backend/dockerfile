@@ -44,8 +44,9 @@ FROM golang:1.23-alpine AS dev
 
 WORKDIR /app
 
-# Installer Go et `air` pour le hot-reload
+# Installer Go et `air` et swag  pour le hot-reload +doc
 RUN apk add --no-cache git curl gcc g++ musl-dev && \
+    go install github.com/swaggo/swag/cmd/swag@latest && \
     curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b /usr/local/bin
 
 #Copier le code Source

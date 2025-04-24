@@ -34,6 +34,7 @@ async function login(email, password) {
 }
 
 async function getuser(userId) {
+  console.log(URL);
   try {
     const response = await axios.get(`${URL}/api/users/${userId}`);
     return response.data;

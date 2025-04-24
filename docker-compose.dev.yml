@@ -7,7 +7,7 @@ services:
     volumes:
       - ./backend:/app
       - ./.env:/env/.env
-      - /app/tmp # pour éviter les conflits avec le binaire `tmp/main`
+      # - /app/tmp # pour éviter les conflits avec le binaire `tmp/main`
     environment:
       - LOG_LEVEL=debug
       - DATABASE_URL=root:root@tcp(mysql:3306)/centaurus?charset=utf8mb4&parseTime=True&loc=Local

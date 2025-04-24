@@ -301,7 +301,7 @@
         },
         "/api/v1/horses/add-horse": {
             "post": {
-                "description": "add a  horse",
+                "description": "add a h  test",
                 "consumes": [
                     "application/json"
                 ],
@@ -311,7 +311,7 @@
                 "tags": [
                     "Horses"
                 ],
-                "summary": "add a horse",
+                "summary": "add a horse test",
                 "parameters": [
                     {
                         "description": "Name, Age and Race",
@@ -537,7 +537,7 @@
                 }
             },
             "post": {
-                "description": "add a weight horse",
+                "description": "Add a weight horse",
                 "consumes": [
                     "application/json"
                 ],
@@ -547,7 +547,7 @@
                 "tags": [
                     "Weights"
                 ],
-                "summary": "add a weight horse",
+                "summary": "A  dd a weight horse",
                 "parameters": [
                     {
                         "description": "Weight, fk_horse_id",
