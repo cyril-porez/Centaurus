@@ -1,0 +1,66 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    env_file:
+      - .env
+    build:
+      context: ./backend
+    container_name: go_backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./.env:/app/.env
+    command:
+      - "/root/main"
+    restart: always
+    environment:
+      - ENV_FILE=/env/.env
+      - DATABASE_URL=root:root@tcp(mysql:3306)/centaurus?charset=utf8mb4&parseTime=True&loc=Local
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin_container
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+  frontend-pwa:
+    container_name: frontend_pwa
+    build:
+      context: ./front-end-PWA
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_HOST: "http://localhost:8080" # EN LOCAL
+        # api_url: "https://api-preprod.example.com" EN PREPROD
+        # api_url: "https://api.example.com" EN PROD
+    ports:
+      - "3000:80"
+    restart: always
+    environment:
+      - REACT_APP_API_HOST=/api
+
+volumes:
+  mysql_data:

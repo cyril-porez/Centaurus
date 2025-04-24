@@ -318,7 +318,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: add a  horse
+      description: add a h  test
       parameters:
       - description: Name, Age and Race
         in: body
@@ -351,7 +351,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: add a horse
+      summary: add a horse test
       tags:
       - Horses
   /api/v1/last-weights/:id:
@@ -435,7 +435,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: add a weight horse
+      description: Add a weight horse
       parameters:
       - description: Weight, fk_horse_id
         in: body
@@ -468,7 +468,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: add a weight horse
+      summary: A  dd a weight horse
       tags:
       - Weights
   /api/v1/weights/:id:

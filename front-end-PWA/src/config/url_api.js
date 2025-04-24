@@ -1,7 +1,7 @@
 // const address = "https://homalink-back-master.development.atelier.ovh";
 // const localAddressStrapi = "http://localhost:1337";
 const localAddress = "http://localhost:8080/api/v1";
-
+// const localAddress = "backend:8080/api/v1";
 export const URL = `${localAddress}`;
 
 export const URL_LOGIN = `${localAddress}/auth/sign-in`;

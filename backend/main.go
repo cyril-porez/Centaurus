@@ -20,24 +20,32 @@ import (
 // @BasePath /
 func  main()  {
 
-	envFile := "../.env";
+	// envFile := "../.env";
+	// envFile := "/app/.env";
 
-	appEnv := os.Getenv("APP_ENV");
-
-	if appEnv == "docker" {
-		envFile = "/app/.env";
+	envFile := os.Getenv("ENV_FILE")
+	if envFile == "" {
+		envFile = "/env/.env" // fallback si non défini
 	}
+
+	// appEnv := os.Getenv("APP_ENV");
+
+	// if appEnv == "docker" {
+	// 	envFile = "/app/.env";
+	// }
 
 	err := godotenv.Load(envFile)
 	if err != nil {
 		log.Printf("Impossible de charger le fichier %s : %v", envFile, err)
 	}
 
-	appEnv = os.Getenv("APP_ENV");
+	appEnv := os.Getenv("APP_ENV");
 	databaseUrl := os.Getenv("DATABASE_URL");
 	localeDataBaseUrl := os.Getenv("LOCAL_DATABASE_URL");
 	jwtSecret := os.Getenv("JWT_SECRET_KEY");
 	port := os.Getenv("PORT");
+
+	
 
 	fmt.Println("appEnv : ", appEnv)
 	fmt.Println("docker : ", databaseUrl);

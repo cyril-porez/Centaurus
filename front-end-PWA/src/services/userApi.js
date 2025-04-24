@@ -12,7 +12,7 @@ async function register(email, password, pseudo) {
 
     return response.data;
   } catch (error) {
-    console.log(error.response.data);
+    console.log(error.response);
 
     return error.response.data;
   }
@@ -34,6 +34,7 @@ async function login(email, password) {
 }
 
 async function getuser(userId) {
+  console.log(URL);
   try {
     const response = await axios.get(`${URL}/api/users/${userId}`);
     return response.data;

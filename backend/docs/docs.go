@@ -307,7 +307,7 @@ const docTemplate = `{
         },
         "/api/v1/horses/add-horse": {
             "post": {
-                "description": "add a  horse",
+                "description": "add a h  test",
                 "consumes": [
                     "application/json"
                 ],
@@ -317,7 +317,7 @@ const docTemplate = `{
                 "tags": [
                     "Horses"
                 ],
-                "summary": "add a horse",
+                "summary": "add a horse test",
                 "parameters": [
                     {
                         "description": "Name, Age and Race",
@@ -543,7 +543,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "add a weight horse",
+                "description": "Add a weight horse",
                 "consumes": [
                     "application/json"
                 ],
@@ -553,7 +553,7 @@ const docTemplate = `{
                 "tags": [
                     "Weights"
                 ],
-                "summary": "add a weight horse",
+                "summary": "A  dd a weight horse",
                 "parameters": [
                     {
                         "description": "Weight, fk_horse_id",

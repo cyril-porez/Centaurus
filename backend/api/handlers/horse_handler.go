@@ -12,8 +12,8 @@ import (
 )
 
 //AddHorseHandler godoc
-//@Summary add a horse
-//@Description add a  horse
+//@Summary add a horse test
+//@Description add a h  test
 //@Tags Horses
 //@Accept json
 //@Produce json

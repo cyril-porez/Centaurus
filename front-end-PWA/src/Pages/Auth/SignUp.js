@@ -13,15 +13,15 @@ function SignUp() {
   let navigate = useNavigate();
 
   const createUser = async (data) => {
-    const fetchData = await userApi.register(
+    const register = await userApi.register(
       data.email,
       data.password,
       data.name
     );
-    if (fetchData.header.code === 201) {
+    if (register.header.code === 201) {
       navigate("/auth/sign-in", { replace: false });
     } else {
-      setError(fetchData.body.details[0].issue);
+      setError(register.body.details[0].issue);
     }
   };
 

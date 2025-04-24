@@ -4,6 +4,11 @@ FROM golang:1.23-alpine AS builder
 #Définir le répertoire de travail
 WORKDIR /app
 
+# Installer air pour le hot-reload
+ENV AIR_POLL=true
+RUN apk add --no-cache curl && \
+    curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b /usr/local/bin
+
 #copier les fichier go mod 
 COPY go.mod go.sum ./
 RUN go mod download
@@ -15,7 +20,7 @@ COPY . .
 RUN go build -o main .
 
 # Etape 2 : Image finale
-FROM alpine:latest
+FROM alpine:latest AS runtime
 
 WORKDIR /root/
 
@@ -24,10 +29,32 @@ RUN apk add --no-cache mysql-client
 
 #Copier l'exécutable depuis le build
 COPY --from=builder /app/main .
-RUN chmod +x /root/main
+COPY --from=builder /usr/local/bin/air /usr/local/bin/air
+
+RUN chmod +x /root/main /usr/local/bin/air
 
 #Exposer le port 
 EXPOSE 8080
 
 # Lancer l'application
-CMD ["/app/main"]
+CMD ["/root/main"]
+
+#Etape 3 : Image pour le devellopement (contient go)
+FROM golang:1.23-alpine AS dev
+
+WORKDIR /app
+
+# Installer Go et `air` et swag  pour le hot-reload +doc
+RUN apk add --no-cache git curl gcc g++ musl-dev && \
+    go install github.com/swaggo/swag/cmd/swag@latest && \
+    curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b /usr/local/bin
+
+#Copier le code Source
+COPY . .
+COPY .air.toml .air.toml
+
+#Expose les port
+EXPOSE 8080
+
+#Lancer `air` pour le developpement
+CMD ["air"] 
