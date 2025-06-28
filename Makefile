@@ -24,6 +24,11 @@ clean:
 	@echo "🧹 Nettoyage complet"
 	docker-compose -f docker-compose.dev.yml down -v --remove-orphans
 
+.PHONY: preprod
+preprod:
+	@echo "🚀 Déploiement PREPROD"
+	docker-compose -f docker-compose.yml -f docker-compose.preprod.yml up --build
+
 ## Lancer l'environnement de production (frontend + backend + nginx)
 .PHONY: prod
 prod:

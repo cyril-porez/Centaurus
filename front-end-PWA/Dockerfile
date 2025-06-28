@@ -20,8 +20,8 @@ FROM node:18-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-ARG REACT_APP_API_HOST
-ENV REACT_APP_API_HOST=$REACT_APP_API_HOST
+ARG REACT_APP_API_URL
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
 RUN npm run build
 
 #-------------------- Step 4 Serve with nginx ----------------------#
