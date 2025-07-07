@@ -27,14 +27,14 @@ clean:
 .PHONY: preprod
 preprod:
 	@echo "🚀 Déploiement PREPROD"
-	docker-compose -f docker-compose.yml -f docker-compose.preprod.yml up --build
+	docker compose -f docker-compose.yml -f docker-compose.preprod.yml up --build
 
 ## Lancer l'environnement de production (frontend + backend + nginx)
 .PHONY: prod
 prod:
 	@echo "🚀 Lancement en mode PROD"
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build
-
+	
 ## Afficher les logs de tous les conteneurs
 .PHONY: logs
 logs:
