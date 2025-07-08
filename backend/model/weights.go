@@ -5,7 +5,6 @@ type Weights struct {
 	Weight           int    `json:"weight" binding:"required"`
 	LastWeight       int    `json:"lastWeight"`
 	DifferenceWeight int    `json:"diiferenceWeight"`
-	Date             string `json:"date" binding:"required"`
 	LastDate         string `json:"last_date"`
 	FkHorseId        int    `json:"FkHorseId"`
 	CreatedAt        string `json:"CreatedAt"`

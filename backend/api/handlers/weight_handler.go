@@ -22,7 +22,7 @@ import (
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /api/v1/weight/:id [post]
+//@Router /api/v1/horses/:id/weights [post]
 func AddWeight(c *gin.Context, db *sql.DB, id string) {
 	var newWeight model.Weights ;
 
@@ -97,126 +97,41 @@ func AddWeight(c *gin.Context, db *sql.DB, id string) {
 
 }
 
+// GetHorseWeights godoc
+// @Summary Get horse weights
+// @Description Retrieve weights of a horse. Use query parameters to filter: limit, sort (asc|desc), and compare=true to include last weight difference.
+// @Tags Weights
+// @Accept json
+// @Produce json
+// @Param id path int true "Horse ID"
+// @Param limit query int false "Limit number of weights returned (e.g., 1, 6, etc.)"
+// @Param sort query string false "Sort order (asc or desc). Default is asc."
+// @Param compare query bool false "Include comparison fields for last weight (only works with limit=1)"
+// @Success 200 {object} model.Weights "Horse weights data"
+// @Failure 400 {object} map[string]string "Validation error"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /api/v1/horses/{id}/weights [get]
+func GetHoreseWeights(c *gin.Context, db *sql.DB, id string, limit string, sort string, compare string) {
+	var details []utils.ErrorDetail
 
-//GetLastWeight godoc
-//@Summary get last a weight horse 
-//@Description get last weight horse and date
-//@Tags Weights
-//@Accept json
-//@Produce json
-//@Param id path int true "Horse Id"
-//@Success 200 {object} model.Weights "Weight add"
-//@Failure 400 {object} map[string]string
-//@Failure 401 {object} map[sting]string
-//@Failure 500 {object} map[string]string
-//@Router /api/v1/weight/:id [get]
-func GetLastWeightHorse(c *gin.Context, db *sql.DB, id string) {
-	var newWeight model.Weights ;
-	var horse model.Horses;
-
-	if details, err := service.GetLastWeightHorse(db, &newWeight, &horse,id); err != nil || len(details) > 0 {
+	horse, weights, comparisonData, details, err := service.GetHorseWeights(db, id, limit, sort, compare)
+	if err != nil || len(details) > 0 {
 		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
+			utils.WriteErrorResponse(c, http.StatusInternalServerError, "Validation Error", utils.ErrorResponseInput{	
 				Details: details,
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/Weight/:id",
-						"METHOD": "POST",
-					},
-				},
+				Meta: map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			})
 		} else {
 			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/auth/signin",
-						"METHOD": "POST",
-					},
-				},
+				Meta: map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			})
-		} 
+		}
 		return
-	}	
+	}
 
 	body := gin.H{
     "horse": gin.H{
 			"name": horse.Name,
-      "weight": newWeight.Weight,
-			"last_weight" : newWeight.LastWeight,
-			"difference_weight": newWeight.DifferenceWeight,
-			"date": newWeight.Date,
-			"previous_date": newWeight.LastDate,
-			"fk_horse_id": newWeight.FkHorseId,
-		},
-		"_links": gin.H{
-        "sign-in": gin.H{
-					"href":"/api/v1/horses/update",
-					"Method": "POST", 
-				},
-		},
-		"meta": gin.H{
-			"createdAt": newWeight.CreatedAt,
-			"welcomeMessage": "You add a weight of a horse", 
-		},
-	}
-
-	utils.WriteSuccesResponse(c, http.StatusOK, "get data successful", body)
-
-}
-
-//GetLastSixWeightsHorse godoc
-//@Summary get last six weights horse 
-//@Description get last six weights horse and date
-//@Tags Weights
-//@Accept json
-//@Produce json
-//@Param id path int true "Horse Id"
-//@Success 200 {object} model.Weights "Weight add"
-//@Failure 400 {object} map[string]string
-//@Failure 401 {object} map[sting]string
-//@Failure 500 {object} map[string]string
-//@Router /api/v1/last-weights/:id [get]
-func GetLastSixWeightsHorse(c *gin.Context, db *sql.DB, id string) {
-	name,weights ,details, err := service.GetLastSixWeightsHorse(db, id)
-	if  err != nil || len(details) > 0 {
-		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
-				Details: details,
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/Weight/:id",
-						"METHOD": "POST",
-					},
-				},
-			})
-		} else {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/auth/signin",
-						"METHOD": "POST",
-					},
-				},
-			})
-		} 
-		return
-	}
-
-	body := gin.H{
-    "horse": gin.H{
-			"name": name.Name,
       "data": weights,
 		},
 		"_links": gin.H{
@@ -230,70 +145,13 @@ func GetLastSixWeightsHorse(c *gin.Context, db *sql.DB, id string) {
 			"welcomeMessage": "You get data a horses for a user", 
 		},
 	}
-
-	utils.WriteSuccesResponse(c, http.StatusOK, "get data horses successful", body)
-}
-
-//GetxWeightsHorse godoc
-//@Summary get weights horse 
-//@Description get weights horse and date
-//@Tags Weights
-//@Accept json
-//@Produce json
-//@Param id path int true "Horse Id"
-//@Success 200 {object} model.Weights "Weight add"
-//@Failure 400 {object} map[string]string
-//@Failure 401 {object} map[sting]string
-//@Failure 500 {object} map[string]string
-//@Router /api/v1/weights/:id [get]
-func GetWeightsHorse(c *gin.Context, db *sql.DB, id string) {
-	name,weights ,details, err := service.GetWeightsHorse(db, id)
-	if  err != nil || len(details) > 0 {
-		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
-				Details: details,
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/Weight/:id",
-						"METHOD": "POST",
-					},
-				},
-			})
-		} else {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/auth/signin",
-						"METHOD": "POST",
-					},
-				},
-			})
-		} 
-		return
+	
+	if comparisonData != nil {
+		body["horse"].(gin.H)["last_weight"] = comparisonData.LastWeight
+		body["horse"].(gin.H)["difference_weight"] = comparisonData.DifferenceWeight
+		body["horse"].(gin.H)["previous_date"] = comparisonData.LastDate
+		body["horse"].(gin.H)["date"] = comparisonData.CreatedAt
 	}
 
-	body := gin.H{
-    "horse": gin.H{
-			"name": name.Name,
-      "data": weights,
-		},
-		"_links": gin.H{
-        "sign-in": gin.H{
-					"href":"/api/v1/horses/update",
-					"Method": "PUT", 
-				},
-		},
-		"meta": gin.H{
-			"count": len(weights),
-			"welcomeMessage": "You get data a horses for a user", 
-		},
-	}
-
-	utils.WriteSuccesResponse(c, http.StatusOK, "get data horses successful", body)
+	utils.WriteSuccesResponse(c, http.StatusOK, "Get weights successful", body)
 }

@@ -17,74 +17,48 @@ func AddWeightHorse(db *sql.DB, weight *model.Weights, id string) ([]utils.Error
   return nil, nil;
 }
 
-func GetLastWeightHorse(db *sql.DB, weight *model.Weights, horse *model.Horses,id string) ([]utils.ErrorDetail, error) {
-  var details []utils.ErrorDetail;
 
-  if err := repository.GetLastWeightHorse(db, weight, horse, id); err != nil {
-    utils.AddErrorDetail(&details,"test", "test");
-    return details, nil;
-  }
-  return nil, nil
-}
-
-func GetLastSixWeightsHorse(db *sql.DB, id string) (*model.Horses, []model.Weights, []utils.ErrorDetail, error) {
+func GetHorseWeights(db *sql.DB, id string, limit string, sort string, compare string) (*model.Horses, []model.Weights, *model.Weights, []utils.ErrorDetail, error){
   var details []utils.ErrorDetail
-	rows, err := repository.GetLastSixWeightsHorse(db, id);
+
+	// Si compare == true et limit == 1 => on appelle la query spéciale "comparaison"
+	if compare == "true" && limit == "1" {
+		weight := &model.Weights{}
+		horse := &model.Horses{}
+
+		if err := repository.GetLastWeightHorse(db, weight, horse, id); err != nil {
+			utils.AddErrorDetail(&details, "query_error", "Error getting last weight with comparison")
+			return nil, nil, nil, details, err
+		}
+
+		// On renvoie un seul poids dans le tableau (pour cohérence)
+		weights := []model.Weights{*weight}
+		return horse, weights, weight, nil, nil
+	}
+  // Sinon, on prend la liste classique
+	rows, err := repository.GetHorseWeights(db, id, limit, sort)
 	if err != nil {
-		utils.AddErrorDetail(&details, "test", "test");
-		return  nil, nil, details, err;
+		utils.AddErrorDetail(&details, "db_error", "Error querying database")
+		return nil, nil, nil, details, err
+	}
+	defer rows.Close()
+
+	var weights []model.Weights
+	var horse model.Horses
+
+	for rows.Next() {
+		var weight model.Weights
+		if err = rows.Scan(&horse.Name, &weight.CreatedAt, &weight.Weight); err != nil {
+			utils.AddErrorDetail(&details, "scan_error", "Error scanning data")
+			return nil, nil, nil, details, err
+		}
+		weights = append(weights, weight)
 	}
 
-  defer rows.Close();
-
-  var weights []model.Weights
-  var horse model.Horses;
-
-  for rows.Next() {
-    var weight model.Weights;
-    
-    if err = rows.Scan(&horse.Name, &weight.Date, &weight.Weight); err != nil {
-      utils.AddErrorDetail(&details, "repsitory error", "Error lors de la récupération des données");
-			return nil, nil, details, err;
-    }
-    weights = append(weights, weight);
-  }
-
-  if err := rows.Err(); err != nil {
-    utils.AddErrorDetail(&details, "repsitory error", "Error lors de la résultats");
-    return nil, nil, details, err;
-  }
-
-  return &horse, weights, details, nil
-}
-
-func GetWeightsHorse(db *sql.DB, id string) (*model.Horses, []model.Weights, []utils.ErrorDetail, error) {
-  var details []utils.ErrorDetail
-	rows, err := repository.GetWeightsHorse(db, id);
-	if err != nil {
-		utils.AddErrorDetail(&details, "test", "test");
-		return  nil, nil, details, err;
+	if err = rows.Err(); err != nil {
+		utils.AddErrorDetail(&details, "rows_error", "Error reading rows")
+		return nil, nil, nil, details, err
 	}
 
-  defer rows.Close();
-
-  var weights []model.Weights
-  var horse model.Horses;
-
-  for rows.Next() {
-    var weight model.Weights;
-    
-    if err = rows.Scan(&horse.Name, &weight.Date, &weight.Weight); err != nil {
-      utils.AddErrorDetail(&details, "repsitory error", "Error lors de la récupération des données");
-			return nil, nil, details, err;
-    }
-    weights = append(weights, weight);
-  }
-
-  if err := rows.Err(); err != nil {
-    utils.AddErrorDetail(&details, "repsitory error", "Error lors de la résultats");
-    return nil, nil, details, err;
-  }
-
-  return &horse, weights, details, nil
+	return &horse, weights, nil, nil, nil
 }
