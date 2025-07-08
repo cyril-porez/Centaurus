@@ -46,22 +46,18 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 			handlers.DeleteHorseHandler(c, db, id);
 	})
 
-	r.POST("api/v1/weight/:id", func(c *gin.Context) {
+	r.POST("api/v1/horses/:id/weights", func(c *gin.Context) {
 		id := c.Param("id");
 		handlers.AddWeight(c, db, id);
 	})
-	r.GET("api/v1/weight/:id", func(c *gin.Context) {
-		id := c.Param("id");
-		handlers.GetLastWeightHorse(c, db, id);
-	})
-	r.GET("api/v1/last-weights/:id", func(c *gin.Context) {
-		id := c.Param("id");
-		handlers.GetLastSixWeightsHorse(c, db, id);
-	})
 
-	r.GET("api/v1/weights/:id", func(c *gin.Context) {
-		id := c.Param("id");
-		handlers.GetWeightsHorse(c, db, id);
+	r.GET("api/v1/horses/:id/weights", func(c *gin.Context) {
+		id := c.Param("id")
+		limit := c.DefaultQuery("limit", "")
+		sort := c.DefaultQuery("sort", "asc")
+		compare:= c.DefaultQuery("compare", "false")
+
+		handlers.GetHoreseWeights(c, db, id,limit, sort, compare)
 	})
 	
 	//route de teste

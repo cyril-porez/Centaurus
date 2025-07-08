@@ -305,6 +305,67 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/horses/:id/weights": {
+            "post": {
+                "description": "Add a weight horse",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Weights"
+                ],
+                "summary": "A  dd a weight horse",
+                "parameters": [
+                    {
+                        "description": "Weight, fk_horse_id",
+                        "name": "addhorse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Weights"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Weight add",
+                        "schema": {
+                            "$ref": "#/definitions/model.Weights"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/horses/add-horse": {
             "post": {
                 "description": "add a h  test",
@@ -425,9 +486,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/last-weights/:id": {
+        "/api/v1/horses/{id}/weights": {
             "get": {
-                "description": "get last six weights horse and date",
+                "description": "Retrieve weights of a horse. Use query parameters to filter: limit, sort (asc|desc), and compare=true to include last weight difference.",
                 "consumes": [
                     "application/json"
                 ],
@@ -437,34 +498,43 @@ const docTemplate = `{
                 "tags": [
                     "Weights"
                 ],
-                "summary": "get last six weights horse",
+                "summary": "Get horse weights",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Horse Id",
+                        "description": "Horse ID",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit number of weights returned (e.g., 1, 6, etc.)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort order (asc or desc). Default is asc.",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Include comparison fields for last weight (only works with limit=1)",
+                        "name": "compare",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Weight add",
+                        "description": "Horse weights data",
                         "schema": {
                             "$ref": "#/definitions/model.Weights"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
+                        "description": "Validation error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -473,184 +543,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/weight/:id": {
-            "get": {
-                "description": "get last weight horse and date",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Weights"
-                ],
-                "summary": "get last a weight horse",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Horse Id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Weight add",
-                        "schema": {
-                            "$ref": "#/definitions/model.Weights"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Add a weight horse",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Weights"
-                ],
-                "summary": "A  dd a weight horse",
-                "parameters": [
-                    {
-                        "description": "Weight, fk_horse_id",
-                        "name": "addhorse",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.Weights"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Weight add",
-                        "schema": {
-                            "$ref": "#/definitions/model.Weights"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/weights/:id": {
-            "get": {
-                "description": "get weights horse and date",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Weights"
-                ],
-                "summary": "get weights horse",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Horse Id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Weight add",
-                        "schema": {
-                            "$ref": "#/definitions/model.Weights"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -764,7 +657,6 @@ const docTemplate = `{
         "model.Weights": {
             "type": "object",
             "required": [
-                "date",
                 "weight"
             ],
             "properties": {
@@ -775,9 +667,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "UpdateddAt": {
-                    "type": "string"
-                },
-                "date": {
                     "type": "string"
                 },
                 "diiferenceWeight": {

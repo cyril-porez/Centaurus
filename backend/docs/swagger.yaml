@@ -61,8 +61,6 @@ definitions:
         type: integer
       UpdateddAt:
         type: string
-      date:
-        type: string
       diiferenceWeight:
         type: integer
       id:
@@ -74,7 +72,6 @@ definitions:
       weight:
         type: integer
     required:
-    - date
     - weight
     type: object
 host: localhost:8080
@@ -275,6 +272,46 @@ paths:
       summary: Get a horse
       tags:
       - Horses
+  /api/v1/horses/:id/weights:
+    post:
+      consumes:
+      - application/json
+      description: Add a weight horse
+      parameters:
+      - description: Weight, fk_horse_id
+        in: body
+        name: addhorse
+        required: true
+        schema:
+          $ref: '#/definitions/model.Weights'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Weight add
+          schema:
+            $ref: '#/definitions/model.Weights'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: A  dd a weight horse
+      tags:
+      - Weights
   /api/v1/horses/{id}:
     get:
       consumes:
@@ -314,6 +351,52 @@ paths:
       summary: get a list of horses
       tags:
       - Horses
+  /api/v1/horses/{id}/weights:
+    get:
+      consumes:
+      - application/json
+      description: 'Retrieve weights of a horse. Use query parameters to filter: limit,
+        sort (asc|desc), and compare=true to include last weight difference.'
+      parameters:
+      - description: Horse ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Limit number of weights returned (e.g., 1, 6, etc.)
+        in: query
+        name: limit
+        type: integer
+      - description: Sort order (asc or desc). Default is asc.
+        in: query
+        name: sort
+        type: string
+      - description: Include comparison fields for last weight (only works with limit=1)
+        in: query
+        name: compare
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Horse weights data
+          schema:
+            $ref: '#/definitions/model.Weights'
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get horse weights
+      tags:
+      - Weights
   /api/v1/horses/add-horse:
     post:
       consumes:
@@ -354,162 +437,6 @@ paths:
       summary: add a horse test
       tags:
       - Horses
-  /api/v1/last-weights/:id:
-    get:
-      consumes:
-      - application/json
-      description: get last six weights horse and date
-      parameters:
-      - description: Horse Id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Weight add
-          schema:
-            $ref: '#/definitions/model.Weights'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: get last six weights horse
-      tags:
-      - Weights
-  /api/v1/weight/:id:
-    get:
-      consumes:
-      - application/json
-      description: get last weight horse and date
-      parameters:
-      - description: Horse Id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Weight add
-          schema:
-            $ref: '#/definitions/model.Weights'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: get last a weight horse
-      tags:
-      - Weights
-    post:
-      consumes:
-      - application/json
-      description: Add a weight horse
-      parameters:
-      - description: Weight, fk_horse_id
-        in: body
-        name: addhorse
-        required: true
-        schema:
-          $ref: '#/definitions/model.Weights'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Weight add
-          schema:
-            $ref: '#/definitions/model.Weights'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: A  dd a weight horse
-      tags:
-      - Weights
-  /api/v1/weights/:id:
-    get:
-      consumes:
-      - application/json
-      description: get weights horse and date
-      parameters:
-      - description: Horse Id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Weight add
-          schema:
-            $ref: '#/definitions/model.Weights'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: get weights horse
-      tags:
-      - Weights
   /ping:
     get:
       description: Respond with "pong"
