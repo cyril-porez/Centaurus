@@ -155,7 +155,47 @@ paths:
       summary: Register a new user
       tags:
       - Credential
-  /api/v1/horse/:id:
+  /api/v1/horses:
+    post:
+      consumes:
+      - application/json
+      description: add a h  test
+      parameters:
+      - description: Name, Age and Race
+        in: body
+        name: addhorse
+        required: true
+        schema:
+          $ref: '#/definitions/model.Horses'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Horse created
+          schema:
+            $ref: '#/definitions/model.Horses'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: add a horse test
+      tags:
+      - Horses
+  /api/v1/horses/{id}:
     delete:
       consumes:
       - application/json
@@ -192,6 +232,44 @@ paths:
               type: string
             type: object
       summary: delete a horse
+      tags:
+      - Horses
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a horse for a specific user
+      parameters:
+      - description: Horse Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Horse retrieved
+          schema:
+            $ref: '#/definitions/model.Horses'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a horse
       tags:
       - Horses
     put:
@@ -231,124 +309,6 @@ paths:
               type: string
             type: object
       summary: Update a horse
-      tags:
-      - Horses
-  /api/v1/horse/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a horse for a specific user
-      parameters:
-      - description: Horse Id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Horse retrieved
-          schema:
-            $ref: '#/definitions/model.Horses'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get a horse
-      tags:
-      - Horses
-  /api/v1/horses/:id/weights:
-    post:
-      consumes:
-      - application/json
-      description: Add a weight horse
-      parameters:
-      - description: Weight, fk_horse_id
-        in: body
-        name: addhorse
-        required: true
-        schema:
-          $ref: '#/definitions/model.Weights'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Weight add
-          schema:
-            $ref: '#/definitions/model.Weights'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: A  dd a weight horse
-      tags:
-      - Weights
-  /api/v1/horses/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a list of horses for a specific user
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Horses récupéré
-          schema:
-            $ref: '#/definitions/model.Horses'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: get a list of horses
       tags:
       - Horses
   /api/v1/horses/{id}/weights:
@@ -397,23 +357,61 @@ paths:
       summary: Get horse weights
       tags:
       - Weights
-  /api/v1/horses/add-horse:
     post:
       consumes:
       - application/json
-      description: add a h  test
+      description: Add a weight horse
       parameters:
-      - description: Name, Age and Race
+      - description: Weight, fk_horse_id
         in: body
         name: addhorse
         required: true
         schema:
-          $ref: '#/definitions/model.Horses'
+          $ref: '#/definitions/model.Weights'
       produces:
       - application/json
       responses:
         "201":
-          description: Horse created
+          description: Weight add
+          schema:
+            $ref: '#/definitions/model.Weights'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: A  dd a weight horse
+      tags:
+      - Weights
+  /api/v1/users/{id}/horses:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of horses for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Horses récupéré
           schema:
             $ref: '#/definitions/model.Horses'
         "400":
@@ -434,7 +432,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: add a horse test
+      summary: get a list of horses
       tags:
       - Horses
   /ping:

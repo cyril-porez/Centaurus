@@ -128,7 +128,125 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/horse/:id": {
+        "/api/v1/horses": {
+            "post": {
+                "description": "add a h  test",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Horses"
+                ],
+                "summary": "add a horse test",
+                "parameters": [
+                    {
+                        "description": "Name, Age and Race",
+                        "name": "addhorse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Horses"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Horse created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Horses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/horses/{id}": {
+            "get": {
+                "description": "Retrieve a horse for a specific user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Horses"
+                ],
+                "summary": "Get a horse",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Horse Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Horse retrieved",
+                        "schema": {
+                            "$ref": "#/definitions/model.Horses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
             "put": {
                 "description": "add a profil user",
                 "consumes": [
@@ -246,9 +364,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/horse/{id}": {
+        "/api/v1/horses/{id}/weights": {
             "get": {
-                "description": "Retrieve a horse for a specific user",
+                "description": "Retrieve weights of a horse. Use query parameters to filter: limit, sort (asc|desc), and compare=true to include last weight difference.",
                 "consumes": [
                     "application/json"
                 ],
@@ -256,36 +374,45 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Horses"
+                    "Weights"
                 ],
-                "summary": "Get a horse",
+                "summary": "Get horse weights",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Horse Id",
+                        "description": "Horse ID",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit number of weights returned (e.g., 1, 6, etc.)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort order (asc or desc). Default is asc.",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Include comparison fields for last weight (only works with limit=1)",
+                        "name": "compare",
+                        "in": "query"
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Horse retrieved",
+                    "200": {
+                        "description": "Horse weights data",
                         "schema": {
-                            "$ref": "#/definitions/model.Horses"
+                            "$ref": "#/definitions/model.Weights"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
+                        "description": "Validation error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -294,7 +421,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -303,9 +430,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/api/v1/horses/:id/weights": {
+            },
             "post": {
                 "description": "Add a weight horse",
                 "consumes": [
@@ -366,68 +491,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/horses/add-horse": {
-            "post": {
-                "description": "add a h  test",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Horses"
-                ],
-                "summary": "add a horse test",
-                "parameters": [
-                    {
-                        "description": "Name, Age and Race",
-                        "name": "addhorse",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.Horses"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Horse created",
-                        "schema": {
-                            "$ref": "#/definitions/model.Horses"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/horses/{id}": {
+        "/api/v1/users/{id}/horses": {
             "get": {
                 "description": "Retrieve a list of horses for a specific user",
                 "consumes": [
@@ -476,74 +540,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/horses/{id}/weights": {
-            "get": {
-                "description": "Retrieve weights of a horse. Use query parameters to filter: limit, sort (asc|desc), and compare=true to include last weight difference.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Weights"
-                ],
-                "summary": "Get horse weights",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Horse ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Limit number of weights returned (e.g., 1, 6, etc.)",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Sort order (asc or desc). Default is asc.",
-                        "name": "sort",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Include comparison fields for last weight (only works with limit=1)",
-                        "name": "compare",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Horse weights data",
-                        "schema": {
-                            "$ref": "#/definitions/model.Weights"
-                        }
-                    },
-                    "400": {
-                        "description": "Validation error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {

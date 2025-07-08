@@ -22,7 +22,7 @@ import (
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /api/v1/horses/:id/weights [post]
+//@Router /api/v1/horses/{id}/weights [post]
 func AddWeight(c *gin.Context, db *sql.DB, id string) {
 	var newWeight model.Weights ;
 

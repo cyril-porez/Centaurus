@@ -22,7 +22,7 @@ import (
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /api/v1/horses/add-horse [post]
+//@Router /api/v1/horses [post]
 func AddHorseHandler(c *gin.Context, db *sql.DB) {
 	var newHorse model.Horses
 
@@ -110,7 +110,7 @@ func AddHorseHandler(c *gin.Context, db *sql.DB) {
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /api/v1/horse/:id [put]
+//@Router /api/v1/horses/{id} [put]
 func UpdateHorseHandler(c *gin.Context, db *sql.DB, id string) {
 	var horse model.Horses
 
@@ -197,7 +197,7 @@ func UpdateHorseHandler(c *gin.Context, db *sql.DB, id string) {
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /api/v1/horse/{id} [get]
+//@Router /api/v1/horses/{id} [get]
 func GetHorseHandler(c *gin.Context, db *sql.DB, id string) {
 	var horse model.Horses
 	
@@ -264,7 +264,7 @@ func GetHorseHandler(c *gin.Context, db *sql.DB, id string) {
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /api/v1/horses/{id} [get]
+//@Router /api/v1/users/{id}/horses [get]
 func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, id string ) {
 	
 	horses, details, err := service.GetHorsesByUserId(db, id);
@@ -329,7 +329,7 @@ func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, id string ) {
 //@Failure 400 {object} map[string]string
 //@Failure 401 {object} map[sting]string
 //@Failure 500 {object} map[string]string
-//@Router /api/v1/horse/:id [delete]
+//@Router /api/v1/horses/{id} [delete]
 func DeleteHorseHandler(c *gin.Context, db *sql.DB, id string) {
 	
 	if details, err := service.DeleteHorse(db, id); err != nil || len(details) > 0 {
