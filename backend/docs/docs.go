@@ -503,7 +503,7 @@ const docTemplate = `{
                 "tags": [
                     "Horses"
                 ],
-                "summary": "get a list of horses",
+                "summary": "Get horses by user ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -515,36 +515,30 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Horses récupéré",
+                        "description": "Horses retrived succesfully",
                         "schema": {
                             "$ref": "#/definitions/model.Horses"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "additionalProperties": true
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "additionalProperties": true
                         }
                     }
                 }

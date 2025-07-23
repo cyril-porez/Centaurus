@@ -41,7 +41,7 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 		id := c.Param("id");
 		handlers.GetHorseHandler(c, db, id);
 	})
-	r.DELETE("api/v1/horse/:id", func(c *gin.Context) {
+	r.DELETE("api/v1/horses/:id", func(c *gin.Context) {
 			id := c.Param("id")
 			handlers.DeleteHorseHandler(c, db, id);
 	})

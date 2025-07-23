@@ -15,7 +15,7 @@ func InsertHorse (db *sql.DB, horse *model.Horses) error{
 	return err;
 }
 
-func UpdateHorse (db *sql.DB, horse *model.Horses, id string) error {
+func UpdateHorse (db *sql.DB, horse *model.HorseUpdate, id string) error {
 	horse.UpdatedAt = time.Now().Format(time.RFC3339);
 	num, er := strconv.Atoi(id);
 	if er != nil {

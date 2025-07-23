@@ -77,9 +77,9 @@ func AddHorseHandler(c *gin.Context, db *sql.DB) {
 		return
 	}	
 
-	body := gin.H{
-    "horse": gin.H{
-      "name": newHorse.Name,
+	resp := gin.H{
+			"horse": gin.H{
+			"name": newHorse.Name,
 			"age": newHorse.Age,
 			"race": newHorse.Race,
 			"fk_user_id": newHorse.FkUserId,
@@ -96,7 +96,8 @@ func AddHorseHandler(c *gin.Context, db *sql.DB) {
 		},
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusCreated, "Registration new successful", body)
+	// utils.WriteSuccesResponse(c, http.StatusCreated, "Registration new successful", body)
+	utils.WriteSuccesResponse2(c, http.StatusCreated, resp)
 }
 
 //UpdateHorseHandler godoc
@@ -112,7 +113,8 @@ func AddHorseHandler(c *gin.Context, db *sql.DB) {
 //@Failure 500 {object} map[string]string
 //@Router /api/v1/horses/{id} [put]
 func UpdateHorseHandler(c *gin.Context, db *sql.DB, id string) {
-	var horse model.Horses
+	// var horse model.Horses
+	var horse model.HorseUpdate
 
 	if err := c.ShouldBindJSON(&horse); err != nil {
 		body := utils.ErrorResponseInput{
@@ -162,31 +164,25 @@ func UpdateHorseHandler(c *gin.Context, db *sql.DB, id string) {
 			})
 		} 
 		return
-	}
-	
-	body := gin.H{
-    "horse": gin.H{
-      "name": horse.Name,
-			"age": horse.Age,
-			"race": horse.Race,
-			"fk_user_id": horse.FkUserId,
+	}	
+
+	resp := gin.H {
+		"Hoese": horse,		
+		"Links": model.Links{
+			SignIn: model.Link{
+				Method: "PUT",
+				Href:   "/api/v1/horses/update",
+			},
 		},
-		"_links": gin.H{
-        "sign-in": gin.H{
-					"href":"/api/v1/horses/update",
-					"Method": "PUT", 
-				},
-		},
-		"meta": gin.H{
-			"createdAt": horse.CreatedAt,
-			"welcomeMessage": "You add a new horse", 
+		"Meta": model.Meta{
+			WelcomeMessage: "You get data a horses for a user",
 		},
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusCreated, "Registration new successful", body)
+	utils.WriteSuccesResponse2(c, http.StatusOK, resp)	
 }
 
-//UpdateHorseHandler godoc
+//GetHorseHandler godoc
 //@Summary Get a horse
 //@Description Retrieve a horse for a specific user
 //@Tags Horses
@@ -231,7 +227,7 @@ func GetHorseHandler(c *gin.Context, db *sql.DB, id string) {
 		return
 	}
 
-	body := gin.H{
+	resp := gin.H{
     "horse": gin.H{
       "name": horse.Name,
 			"age": horse.Age,
@@ -241,29 +237,29 @@ func GetHorseHandler(c *gin.Context, db *sql.DB, id string) {
 		"_links": gin.H{
         "sign-in": gin.H{
 					"href":"/api/v1/horses/update",
-					"Method": "PUT", 
+					"Method": "PUT",
 				},
 		},
 		"meta": gin.H{
 			"createdAt": horse.CreatedAt,
-			"welcomeMessage": "You get data a horse", 
+			"welcomeMessage": "You get data a horse",
 		},
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusOK, "get data horse successful", body)
+	utils.WriteSuccesResponse2(c, http.StatusOK, resp)
 }
 
 // GetHorsesByUserHanndler godoc
-//@Summary get a list of horses 
+//@Summary Get horses by user ID 
 //@Description Retrieve a list of horses for a specific user
 //@Tags Horses
 //@Accept json
 //@Produce json
 //@Param id path int true "User ID"
-//@Success 200 {object} model.Horses "Horses récupéré"
-//@Failure 400 {object} map[string]string
-//@Failure 401 {object} map[sting]string
-//@Failure 500 {object} map[string]string
+//@Success 200 {object} model.Horses "Horses retrived succesfully"
+//@Failure 400 {object} map[string]interface{} "Bad request"
+//@Failure 401 {object} map[sting]interface{} ""
+//@Failure 500 {object} map[string]interface{} "Internal server error"
 //@Router /api/v1/users/{id}/horses [get]
 func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, id string ) {
 	
@@ -298,24 +294,23 @@ func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, id string ) {
 		return
 	}
 
-	body := gin.H{
-    "horse": gin.H{
-      "data": horses,
+	resp := model.HorsesResponse{
+		Horse: model.HorseData{
+			Data: horses,
 		},
-		"_links": gin.H{
-        "sign-in": gin.H{
-					"href":"/api/v1/horses/update",
-					"Method": "PUT", 
-				},
+		Links: model.Links{
+			SignIn: model.Link{
+				Method: "PUT",
+				Href:   "/api/v1/horses/update",
+			},
 		},
-		"meta": gin.H{
-			"count": len(horses),
-			"welcomeMessage": "You get data a horses for a user", 
+		Meta: model.Meta{
+			Count: len(horses),
+			WelcomeMessage: "You get data a horses for a user",
 		},
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusOK, "get data horses successful", body)
-
+	utils.WriteSuccesResponse2(c, http.StatusOK, resp)
 }
 
 // DeleteHorseHanndler godoc
@@ -362,7 +357,7 @@ func DeleteHorseHandler(c *gin.Context, db *sql.DB, id string) {
 		return;
 	}
 
-	body := gin.H{
+	resp := gin.H{
     "horse": gin.H{
       "horse": "delete",
 		},
@@ -378,5 +373,6 @@ func DeleteHorseHandler(c *gin.Context, db *sql.DB, id string) {
 		},
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusOK, "horse deleted successful", body);
+	// utils.WriteSuccesResponse(c, http.StatusOK, "horse deleted successful", body);
+	utils.WriteSuccesResponse2(c, http.StatusOK, resp)
 }

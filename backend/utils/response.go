@@ -16,6 +16,7 @@ type ResponseHeader struct {
 }
 
 func WriteSuccesResponse(c *gin.Context, statusCode int, message string, body interface{}) {
+
 	response := Response{
 		Header: ResponseHeader{
 			Status: "success",
@@ -26,4 +27,8 @@ func WriteSuccesResponse(c *gin.Context, statusCode int, message string, body in
 		Body: body,
 	}
 	c.JSON(statusCode, response)
+}
+
+func WriteSuccesResponse2(c *gin.Context, statusCode int, resp interface{}) {
+	c.JSON(statusCode, resp)
 }
