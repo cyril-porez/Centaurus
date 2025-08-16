@@ -7,7 +7,20 @@ type Horses struct {
 	Race      string `json:"race" binding:"required"`
 	FkUserId  int    `json:"fk_user_id" binding:"required"`
 	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	UpdatedAt string `json:"updatedAt,omitempty"`
+}
+
+type HorseInput struct {
+	Name     string `json:"name" binding:"required"`
+	Age      int    `json:"age" binding:"required"`
+	Race     string `json:"race" binding:"required"`
+	FkUserId int    `json:"fk_user_id"`
+}
+
+type HorseUpdateInput struct {
+	Name string `json:"name" binding:"required"`
+	Age  int    `json:"age" binding:"required"`
+	Race string `json:"race" binding:"required"`
 }
 
 type HorseUpdate struct {
@@ -27,12 +40,29 @@ type Link struct {
 }
 
 type Links struct {
-	SignIn Link `json:"sign-in"`
+	Update Link `json:"update"`
+	Get    Link `json:"get"`
 }
 
 type Meta struct {
-	Count          int    `json:"count"`
-	WelcomeMessage string `json:"welcomeMessage"`
+	Count   int    `json:"count"`
+	Message string `json:"welcomeMessage"`
+}
+
+type MetaSimple struct {
+	Message string `json:"message"`
+}
+
+type HorseCreateResponse struct {
+	Horse Horses     `json:"horse"`
+	Links Links      `json:"_links"`
+	Meta  MetaSimple `json:"meta"`
+}
+
+type HorseUpdateResponse struct {
+	Horse HorseUpdate `json:"horse"`
+	Links Links       `json:"_links"`
+	Meta  Meta        `json:"meta"`
 }
 
 type HorsesResponse struct {

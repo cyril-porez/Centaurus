@@ -2,7 +2,11 @@ package router
 
 import (
 	handlers "back-end-go/api/handlers"
+	"back-end-go/repository"
+	"back-end-go/service"
 	"database/sql"
+
+	middleware "back-end-go/api/middleware"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -12,56 +16,68 @@ import (
 
 func SetupRouter(db *sql.DB) *gin.Engine {
 	r := gin.Default();
-
 	r.Use(cors.Default());
+
+	horseRepo := &repository.SQLHorseRepository{}
+	horseService := service.NewHorseService(horseRepo)
+
+	weightRepo := &repository.SQLWeightRepository{}
+	weightService := service.NewWeightService(weightRepo)
+
+	userRepo := &repository.SQLUserRepository{}
+	userService := service.NewUserService(userRepo)
+
+	//route de teste
+	r.GET("/api/ping", handlers.PingHandler);
 
 	//route Swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler));
 
-	//route api
-	r.POST("api/v1/auth/sign-up", func(c *gin.Context) {
-		handlers.RegisterHandler(c, db);
+	//Auth route (publiques)
+	r.POST("/api/v1/auth/sign-up", func(c *gin.Context) {
+		handlers.RegisterHandler(c, db, userService);
 	})
-	r.POST("api/v1/auth/sign-in", func(c *gin.Context) {
-		handlers.SignInHandler(c, db);
+	r.POST("/api/v1/auth/sign-in", func(c *gin.Context) {
+		handlers.SignInHandler(c, db, userService);
 	})
 
-	r.POST("api/v1/horses", func(c *gin.Context) {
-		handlers.AddHorseHandler(c, db);
+
+	//Middleware d'authentification
+	authMiddleware := middleware.AuthMiddleware()
+
+	api := r.Group("/api/v1")
+	api.Use(authMiddleware)
+
+	api.POST("/horses", func(c *gin.Context) {
+		handlers.AddHorseHandler(c, db, horseService);
 	})
-	r.GET("api/v1/users/:id/horses", func(c *gin.Context) {
-		id := c.Param("id") 
-		handlers.GetHorsesByUserHanndler(c, db, id);
+
+	api.GET("/users/:id/horses", func(c *gin.Context) {
+		handlers.GetHorsesByUserHanndler(c, db, horseService);
 	})
-	r.PUT("api/v1/horses/:id", func(c *gin.Context) {
-		id := c.Param("id");
-		handlers.UpdateHorseHandler(c, db, id);
+
+	api.PUT("/horses/:id", func(c *gin.Context) {
+		handlers.UpdateHorseHandler(c, db, horseService);
 	})  
-	r.GET("api/v1/horses/:id", func(c *gin.Context) {
-		id := c.Param("id");
-		handlers.GetHorseHandler(c, db, id);
-	})
-	r.DELETE("api/v1/horses/:id", func(c *gin.Context) {
-			id := c.Param("id")
-			handlers.DeleteHorseHandler(c, db, id);
+
+	api.GET("/horses/:id", func(c *gin.Context) {
+		handlers.GetHorseHandler(c, db, horseService);
 	})
 
-	r.POST("api/v1/horses/:id/weights", func(c *gin.Context) {
-		id := c.Param("id");
-		handlers.AddWeight(c, db, id);
+	api.DELETE("/horses/:id", func(c *gin.Context) {
+			handlers.DeleteHorseHandler(c, db, horseService);
 	})
 
-	r.GET("api/v1/horses/:id/weights", func(c *gin.Context) {
-		id := c.Param("id")
-		limit := c.DefaultQuery("limit", "")
-		sort := c.DefaultQuery("sort", "asc")
-		compare:= c.DefaultQuery("compare", "false")
+	api.POST("/horses/:id/weights", func(c *gin.Context) {
+		handlers.AddWeight(c, db, weightService);
+	})
 
-		handlers.GetHoreseWeights(c, db, id,limit, sort, compare)
+	api.GET("/horses/:id/weights", func(c *gin.Context) {
+		handlers.GetHoreseWeights(c, db, weightService)
 	})
 	
-	//route de teste
-	r.GET("api/ping", handlers.PingHandler);
+	
+	
 
 	return r
 }

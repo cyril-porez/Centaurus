@@ -25,11 +25,11 @@
                 "parameters": [
                     {
                         "description": "Email and password",
-                        "name": "credential",
+                        "name": "input",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Credential"
+                            "$ref": "#/definitions/model.LoginInput"
                         }
                     }
                 ],
@@ -37,34 +37,25 @@
                     "200": {
                         "description": "User connected",
                         "schema": {
-                            "$ref": "#/definitions/model.Credential"
+                            "$ref": "#/definitions/model.PublicUser"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Validation error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized (bad credentials)",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     }
                 }
@@ -90,7 +81,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/model.RegisterInput"
                         }
                     }
                 ],
@@ -98,25 +89,25 @@
                     "200": {
                         "description": "User created successfully",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/model.PublicUser"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid input data",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Email or username already in use",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     }
                 }
@@ -137,12 +128,12 @@
                 "summary": "add a horse test",
                 "parameters": [
                     {
-                        "description": "Name, Age and Race",
+                        "description": "Horse data",
                         "name": "addhorse",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Horses"
+                            "$ref": "#/definitions/model.HorseInput"
                         }
                     }
                 ],
@@ -150,34 +141,31 @@
                     "201": {
                         "description": "Horse created",
                         "schema": {
-                            "$ref": "#/definitions/model.Horses"
+                            "$ref": "#/definitions/model.HorsesResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Horse already exists",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Horse already exists",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     }
                 }
@@ -206,43 +194,34 @@
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Horse retrieved",
                         "schema": {
-                            "$ref": "#/definitions/model.Horses"
+                            "$ref": "#/definitions/model.HorseCreateResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid ID format or validation error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "404": {
+                        "description": "Horse not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     }
                 }
             },
             "put": {
-                "description": "add a profil user",
+                "description": "Update a horse by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -255,47 +234,57 @@
                 "summary": "Update a horse",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "Horse ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "Name, Age and Race",
                         "name": "addhorse",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Horses"
+                            "$ref": "#/definitions/model.HorseUpdateInput"
                         }
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Horse created",
+                    "200": {
+                        "description": "Horse updated",
                         "schema": {
-                            "$ref": "#/definitions/model.Horses"
+                            "$ref": "#/definitions/model.HorseUpdateResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid input",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Horse not found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     }
                 }
@@ -323,36 +312,28 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Horses récupéré",
+                        "description": "Horse deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/model.Horses"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid horse ID format",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "404": {
+                        "description": "Horse not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     }
                 }
@@ -440,46 +421,31 @@
                 "parameters": [
                     {
                         "description": "Weight, fk_horse_id",
-                        "name": "addhorse",
+                        "name": "addWeight",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Weights"
+                            "$ref": "#/definitions/model.WeightInput"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Weight add",
+                        "description": "Weight added",
                         "schema": {
-                            "$ref": "#/definitions/model.Weights"
+                            "$ref": "#/definitions/model.WeightCreateResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     }
                 }
@@ -509,30 +475,27 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Horses retrived succesfully",
+                        "description": "List of horses for the given user",
                         "schema": {
-                            "$ref": "#/definitions/model.Horses"
+                            "$ref": "#/definitions/model.HorsesResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Invalid user ID format or validation issue",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "User not found (if needed)",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/model.ErrorResponse"
                         }
                     }
                 }
@@ -560,24 +523,143 @@
         }
     },
     "definitions": {
-        "model.Credential": {
+        "model.ErrorDetail": {
             "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
             "properties": {
-                "email": {
+                "field": {
                     "type": "string"
                 },
-                "id": {
+                "issue": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
                     "type": "integer"
                 },
-                "password": {
+                "details": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ErrorDetail"
+                    }
+                },
+                "links": {},
+                "message": {
                     "type": "string"
                 },
-                "username": {
+                "meta": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "status": {
                     "type": "string"
+                }
+            }
+        },
+        "model.HorseCreateResponse": {
+            "type": "object",
+            "properties": {
+                "_links": {
+                    "$ref": "#/definitions/model.Links"
+                },
+                "horse": {
+                    "$ref": "#/definitions/model.Horses"
+                },
+                "meta": {
+                    "$ref": "#/definitions/model.MetaSimple"
+                }
+            }
+        },
+        "model.HorseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Horses"
+                    }
+                }
+            }
+        },
+        "model.HorseInput": {
+            "type": "object",
+            "required": [
+                "age",
+                "name",
+                "race"
+            ],
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "fk_user_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "race": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.HorseUpdate": {
+            "type": "object",
+            "required": [
+                "age",
+                "name",
+                "race"
+            ],
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "race": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.HorseUpdateInput": {
+            "type": "object",
+            "required": [
+                "age",
+                "name",
+                "race"
+            ],
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "race": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.HorseUpdateResponse": {
+            "type": "object",
+            "properties": {
+                "_links": {
+                    "$ref": "#/definitions/model.Links"
+                },
+                "horse": {
+                    "$ref": "#/definitions/model.HorseUpdate"
+                },
+                "meta": {
+                    "$ref": "#/definitions/model.Meta"
                 }
             }
         },
@@ -613,13 +695,78 @@
                 }
             }
         },
-        "model.User": {
+        "model.HorsesResponse": {
+            "type": "object",
+            "properties": {
+                "_links": {
+                    "$ref": "#/definitions/model.Links"
+                },
+                "horse": {
+                    "$ref": "#/definitions/model.HorseData"
+                },
+                "meta": {
+                    "$ref": "#/definitions/model.Meta"
+                }
+            }
+        },
+        "model.Link": {
+            "type": "object",
+            "properties": {
+                "href": {
+                    "type": "string"
+                },
+                "method": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Links": {
+            "type": "object",
+            "properties": {
+                "get": {
+                    "$ref": "#/definitions/model.Link"
+                },
+                "update": {
+                    "$ref": "#/definitions/model.Link"
+                }
+            }
+        },
+        "model.LoginInput": {
             "type": "object",
             "required": [
                 "email",
-                "password",
-                "username"
+                "password"
             ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Meta": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "welcomeMessage": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.MetaSimple": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.PublicUser": {
+            "type": "object",
             "properties": {
                 "createdAt": {
                     "type": "string"
@@ -627,10 +774,26 @@
                 "email": {
                     "type": "string"
                 },
-                "password": {
+                "id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.RegisterInput": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "password": {
                     "type": "string"
                 },
                 "username": {
@@ -638,7 +801,35 @@
                 }
             }
         },
-        "model.Weights": {
+        "model.WeightCreateResponse": {
+            "type": "object",
+            "properties": {
+                "_links": {
+                    "$ref": "#/definitions/model.Links"
+                },
+                "meta": {
+                    "$ref": "#/definitions/model.MetaSimple"
+                },
+                "weight": {
+                    "$ref": "#/definitions/model.WeightData"
+                }
+            }
+        },
+        "model.WeightData": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "fk_horse_id": {
+                    "type": "integer"
+                },
+                "weight": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.WeightInput": {
             "type": "object",
             "required": [
                 "weight"
@@ -647,13 +838,24 @@
                 "CreatedAt": {
                     "type": "string"
                 },
-                "FkHorseId": {
+                "weight": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.Weights": {
+            "type": "object",
+            "properties": {
+                "CreatedAt": {
+                    "type": "string"
                 },
                 "UpdateddAt": {
                     "type": "string"
                 },
                 "diiferenceWeight": {
+                    "type": "integer"
+                },
+                "fk_horse_id": {
                     "type": "integer"
                 },
                 "id": {
