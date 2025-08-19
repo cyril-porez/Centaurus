@@ -54,3 +54,34 @@ func TestAddHorseHandler(t *testing.T) {
 
 	require.NoError(t, mock.ExpectationsWereMet())
 }
+
+func TestGetHorsesByUserHandler(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+	defer db.Close()
+
+	rows := sqlmock.NewRows([]string{"id","name","age","race","fk_user_id","created_at"}).
+		AddRow(1,"Yakari",5,"Pur-sang",42,"2025-01-01T00:00:00Z")
+
+	mock.ExpectQuery(`^SELECT id, name, age, race, fk_user_id, created_at FROM horses WHERE fk_user_id\s*=\s*\?$`).
+		WithArgs(42).
+		WillReturnRows(rows)
+
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+
+	horseRepo := &repository.SQLHorseRepository{}
+	horseSvc := service.NewHorseService(horseRepo)
+
+	r.GET("/api/v1/users/:id/horses", func(c *gin.Context) {
+		handlers.GetHorsesByUserHanndler(c, db, horseSvc) 
+	})
+
+	req := httptest.NewRequest("GET", "/api/v1/users/42/horses", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Body.String(), "Yakari")
+	require.NoError(t, mock.ExpectationsWereMet())
+}
