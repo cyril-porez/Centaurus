@@ -5,27 +5,23 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
-	"time"
 )
 
-func AddWeightHorse(db *sql.DB, weight *model.Weights, id string) error {
-	weight.CreatedAt = time.Now().Format(time.RFC3339);
-	var errId error;
-	weight.FkHorseId, errId = strconv.Atoi(id);
-	if errId != nil {
-		return errId
-	}
-	query := "INSERT INTO weights (weight, date, fk_horse_id, created_at) VALUES (?, ?, ?, ?)"
-	_, err := db.Exec(query, weight.Weight, weight.CreatedAt, weight.FkHorseId, weight.CreatedAt)
+type SQLWeightRepository struct {}
+
+func (r *SQLWeightRepository) AddWeightHorse(db *sql.DB, weight *model.Weights) error {	
+	query := "INSERT INTO weights (weight, fk_horse_id, created_at) VALUES (?, ?, ?)"
+	_, err := db.Exec(query, weight.Weight, weight.FkHorseId, weight.CreatedAt)
 	return err
 }
 
-func GetHorseWeights(db *sql.DB, id string, limit string, sort string) (*sql.Rows, error) {
+func (r *SQLWeightRepository) GetHorseWeights(db *sql.DB, horseId int, limit string, sort string) (*sql.Rows, error) {
 	baseQuery := `
 		SELECT 
 			h.name, 
 			w.created_at, 
-			w.weight
+			w.weight,
+			w.fk_horse_id
 		FROM horses AS h
 			INNER JOIN weights AS w ON h.id = w.fk_horse_id
 		WHERE h.id = ?
@@ -44,11 +40,11 @@ func GetHorseWeights(db *sql.DB, id string, limit string, sort string) (*sql.Row
 		baseQuery += " LIMIT " + limit
 	}
 
-	rows, err := db.Query(baseQuery, id)
+	rows, err := db.Query(baseQuery, horseId)
 	return rows, err
 }
 
-func GetLastWeightHorse(db *sql.DB, weight *model.Weights, horse *model.Horses,id string) error {
+func (r *SQLWeightRepository) GetLastWeightHorse(db *sql.DB, horseId int, weight *model.Weights, horse *model.Horses) error {
 	query := `
 			SELECT 
 				h.name,
@@ -56,7 +52,8 @@ func GetLastWeightHorse(db *sql.DB, weight *model.Weights, horse *model.Horses,i
 				w2.weight AS LastWeight,
 				w1.weight - w2.weight AS DifferenceWeight,
 				w1.created_at AS date,
-				w2.created_at AS LastDate
+				w2.created_at AS LastDate,
+				w1.fk_horse_id
 			FROM horses AS h
 			INNER JOIN weights AS w1 ON h.id = w1.fk_horse_id
 			LEFT JOIN weights AS w2 ON w2.fk_horse_id = w1.fk_horse_id 
@@ -70,13 +67,14 @@ func GetLastWeightHorse(db *sql.DB, weight *model.Weights, horse *model.Horses,i
 			ORDER BY w1.created_at DESC 
 			LIMIT 1`;
 
-	err := db.QueryRow(query, id).Scan(
+	err := db.QueryRow(query, horseId).Scan(
 				&horse.Name,
 				&weight.Weight,
 				&weight.LastWeight,
 				&weight.DifferenceWeight, 
 				&weight.CreatedAt, 
 				&weight.LastDate,
+				&weight.FkHorseId,
 			);
 	return err;
 }

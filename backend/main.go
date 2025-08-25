@@ -20,9 +20,6 @@ import (
 // @BasePath /
 func  main()  {
 
-	// envFile := "../.env";
-	// envFile := "/app/.env";
-
 	envFile := os.Getenv("ENV_FILE")
 	if envFile == "" {
 		// envFile = "/env/.env" // fallback si non défini
@@ -41,88 +38,37 @@ func  main()  {
 	}
 
 	appEnv := os.Getenv("APP_ENV");
-	databaseUrl := os.Getenv("DATABASE_URL");
-	localeDataBaseUrl := os.Getenv("LOCAL_DATABASE_URL");
+	dockerDSN := os.Getenv("DATABASE_URL");
+	localeDSN := os.Getenv("LOCAL_DATABASE_URL");
 	jwtSecret := os.Getenv("JWT_SECRET_KEY");
 	port := os.Getenv("PORT");
 
 	
 
 	fmt.Println("appEnv : ", appEnv)
-	fmt.Println("docker : ", databaseUrl);
-	fmt.Println("local : ", localeDataBaseUrl);
+	fmt.Println("docker : ", dockerDSN);
+	fmt.Println("local : ", localeDSN);
 	fmt.Println("Clé secrète :", jwtSecret)
 	fmt.Println("port :", port)
 
-	var dns string
+	dns := localeDSN
 	if appEnv == "docker" {
-		dns = databaseUrl
-	} else {
-		dns = localeDataBaseUrl
-	}
+		dns = dockerDSN
+	} 
 
-	// Initialisation de la base de données
-	db, err := config.InitializeDatabase(dns)
+	db, err := config.EnsureDatabaseAndConnect(dns, "centaurus")
 	if err != nil {
-		log.Fatal("erreur de connexion à la BDD : ",err)
+		log.Fatal("DB bootstrao error: ", err)
 	}
-	defer db.Close()
+  defer db.Close()
 
-	queryDB := `CREATE DATABASE IF NOT EXISTS centaurus`
-	_, err = db.Exec(queryDB);
-	if err != nil {
-		log.Fatalf("error lors de la creation de la BDD centaurus : %v", err)
+  if err := config.Migrate(db); err != nil {
+		log.Fatal("migration error: ", err)
 	}
-	fmt.Println("BDD centaurus créé avec succès")
+	fmt.Println("DB ready !!!")
 
-	queryUsers := `CREATE TABLE IF NOT EXISTS users (
-		id INT AUTO_INCREMENT PRIMARY KEY,
-		username VARCHAR(255) NOT NULL,
-		password VARCHAR(255) NOT NULL,
-		email VARCHAR(255) NOT NULL,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	) DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;` 
-
-	_,err = db.Exec(queryUsers)
-	if err != nil {
-		log.Fatalf("error lors de la creation de la table users : %v", err)
+	r := router.SetupRouter(db)
+	if  err := r.Run(":" + port); err != nil {
+		log.Fatal(err)
 	}
-	fmt.Println("Table users créé avec succès")
-
-	query := `CREATE TABLE IF NOT EXISTS horses (
-		id INT AUTO_INCREMENT PRIMARY KEY,
-		name VARCHAR(255) NOT NULL,
-		age INT NOT NULL,
-		race VARCHAR(255) NOT NULL,
-		fk_user_id INT NOT NULL,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY (fk_user_id) REFERENCES users(id) ON DELETE CASCADE
-	) DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;`
-
-	_, err = db.Exec(query)
-	if err != nil {
-		log.Fatalf("error lors de la creation de la table horses : %v", err)
-	}
-	fmt.Println("Table horses créé avec succès")
-
-	queryWeight := `CREATE TABLE IF NOT EXISTS weights (
-		id INT AUTO_INCREMENT PRIMARY KEY,
-		weight INT NOT NULL,
-		fk_horse_id INT NOT NULL,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY (fk_horse_id) REFERENCES horses(id) ON DELETE CASCADE
-	) DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;`
-
-	_, err = db.Exec(queryWeight)
-	if err != nil {
-		log.Fatalf("error lors de la creation de la table weights : %v", err)
-	}
-	fmt.Println("Table weifhts créé avec succès")
-
- 	r := router.SetupRouter(db)
-
-	r.Run(":" + port)
 }

@@ -6,30 +6,61 @@ import (
 	"time"
 )
 
-func InsertUser(db *sql.DB, user *model.User) error {
+type SQLUserRepository struct {}
+
+func (r *SQLUserRepository) InsertUser(db *sql.DB, user *model.User) error {
 	user.CreatedAt = time.Now()
 	query := "INSERT INTO users (username, password, email, created_at)	Values (?,?,?,?)"
-	_, err := db.Exec(query, user.Username, user.Password, user.Email, user.CreatedAt)
-	return err
+	result, err := db.Exec(query, user.Username, user.Password, user.Email, user.CreatedAt)
+	if err != nil {
+		return err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	user.Id = int(id)
+
+	return nil
 }
 
-func IsEmailTaken (db *sql.DB, email string) (bool, error) {
+func (r *SQLUserRepository) IsEmailTaken(db *sql.DB, email string) (bool, error) {
 	var exists bool
 	query := "SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)"
 	err := db.QueryRow(query, email).Scan(&exists)
 	return exists, err
 }
 
-func IsUsernameTaken (db *sql.DB, email string) (bool, error) {
+func (r *SQLUserRepository) IsUsernameTaken(db *sql.DB, email string) (bool, error) {
 	var exists bool
 	query := "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)"
 	err := db.QueryRow(query, email).Scan(&exists)
 	return exists, err
 }
 
-func SelectUserByCredential (db *sql.DB, user *model.Credential) (string, error) {
+func (r *SQLUserRepository) SelectUserByCredential(db *sql.DB, email string) (*model.User, string, error) {
+	var user model.User
 	var	password string
-	query := "SELECT id, username, password FROM users WHERE email = ?"
-	err := db.QueryRow(query, user.Email).Scan(&user.Id, &user.Username, &password)
-	return password, err	
+	query := `SELECT
+							id,
+							username,
+							password,
+							email,
+							created_at
+						FROM users 
+						WHERE email = ?`
+	err := db.QueryRow(query, email).Scan(
+		&user.Id, 
+		&user.Username, 
+		&password,
+		&user.Email,
+		&user.CreatedAt,
+	)
+	if err != nil {
+		return nil, "", err
+	}
+
+	user.Password = password
+	return &user, password, err	
 } 

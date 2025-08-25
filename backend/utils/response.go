@@ -1,29 +1,26 @@
 package utils
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 )
 
-type Response struct {
-	Header	ResponseHeader	`json:"header"`
-	Body		interface{}			`json:"body"`
+func WriteSuccesResponse(c *gin.Context, statusCode int, resp interface{}) {
+	c.JSON(statusCode, resp)
 }
 
-type ResponseHeader struct {
-	Status	string	`json:"status"`
-	Code 		int			`json:"code"`
-	Message	string	`json:"message"`
-}
-
-func WriteSuccesResponse(c *gin.Context, statusCode int, message string, body interface{}) {
-	response := Response{
-		Header: ResponseHeader{
-			Status: "success",
-			Code: statusCode,
-			Message: message,
-		},
-
-		Body: body,
+func GenerateMeta() map[string]string {
+	return map[string]string{
+		"timestamp": time.Now().Format(time.RFC3339),
 	}
-	c.JSON(statusCode, response)
+}
+
+func HateoasLink(href, method string) map[string]interface{} {
+	return map[string]interface{}{
+		"self": gin.H{
+			"href":   href,
+			"method": method,
+		},
+	}
 }

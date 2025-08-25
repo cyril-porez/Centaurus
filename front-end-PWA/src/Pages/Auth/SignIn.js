@@ -66,53 +66,47 @@ function SignIn() {
                       flex-col"
         >
           <div
-            className="flex 
-                        flex-col 
-                        items-center 
-                        justify-center 
-                        min-h-[400px]"
+            className="
+              flex 
+              flex-col 
+              items-center 
+              justify-center 
+              min-h-[400px]
+            "
           >
             <div className="mb-[5%] w-full">
-              <fieldset
-                className="w-full
-                        mx-auto
-                        rounded-lg
-                        border
-                        border-homa-beige
-                        p-[4%]"
-              >
-                <legend className="text-sm text-homa-beige">E-mail</legend>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="marie.dupont@gmail.com"
-                  {...register("email")}
-                  className="w-full focus:outline-none focus:ring-2 focus:ring-homa-beige"
-                />
-              </fieldset>
+              <label className="text-sm text-centaurus-oxford-blue">
+                E-mail:
+              </label>
+              <input
+                type="email"
+                id="email"
+                placeholder="marie.dupont@gmail.com"
+                {...register("email")}
+                className="
+                  w-full
+                  border-2 border-centaurus-oxford-blue
+                  focus:outline-none
+                  focus:border-2 focus:border-centaurus-dark-cerelean"
+              />
               <p className="text-red mt-[2%]">{errors.email?.message}</p>
             </div>
 
             <div className="mb-[6%] w-full">
-              <fieldset
-                className="w-full
-                        mx-auto
-                        rounded-lg
-                        border
-                        border-homa-beige
-                        p-[4%]"
-              >
-                <legend className="text-sm text-homa-beige">
-                  Mot de passe
-                </legend>
-                <input
-                  type="password"
-                  id="password"
-                  placeholder=".........."
-                  {...register("password")}
-                  className="w-full focus:outline-none focus:ring-2 focus:ring-homa-beige"
-                />
-              </fieldset>
+              <label className="text-sm text-centaurus-oxford-blue">
+                Mot de passe
+              </label>
+              <input
+                type="password"
+                id="password"
+                placeholder=".........."
+                {...register("password")}
+                className="w-full 
+                border-2 border-centaurus-oxford-blue
+                focus:outline-none                 
+                focus:border-2 focus:border-centaurus-dark-cerelean"
+              />
+
               <p className="text-red mt-[2%]">{errors.password?.message}</p>
               <p className="text-red mt-[2%]">
                 {error !== "" ? "*".concat(" ", error) : null}
@@ -149,7 +143,7 @@ function SignIn() {
             className="mx-auto mt-6 text-sky-blue underline text-2xl"
             to="/auth/sign-up"
           >
-            S'inscrire
+            Pas encore de compte ?
           </Link>
         </form>
       </div>
