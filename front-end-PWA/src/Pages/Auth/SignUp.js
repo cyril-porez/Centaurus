@@ -79,165 +79,129 @@ function SignUp() {
 
   return (
     <div
-      className="flex flex-col 
-                  items-center
-                  max-h-screen"
+      className="
+        flex justify-center
+        min-h-screen
+        
+      "
     >
-      <div
-        className="w-[90%] 
-                      max-w-[400px] 
-                      p-[5%]"
-      >
+      <div className="w-[90%] max-w-[360px] p-[5%]">
         <HeaderText props={data} />
+
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-          <div
-            className="flex 
-                        flex-col 
-                        items-center 
-                        justify-center 
-                        min-h-[400px]"
-          >
-            <div className="mb-[5%] w-full">
-              <fieldset
-                className="w-full
-                        mx-auto
-                        rounded-lg
-                        border
-                        border-homa-beige
-                        p-[4%]"
-              >
-                <legend className="text-sm text-homa-beige">E-mail</legend>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="marie.dupont@gmail.com"
-                  {...register("email")}
-                  className="w-full focus:outline-none focus:ring-2 focus:ring-homa-beige"
-                />
-              </fieldset>
-              <p className="text-red mt-[2%]">{errors.email?.message}</p>
+          <div className="flex flex-col gap-y-4 mt-3 mb-2">
+            <div className="w-full">
+              <label className="*block mb-1 text-sm text-centaurus-oxford-blue">
+                E-mail
+              </label>
+              <input
+                type="email"
+                id="email"
+                placeholder="marie.dupont@gmail.com"
+                {...register("email")}
+                className="
+                    w-full h-11 px-3
+                    rounded-md
+                    border-2 border-centaurus-oxford-blue
+                    focus:outline-none
+                    focus:border-2 focus:border-centaurus-dark-cerelean
+                  "
+              />
+              <p className="text-red mt-1 text-sm">{errors.email?.message}</p>
             </div>
 
-            <div className="mb-[5%] w-full">
-              <fieldset
-                className="w-full
-                        mx-auto
-                        rounded-lg
-                        border
-                        border-homa-beige
-                        p-[4%]"
-              >
-                <legend className="text-sm text-homa-beige">
-                  Nom d'utilisateur
-                </legend>
-                <input
-                  type="text"
-                  id="pseudo"
-                  placeholder="marie_dupont"
-                  {...register("name")}
-                  className="w-full 
-                              focus:outline-none 
-                              focus:ring-2 
-                              focus:ring-homa-beige"
-                />
-              </fieldset>
-              <p className="text-red mt-[2%]">{errors.name?.message}</p>
+            <div className="w-full">
+              <label className="block mb-1 text-sm text-centaurus-oxford-blue">
+                Nom d'utilisateur
+              </label>
+              <input
+                type="text"
+                id="pseudo"
+                placeholder="marie_dupont"
+                {...register("name")}
+                className="
+                  w-full h-11 px-3
+                  rounded-md
+                  border-2 border-centaurus-oxford-blue
+                  focus:outline-none
+                  focus:border-2 focus:border-centaurus-dark-cerelean  
+                "
+              />
+              <p className="text-red mt-1 text-sm">{errors.name?.message}</p>
             </div>
 
-            <div
-              className="mb-[5%] 
-                          w-full"
-            >
-              <fieldset
-                className="w-full
-                        mx-auto
-                        rounded-lg
-                        border
-                        border-homa-beige
-                        p-[4%]"
-              >
-                <legend className="text-sm text-homa-beige">
-                  Mot de passe
-                </legend>
-                <input
-                  type="password"
-                  id="password"
-                  placeholder="........"
-                  {...register("password")}
-                  className="w-full 
-                              focus:outline-none 
-                              focus:ring-2 
-                              focus:ring-homa-beige"
-                />
-              </fieldset>
-              <p className="text-red mt-[2%]">{errors.password?.message}</p>
+            <div className="w-full">
+              <legend className="block mb-1 text-sm text-centaurus-oxford-blue">
+                Mot de passe
+              </legend>
+              <input
+                type="password"
+                id="password"
+                placeholder="........"
+                {...register("password")}
+                className="
+                  w-full h-11 px-3
+                  rounded-md
+                  border-2 border-centaurus-oxford-blue
+                  focus:outline-none
+                  focus:border-2 focus:border-centaurus-dark-cerelean
+                "
+              />
+
+              <p className="text-red mt-1 text-sm">
+                {errors.password?.message}
+              </p>
             </div>
 
-            <div
-              className="mb-[5%] 
-                          w-full"
-            >
-              <fieldset
-                className="w-full
-                        mx-auto
-                        rounded-lg
-                        border
-                        border-homa-beige
-                        p-[4%]"
-              >
-                <legend className="text-sm text-homa-beige">
-                  Confirmes ton mot de passe
-                </legend>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  placeholder="........"
-                  {...register("confirmPassword")}
-                  className="w-full 
-                              focus:outline-none 
-                              focus:ring-2 
-                              focus:ring-homa-beige"
-                />
-              </fieldset>
-              <p className="text-red mt-[2%]">
+            <div className="w-full">
+              <label className="block mb-1 text-sm text-centaurus-oxford-blue">
+                Confirmes ton mot de passe
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                placeholder="........"
+                {...register("confirmPassword")}
+                className="
+                  w-full h-11 px-3
+                  rounded-md
+                  border-2 border-centaurus-oxford-blue
+                  focus:outline-none
+                  focus:border-2 focus:border-centaurus-dark-cerelean
+                "
+              />
+              <p className="text-red mt-1 text-sm">
                 {errors.confirmPassword?.message}
               </p>
-              <p className="text-red mt-[2%]">
+              <p className="text-red mt-1 text-sm">
                 {error !== "" ? error.concat(" ", "*") : null}
               </p>
             </div>
-
-            <ToggleInput text=" J'ai lu et j'accepte les CGU et la politique de confidentialité." />
           </div>
+
           <button
-            className="bg-sky-blue
-                hover:bg-sky-blue-hover
-                text-white
-                text-xl
-                font-bold
-                rounded-full
-                shadow-lg
-                w-full 
-                p-[10px] 
-                py-5 w-80
-                mx-auto
-                transition
-                duration-300
-                flex
-                items-center
-                justify-center"
+            className="
+              mt-6 mb-3
+              inline-flex items-center justify-center
+              w-full h-12
+              rounded-md
+              bg-centaurus-dark-cerelean text-white
+              text-base font-medium
+              shadow-md shadow-black/10
+              hover:brightness-110
+              active:translate-y-px
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-centaurus-oxford-blue
+              transition
+            "
             type="submit"
           >
-            <span className="mt-2">Suivant</span>
-            <span className="text-[40px] font-extrabold ml-1 align-middle">
-              {">"}
-            </span>
+            Inscription
           </button>
           <Link
-            className="mx-auto mt-6 text-sky-blue underline text-2xl"
+            className="mx-auto mt-6 text-centaurus-oxford-blue underline text-base"
             to="/auth/sign-in"
           >
-            Se connecter
+            Déjà un compte
           </Link>
         </form>
       </div>
