@@ -5,7 +5,9 @@ import (
 	"back-end-go/service"
 	"back-end-go/utils"
 	"database/sql"
+	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,84 +19,71 @@ import (
 //@Tags Weights
 //@Accept json
 //@Produce json
-//@Param addhorse body model.Weights true "Weight, fk_horse_id"
-//@Success 201 {object} model.Weights "Weight add"
-//@Failure 400 {object} map[string]string
-//@Failure 401 {object} map[sting]string
-//@Failure 500 {object} map[string]string
+//@Param addWeight body model.WeightInput true "Weight, fk_horse_id"
+//@Success 201 {object} model.WeightCreateResponse "Weight added"
+//@Failure 400 {object} model.ErrorResponse "Bad request"
+//@Failure 500 {object} model.ErrorResponse "Internal server error"
 //@Router /api/v1/horses/{id}/weights [post]
-func AddWeight(c *gin.Context, db *sql.DB, id string) {
-	var newWeight model.Weights ;
-
-	if err := c.ShouldBindJSON(&newWeight); err != nil {
-		body := utils.ErrorResponseInput{
-			Details : []utils.ErrorDetail{
-				{
-					Field: "body",
-					Issue: "The provided data is not valid",
-				},
+func AddWeight(c *gin.Context, db *sql.DB, weightService *service.Weightservice) {
+	horseIdStr := c.Param("id") 
+	horseId, err := strconv.Atoi(horseIdStr)
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid horse ID", model.ErrorResponseInput{
+			Details: []model.ErrorDetail{{Field: "id", Issue: "Horse ID must be a valid integer"}},
+			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links: model.Links{
+				Get: model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"},
 			},
-			Meta : map[string]string{
-				"timestamp": time.Now().Format(time.RFC3339),
-			},
-			Links : gin.H{
-				"self":   "/api/v1/weight/:id",
-				"Method": "POST",
-			},
-		}
-		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid REquest", body)
-		return;
-	}
-
-	if details, err := service.AddWeightHorse(db, &newWeight, id); err != nil || len(details) > 0 {
-		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
-				Details: details,
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/Weight/:id",
-						"METHOD": "POST",
-					},
-				},
-			})
-		} else {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/auth/signin",
-						"METHOD": "POST",
-					},
-				},
-			})
-		} 
+		})
 		return
-	}	
-
-	body := gin.H{
-    "horse": gin.H{
-      "weight": newWeight.FkHorseId,
-			"fk_horse_id": newWeight.FkHorseId,
-		},
-		"_links": gin.H{
-        "sign-in": gin.H{
-					"href":"/api/v1/horses/update",
-					"Method": "POST", 
-				},
-		},
-		"meta": gin.H{
-			"createdAt": newWeight.CreatedAt,
-			"welcomeMessage": "You add a weight of a horse", 
-		},
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusCreated, "Registration new successful", body)
+	var input model.WeightInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid request body", model.ErrorResponseInput{
+			Details: []model.ErrorDetail{{Field: "body", Issue: "The provided weight data is not valid"}},
+			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links: model.Links{
+				Get: model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"},
+			},
+		})
+		return
+	}
 
+	weight, details, err := weightService.AddWeightHorse(db, &input, horseId)
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal Server Error", model.ErrorResponseInput{
+			Meta:  map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links: model.Links{Get: model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"}},
+		})
+		return
+	}
+	if len(details) > 0 {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", model.ErrorResponseInput{
+			Details: details,
+			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links:   model.Links{Get: model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"}},
+		})
+		return
+	}
+
+	resp := model.WeightCreateResponse{
+	Weight: model.WeightData{
+		Weight:    weight.Weight,
+		FkHorseId: weight.FkHorseId,
+		CreatedAt: weight.CreatedAt,
+	},
+	Links: model.Links{
+		Get: model.Link{
+			Method: "GET",
+			Href:   fmt.Sprintf("/api/v1/horses/%d/weights", weight.FkHorseId), 
+		},
+	},
+	Meta: model.MetaSimple{
+		Message: "Weight added successfully",
+	},
+}
+	utils.WriteSuccesResponse(c, http.StatusCreated, resp)
 }
 
 // GetHorseWeights godoc
@@ -111,47 +100,70 @@ func AddWeight(c *gin.Context, db *sql.DB, id string) {
 // @Failure 400 {object} map[string]string "Validation error"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/v1/horses/{id}/weights [get]
-func GetHoreseWeights(c *gin.Context, db *sql.DB, id string, limit string, sort string, compare string) {
-	var details []utils.ErrorDetail
+func GetHoreseWeights(c *gin.Context, db *sql.DB, weightService *service.Weightservice) {
+	idParam := c.Param("id")
+	limit := c.DefaultQuery("limit", "")
+	sort := c.DefaultQuery("sort", "asc")
+	compare := c.DefaultQuery("compare", "false")
 
-	horse, weights, comparisonData, details, err := service.GetHorseWeights(db, id, limit, sort, compare)
-	if err != nil || len(details) > 0 {
-		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "Validation Error", utils.ErrorResponseInput{	
-				Details: details,
-				Meta: map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
-			})
-		} else {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-				Meta: map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
-			})
-		}
+	horseId, err := strconv.Atoi(idParam)
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid horse ID", model.ErrorResponseInput{
+			Details: []model.ErrorDetail{{Field: "id", Issue: "Must be an integer"}},
+			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links: model.Links{
+				Get: model.Link{Method: "GET", Href: "/api/v1/horses/" + idParam + "/weights"},
+			},
+		})
 		return
 	}
 
-	body := gin.H{
-    "horse": gin.H{
-			"name": horse.Name,
-      "data": weights,
-		},
-		"_links": gin.H{
-        "sign-in": gin.H{
-					"href":"/api/v1/horses/update",
-					"Method": "PUT", 
-				},
-		},
-		"meta": gin.H{
-			"count": len(weights),
-			"welcomeMessage": "You get data a horses for a user", 
-		},
-	}
-	
-	if comparisonData != nil {
-		body["horse"].(gin.H)["last_weight"] = comparisonData.LastWeight
-		body["horse"].(gin.H)["difference_weight"] = comparisonData.DifferenceWeight
-		body["horse"].(gin.H)["previous_date"] = comparisonData.LastDate
-		body["horse"].(gin.H)["date"] = comparisonData.CreatedAt
+	horse, weights, comparison, details, err := weightService.GetHorseWeights(db, horseId, limit, sort, compare)
+	if err != nil || len(details) > 0 {
+		status := http.StatusInternalServerError
+		if len(details) > 0 {
+			status = http.StatusBadRequest
+		}
+		utils.WriteErrorResponse(c, status, "Failed to retrieve horse weights", model.ErrorResponseInput{
+			Details: details,
+			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links: model.Links{
+				Get: model.Link{Method: "GET", Href: "/api/v1/horses/" + idParam + "/weights"},
+			},
+		})
+		return
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusOK, "Get weights successful", body)
+	var weightsData []model.WeightData
+	for _, w := range weights {
+		weightsData = append(weightsData, model.WeightData{
+			Weight:    w.Weight,
+			FkHorseId: w.FkHorseId,
+			CreatedAt: w.CreatedAt,
+		})
+	}
+
+	resp := model.HorseWeightsResponse{
+		Horse: model.HorseWeight{
+			Name: horse.Name,
+			Data: weightsData,
+		},
+		Links: model.Links{
+			Get: model.Link{Method: "GET", Href: "/api/v1/horses/" + idParam + "/weights"},
+		},
+		Meta: model.Meta{
+			Count:   len(weights),
+			Message: "Horse weights retrieved successfully",
+		},
+	}
+
+	// Ajout de la comparaison si `compare=true` && `limit=1`
+	if comparison != nil {
+		resp.Horse.LastWeight = comparison.LastWeight
+		resp.Horse.DifferenceWeight = comparison.DifferenceWeight
+		resp.Horse.LastDate = comparison.LastDate
+		resp.Horse.CreatedAt = comparison.CreatedAt
+	}
+
+	utils.WriteSuccesResponse(c, http.StatusOK, resp)
 }

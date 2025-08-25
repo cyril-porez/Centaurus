@@ -6,21 +6,17 @@ export default function TextInput({ props, value, onValueChange }) {
     if (onValueChange) onValueChange(newValue);
   };
 
-  const fieldset = `w-full mx-auto rounded-lg p-[4%] border ${props.colorBorder} `;
-
   return (
     <div className="mb-[5%] w-full">
-      <fieldset className={fieldset}>
-        <legend className={`text-sm ${props.textColor}`}>{props.legend}</legend>
-        <input
-          className={`w-full focus:outline-none focus:ring-2 ${props.inputBoderColor}`}
-          type={props.type}
-          value={value}
-          onChange={handleChange}
-          placeholder={props.placeholder}
-          id=""
-        />
-      </fieldset>
+      <label className={`text-sm ${props.textColor}`}>{props.legend}:</label>
+      <input
+        className={`w-full focus:outline-none focus:ring-2 ${props.inputBoderColor}`}
+        type={props.type}
+        value={value}
+        onChange={handleChange}
+        placeholder={props.placeholder}
+        id=""
+      />
     </div>
   );
 }

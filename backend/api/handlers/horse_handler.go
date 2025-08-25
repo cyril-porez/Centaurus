@@ -3,9 +3,12 @@ package handlers
 import (
 	"back-end-go/model"
 	"back-end-go/service"
+	"back-end-go/shared"
 	"back-end-go/utils"
 	"database/sql"
+	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,18 +20,19 @@ import (
 //@Tags Horses
 //@Accept json
 //@Produce json
-//@Param addhorse body model.Horses true "Name, Age and Race"
-//@Success 201 {object} model.Horses "Horse created"
-//@Failure 400 {object} map[string]string
-//@Failure 401 {object} map[sting]string
-//@Failure 500 {object} map[string]string
+//@Param addhorse body model.HorseInput true "Horse data"
+//@Success 201 {object} model.HorsesResponse "Horse created"
+//@Failure 400 {object} model.ErrorResponse "Invalid input"
+//@Failure 401 {object} model.ErrorResponse "Horse already exists"
+//@Failure 409 {object} model.ErrorResponse "Horse already exists"
+//@Failure 500 {object} model.ErrorResponse "Server error"
 //@Router /api/v1/horses [post]
-func AddHorseHandler(c *gin.Context, db *sql.DB) {
-	var newHorse model.Horses
+func AddHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseService) {
+	var input model.HorseInput
 
-	if err := c.ShouldBindJSON(&newHorse); err != nil {
-		body := utils.ErrorResponseInput{
-			Details : []utils.ErrorDetail{
+	if err := c.ShouldBindJSON(&input); err != nil {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid REquest", model.ErrorResponseInput{
+			Details : []model.ErrorDetail{
 				{
 					Field: "body",
 					Issue: "The provided data is not valid",
@@ -41,85 +45,94 @@ func AddHorseHandler(c *gin.Context, db *sql.DB) {
 				"self":   "/api/v1/horses/update",
 				"Method": "POST",
 			},
-		}
-		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid REquest", body)
+		})
 		return
 	}
 
-	
-	if details, err := service.CreateHorse(db, &newHorse); err != nil || len(details) > 0 {
+	userID, ok := utils.GetUserIDFromContext(c)
+	if !ok {
+		return 
+	}
+	input.FkUserId = userID
+
+	horse, details, err := horseService.CreateHorse(db, &input);
+	if  err != nil || len(details) > 0 {
+		code := http.StatusInternalServerError
+		message := "Internal Server Error"
+		
 		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
-				Details: details,
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/horses/update",
-						"METHOD": "PUT",
-					},
-				},
-			})
-		} else {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/auth/signin",
-						"METHOD": "POST",
-					},
-				},
-			})
+			code = http.StatusBadRequest
+			message = "Validation Error"
 		} 
+		utils.WriteErrorResponse(c, code, message, model.ErrorResponseInput{
+			Details: details,
+			Meta: map[string]string{
+				"timestamp": time.Now().Format(time.RFC3339),
+			},
+			Links: gin.H{
+				"self": "/api/v1/horses",
+				"method": "POST",
+			},
+		})	
 		return
 	}	
 
-	body := gin.H{
-    "horse": gin.H{
-      "name": newHorse.Name,
-			"age": newHorse.Age,
-			"race": newHorse.Race,
-			"fk_user_id": newHorse.FkUserId,
-		},
-		"_links": gin.H{
-        "sign-in": gin.H{
-					"href":"/api/v1/horses/update",
-					"Method": "PUT", 
+	resp := model.HorseCreateResponse{
+		Horse: *horse,
+		Links: model.Links{
+        Update: model.Link{
+					Href:"/api/v1/horses/" + strconv.Itoa(horse.Id),
+					Method: "PUT", 
+				},
+				Get:model.Link{
+					Href:"/api/v1/horses/" + strconv.Itoa(horse.Id),
+					Method: "GET", 
 				},
 		},
-		"meta": gin.H{
-			"createdAt": newHorse.CreatedAt,
-			"welcomeMessage": "You add a new horse", 
+		Meta: model.MetaSimple{
+			Message: "You add a new horse", 
 		},
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusCreated, "Registration new successful", body)
+	utils.WriteSuccesResponse(c, http.StatusCreated, resp)
 }
 
-//UpdateHorseHandler godoc
+//UpdateHorseHandler godoc 
 //@Summary Update a horse
-//@Description add a profil user
+//@Description Update a horse by ID
 //@Tags Horses
 //@Accept json
 //@Produce json
-//@Param addhorse body model.Horses true "Name, Age and Race"
-//@Success 201 {object} model.Horses "Horse created"
-//@Failure 400 {object} map[string]string
-//@Failure 401 {object} map[sting]string
-//@Failure 500 {object} map[string]string
+//@Param id path int true "Horse ID"
+//@Param addhorse body model.HorseUpdateInput true "Name, Age and Race"
+//@Success 200 {object} model.HorseUpdateResponse "Horse updated"
+//@Failure 400 {object} model.ErrorResponse "Invalid input"
+//@Failure 401 {object} model.ErrorResponse "Unauthorized"
+//@Failure 403 {object} model.ErrorResponse "Forbidden"
+//@Failure 404 {object} model.ErrorResponse "Horse not found"
+//@Failure 500 {object} model.ErrorResponse "Internal Error"
 //@Router /api/v1/horses/{id} [put]
-func UpdateHorseHandler(c *gin.Context, db *sql.DB, id string) {
-	var horse model.Horses
+func UpdateHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseService) {
+	var input model.HorseUpdateInput
 
-	if err := c.ShouldBindJSON(&horse); err != nil {
-		body := utils.ErrorResponseInput{
-			Details : []utils.ErrorDetail{
+	if err := c.ShouldBindJSON(&input); err != nil {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid input", model.ErrorResponseInput{
+			Details: []model.ErrorDetail{
+				{Field: "body", Issue: "Malformed JSON or missing required fields"},
+			},
+			Meta:  map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links: model.Links{Get: model.Link{Method: "GET", Href: "/api/v1/horses"}},
+		})
+		return
+	}
+
+	horseId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid ID", model.ErrorResponseInput{
+			Details : []model.ErrorDetail{
 				{
-					Field: "body",
-					Issue: "The provided data is not valid",
+					Field: "id",
+					Issue: "Horse ID must be an integer",
 				},
 			},
 			Meta : map[string]string{
@@ -129,193 +142,178 @@ func UpdateHorseHandler(c *gin.Context, db *sql.DB, id string) {
 				"self":   "/api/v1/horses/update",
 				"Method": "POST",
 			},
-		}
-		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid REquest", body)
-		return
+		})
+		return			
 	}
 
-	if details, err := service.UpdateHorse(db, &horse, id); err != nil || len(details) > 0 {
-		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
-				Details: details,
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/horses/update",
-						"METHOD": "PUT",
-					},
-				},
-			})
-		} else {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/auth/signin",
-						"METHOD": "POST",
-					},
-				},
-			})
-		} 
-		return
+	userID, ok := utils.GetUserIDFromContext(c)
+	if !ok {
+		return 
 	}
 	
-	body := gin.H{
-    "horse": gin.H{
-      "name": horse.Name,
-			"age": horse.Age,
-			"race": horse.Race,
-			"fk_user_id": horse.FkUserId,
-		},
-		"_links": gin.H{
-        "sign-in": gin.H{
-					"href":"/api/v1/horses/update",
-					"Method": "PUT", 
+
+	horse, details, err := horseService.UpdateHorse(db, &input, horseId, userID);
+	code := http.StatusInternalServerError
+	message := "Internal Server Error"
+
+	for _, d := range details {
+		if d.Field == "authorization" {
+			code = http.StatusForbidden
+			message = "Forbidden"
+			break
+		}
+	}
+	if len(details) > 0 && code != http.StatusForbidden {
+		code = http.StatusBadRequest
+		message = "Validation Error"
+	}
+	if err != nil || len(details) > 0 {		
+		utils.WriteErrorResponse(c, code, message, model.ErrorResponseInput{
+			Details: details,
+			Meta: map[string]string{
+				"timestamp": time.Now().Format(time.RFC3339),
+			},
+			Links : gin.H{
+				"sign-in": gin.H{
+					"self":   "/api/v1/horses/update",
+					"METHOD": "PUT",
 				},
-		},
-		"meta": gin.H{
-			"createdAt": horse.CreatedAt,
-			"welcomeMessage": "You add a new horse", 
-		},
+			},
+		})	 
+	return
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusCreated, "Registration new successful", body)
+	resp := model.HorseCreateResponse{
+		Horse: *horse,
+		Links: model.Links{
+			Update: model.Link{Method: "PUT", Href: fmt.Sprintf("/api/v1/horses/%d", horse.Id)},
+			Get:    model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/horses/%d", horse.Id)},
+		},
+		Meta: model.MetaSimple{Message: "Horse updated successfully"},
+	}
+	
+
+	utils.WriteSuccesResponse(c, http.StatusOK, resp)	
 }
 
-//UpdateHorseHandler godoc
+//GetHorseHandler godoc
 //@Summary Get a horse
 //@Description Retrieve a horse for a specific user
 //@Tags Horses
 //@Accept json
 //@Produce json
 //@Param id path int true "Horse Id"
-//@Success 201 {object} model.Horses "Horse retrieved"
-//@Failure 400 {object} map[string]string
-//@Failure 401 {object} map[sting]string
-//@Failure 500 {object} map[string]string
+//@Success 200 {object} model.HorseCreateResponse "Horse retrieved"
+//@Failure 400 {object} model.ErrorResponse "Invalid ID format or validation error"
+//@Failure 404 {object} model.ErrorResponse "Horse not found"
+//@Failure 500 {object} model.ErrorResponse "Internal Server Error"
 //@Router /api/v1/horses/{id} [get]
-func GetHorseHandler(c *gin.Context, db *sql.DB, id string) {
-	var horse model.Horses
+func GetHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseService) {
+	horseId, err := strconv.Atoi(c.Param("id")) 
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid horse ID", model.ErrorResponseInput{
+			Details: []model.ErrorDetail{{Field: "id", Issue: "Must be an integer"}},
+			Meta: map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links: model.Links{
+				Get:    model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/horses/%d", horseId)},
+			},
+		})
+		return
+	}
 	
-	if details, err := service.GetHorse(db, &horse, id); err != nil || len(details) > 0 {
+	horse, details, err := horseService.GetHorse(db, horseId)
+	if err != nil || len(details) > 0 {
+		code := http.StatusInternalServerError
+		message := "Internal Server Error"
 		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
-				Details: details,
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/horses/update",
-						"METHOD": "PUT",
-					},
-				},
-			})
-		} else {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/auth/signin",
-						"METHOD": "POST",
-					},
-				},
-			})
-		} 
+			code = http.StatusNotFound
+			message = "Horse not found"
+		}
+		utils.WriteErrorResponse(c, code, message, model.ErrorResponseInput{
+			Details: details,
+			Meta: map[string]string{
+				"timestamp": time.Now().Format(time.RFC3339),
+			},
+			Links: model.Links{
+				Get:    model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/horses/%d", horseId)},
+			},
+		})
 		return
 	}
 
-	body := gin.H{
-    "horse": gin.H{
-      "name": horse.Name,
-			"age": horse.Age,
-			"race": horse.Race,
-			"fk_user_id": horse.FkUserId,
+	resp := model.HorseCreateResponse{
+		Horse: *horse,
+		Links: model.Links{
+			Update: model.Link{Method: "PUT", Href: "/api/v1/horses/" + strconv.Itoa(horse.Id)},
+			Get:    model.Link{Method: "GET", Href: "/api/v1/horses/" + strconv.Itoa(horse.Id)},
 		},
-		"_links": gin.H{
-        "sign-in": gin.H{
-					"href":"/api/v1/horses/update",
-					"Method": "PUT", 
-				},
-		},
-		"meta": gin.H{
-			"createdAt": horse.CreatedAt,
-			"welcomeMessage": "You get data a horse", 
-		},
+		Meta: model.MetaSimple{Message: "Horse retrieved successfully"},
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusOK, "get data horse successful", body)
+	utils.WriteSuccesResponse(c, http.StatusOK, resp)
 }
 
 // GetHorsesByUserHanndler godoc
-//@Summary get a list of horses 
+//@Summary Get horses by user ID 
 //@Description Retrieve a list of horses for a specific user
 //@Tags Horses
 //@Accept json
 //@Produce json
 //@Param id path int true "User ID"
-//@Success 200 {object} model.Horses "Horses récupéré"
-//@Failure 400 {object} map[string]string
-//@Failure 401 {object} map[sting]string
-//@Failure 500 {object} map[string]string
+//@Success 200 {object} model.HorsesResponse "List of horses for the given user"
+//@Failure 400 {object} model.ErrorResponse "Invalid user ID format or validation issue"
+//@Failure 401 {object} model.ErrorResponse "User not found (if needed)"
+//@Failure 500 {object} model.ErrorResponse "Internal server error"
 //@Router /api/v1/users/{id}/horses [get]
-func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, id string ) {
+func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, horseService *service.HorseService) {
+	userIdStr := c.Param("id")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid user ID", model.ErrorResponseInput{
+			Details: []model.ErrorDetail{{Field: "id", Issue: "User ID must be an integer"}},
+			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links: model.Links{
+				Get: model.Link{Method: "GET", Href: "/api/v1/users/" + userIdStr + "/horses"},
+			},
+		})
+		return
+	}
 	
-	horses, details, err := service.GetHorsesByUserId(db, id);
-	if err != nil || len(details) > 0 {
-		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
-				Details: details,
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/horses/update",
-						"METHOD": "PUT",
-					},
-				},
-			})
-		} else {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/auth/signin",
-						"METHOD": "POST",
-					},
-				},
-			})
-		} 
+	horses, details, err := horseService.GetHorsesByUserId(db, userId)
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal Server Error", model.ErrorResponseInput{
+			Details: nil,
+			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links: model.Links{
+				Get: model.Link{Method: "GET", Href: "/api/v1/users/" + userIdStr + "/horses"},
+			},
+		})
+		return
+	}
+	if len(details) > 0 {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", model.ErrorResponseInput{
+			Details: details,
+			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links: model.Links{
+				Get: model.Link{Method: "GET", Href: "/api/v1/users/" + userIdStr + "/horses"},
+			},
+		})
 		return
 	}
 
-	body := gin.H{
-    "horse": gin.H{
-      "data": horses,
+	resp := model.HorsesResponse{
+		Horse: model.HorseData{Data: horses},
+		Links: model.Links{
+			Update: model.Link{Method: "PUT", Href: "/api/v1/horses/" + userIdStr + "/horses"},
+			Get:    model.Link{Method: "GET", Href: "/api/v1/users/" + userIdStr + "/horses"},
 		},
-		"_links": gin.H{
-        "sign-in": gin.H{
-					"href":"/api/v1/horses/update",
-					"Method": "PUT", 
-				},
-		},
-		"meta": gin.H{
-			"count": len(horses),
-			"welcomeMessage": "You get data a horses for a user", 
+		Meta: model.Meta{
+			Count:   len(horses),
+			Message: "List of horses for the user",
 		},
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusOK, "get data horses successful", body)
-
+	utils.WriteSuccesResponse(c, http.StatusOK, resp)
 }
 
 // DeleteHorseHanndler godoc
@@ -325,58 +323,61 @@ func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, id string ) {
 //@Accept json
 //@Produce json
 //@Param id path int true "Horse ID"
-//@Success 200 {object} model.Horses "Horses récupéré"
-//@Failure 400 {object} map[string]string
-//@Failure 401 {object} map[sting]string
-//@Failure 500 {object} map[string]string
+//@Success 200 {object} map[string]interface{} "Horse deleted successfully"
+//@Failure 400 {object} model.ErrorResponse "Invalid horse ID format"
+//@Failure 404 {object} model.ErrorResponse "Horse not found"
+//@Failure 500 {object} model.ErrorResponse "Internal server error"
 //@Router /api/v1/horses/{id} [delete]
-func DeleteHorseHandler(c *gin.Context, db *sql.DB, id string) {
-	
-	if details, err := service.DeleteHorse(db, id); err != nil || len(details) > 0 {
-		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
-				Details: details,
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
+func DeleteHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseService) {
+	idParam := c.Param("id")
+	horseId, err := strconv.Atoi(idParam)
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid horse ID", model.ErrorResponseInput{
+			Details: []model.ErrorDetail{{Field: "id", Issue: "Horse ID must be an integer"}},
+			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+			Links: model.Links{
+				Get: model.Link{
+					Method: "DELETE",
+					Href:   "/api/v1/horses/" + idParam,
 				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/horses/update",
-						"METHOD": "PUT",
-					},
-				},
-			})
-		} else {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/auth/signin",
-						"METHOD": "POST",
-					},
-				},
-			})
-		} 
-		return;
+			},
+		})
+		return
 	}
+	
+	err = horseService.DeleteHorse(db, horseId)
+	if err != nil {
+		switch err {
+		case shared.ErrNotFound:
+			utils.WriteErrorResponse(c, http.StatusNotFound, "Horse not found", model.ErrorResponseInput{
+				Details: []model.ErrorDetail{{Field: "id", Issue: "No horse found with the given ID"}},
+				Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+				Links:   model.Links{Get: model.Link{Method: "DELETE", Href: "/api/v1/horses/" + idParam}},
+			})
+		default:
+			utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal Server Error", model.ErrorResponseInput{
+				Meta:  map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
+				Links: model.Links{Get: model.Link{Method: "DELETE", Href: "/api/v1/horses/" + idParam}},
+			})
+		}
+		return
+	}
+	
+	
 
-	body := gin.H{
-    "horse": gin.H{
-      "horse": "delete",
-		},
+	resp := gin.H{
+		"message": "Horse deleted successfully",
 		"_links": gin.H{
-        "sign-in": gin.H{
-					"href":"/api/v1/horses/update",
-					"Method": "PUT", 
-				},
+			"create": gin.H{
+				"method": "POST",
+				"href": "/api/v1/horses",
+			},
 		},
 		"meta": gin.H{
-			"deletedAt": time.Now().Format(time.RFC1123),
-			"welcomeMessage": "horse deleted with success", 
+			"deletedAt":      time.Now().Format(time.RFC3339),
+			"welcomeMessage": "The horse has been successfully removed",
 		},
 	}
 
-	utils.WriteSuccesResponse(c, http.StatusOK, "horse deleted successful", body);
+	utils.WriteSuccesResponse(c, http.StatusOK, resp)
 }

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"regexp"
 
+	"back-end-go/model"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -13,8 +15,8 @@ func HashPassword(password string) (string, error) {
 	return string(hashedPAssword), err
 }
 
-func ValidatePassword(password string) ([]ErrorDetail, error) {
-	var details []ErrorDetail
+func ValidatePassword(password string) ([]model.ErrorDetail, error) {
+	var details []model.ErrorDetail
 	
 	if len(password ) < 12 { 
 		AddErrorDetail(&details, "password", "le mot de passe doit contenir au mois 12 caractères")
