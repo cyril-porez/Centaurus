@@ -86,7 +86,7 @@ func AddHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseServ
 				},
 				Get:model.Link{
 					Href:"/api/v1/horses/" + strconv.Itoa(horse.Id),
-					Method: "PUT", 
+					Method: "GET", 
 				},
 		},
 		Meta: model.MetaSimple{
@@ -304,7 +304,7 @@ func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, horseService *service.H
 	resp := model.HorsesResponse{
 		Horse: model.HorseData{Data: horses},
 		Links: model.Links{
-			Update: model.Link{Method: "PUT", Href: "/api/v1/horses/update"},
+			Update: model.Link{Method: "PUT", Href: "/api/v1/horses/" + userIdStr + "/horses"},
 			Get:    model.Link{Method: "GET", Href: "/api/v1/users/" + userIdStr + "/horses"},
 		},
 		Meta: model.Meta{
