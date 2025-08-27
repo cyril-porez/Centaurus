@@ -35,100 +35,99 @@ function App() {
   return (
     <div className="h-screen">
       <Header />
-      <Router>
-        <Routes>
-          <Route path="/auth/sign-in" element={<SignIn />} />
-          <Route path="/auth/sign-up" element={<SignUp />} />
-          <Route
-            path="/"
-            element={
-              <PrivateRoute>
-                <Home />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/horses/my-horse/my-horses"
-            element={
-              <PrivateRoute>
-                <MyHorses />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/horses/my-horse/add-horse"
-            element={
-              <PrivateRoute>
-                <AddHorse />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/horses/calculation/ChoiceHorse"
-            element={
-              <PrivateRoute>
-                <ChoiceHorse />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/horses/my-horse/update-horse/:id"
-            element={
-              <PrivateRoute>
-                <UpdateHorse />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/horses/follow/follow-weight"
-            element={
-              <PrivateRoute>
-                <FollowWeight />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/users/profile"
-            element={
-              <PrivateRoute>
-                <Account />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/horses/follow/evolution/weight/table/:id"
-            element={
-              <PrivateRoute>
-                <WeightTable />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/horses/follow/evolution/weight/graph/:id"
-            element={
-              <PrivateRoute>
-                <WeightGraph />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/horses/calculation/mensurations/:id"
-            element={
-              <PrivateRoute>
-                <Mensurations />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/horses/calculation/ResultWeight/:id"
-            element={
-              <PrivateRoute>
-                <ResultWeight />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </Router>
+
+      <Routes>
+        <Route path="/auth/sign-in" element={<SignIn />} />
+        <Route path="/auth/sign-up" element={<SignUp />} />
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/horses/my-horse/my-horses"
+          element={
+            <PrivateRoute>
+              <MyHorses />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/horses/my-horse/add-horse"
+          element={
+            <PrivateRoute>
+              <AddHorse />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/horses/calculation/ChoiceHorse"
+          element={
+            <PrivateRoute>
+              <ChoiceHorse />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/horses/my-horse/update-horse/:id"
+          element={
+            <PrivateRoute>
+              <UpdateHorse />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/horses/follow/follow-weight"
+          element={
+            <PrivateRoute>
+              <FollowWeight />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/users/profile"
+          element={
+            <PrivateRoute>
+              <Account />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/horses/follow/evolution/weight/table/:id"
+          element={
+            <PrivateRoute>
+              <WeightTable />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/horses/follow/evolution/weight/graph/:id"
+          element={
+            <PrivateRoute>
+              <WeightGraph />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/horses/calculation/mensurations/:id"
+          element={
+            <PrivateRoute>
+              <Mensurations />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/horses/calculation/ResultWeight/:id"
+          element={
+            <PrivateRoute>
+              <ResultWeight />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
     </div>
   );
 }

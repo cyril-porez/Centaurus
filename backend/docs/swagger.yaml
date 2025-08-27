@@ -34,6 +34,13 @@ definitions:
       meta:
         $ref: '#/definitions/model.MetaSimple'
     type: object
+  model.HorseData:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.Horses'
+        type: array
+    type: object
   model.HorseInput:
     properties:
       age:
@@ -88,8 +95,6 @@ definitions:
     type: object
   model.Horses:
     properties:
-      _links:
-        $ref: '#/definitions/model.Links'
       age:
         type: integer
       createdAt:
@@ -115,7 +120,7 @@ definitions:
       _links:
         $ref: '#/definitions/model.Links'
       horse:
-        $ref: '#/definitions/model.Horses'
+        $ref: '#/definitions/model.HorseData'
       meta:
         $ref: '#/definitions/model.Meta'
     type: object
@@ -128,15 +133,9 @@ definitions:
     type: object
   model.Links:
     properties:
-      create:
-        $ref: '#/definitions/model.Link'
-      delete:
-        $ref: '#/definitions/model.Link'
-      self:
+      get:
         $ref: '#/definitions/model.Link'
       update:
-        $ref: '#/definitions/model.Link'
-      weights:
         $ref: '#/definitions/model.Link'
     type: object
   model.LoginInput:
