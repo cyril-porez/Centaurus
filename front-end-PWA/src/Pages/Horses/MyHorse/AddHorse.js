@@ -46,6 +46,8 @@ function AddHorse() {
   };
 
   const onSubmit = async () => {
+    console.log("test");
+
     const AddHorse = await horseApi.AddHorse(name, age, category, userId);
     if (AddHorse.header.code === 201) {
       navigate("/horses/my-horse/my-horses", { replace: false });
@@ -53,48 +55,34 @@ function AddHorse() {
   };
 
   const nameHorse = {
-    legend: "Nom du cheval",
-    colorBorder: "border-homa-beige",
-    textColor: "text-homa-beige",
-    inputBoderColor: "focus:ring-homa-beige",
+    label: "Nom du cheval",
     type: "text",
     placeholder: "Horisse du chêne",
   };
 
   const ageHorse = {
-    legend: "Âge du cheval",
-    colorBorder: "border-homa-beige",
-    inputBoderColor: "focus:ring-homa-beige",
-    textColor: "text-homa-beige",
+    label: "Âge du cheval",
     type: "number",
     placeholder: "10",
   };
 
   return (
     <div
-      className="flex flex-col 
-                  items-center
-                  max-h-screen"
+      className="
+        flex justify-center
+        max-h-[100svh]
+        px-[5%]
+      "
     >
-      <img
-        src="/icons/horseHead.png"
-        width={50}
-        className="absolute top-8 right-8"
-        alt=""
-      />
-      <div
-        className="w-[90%] 
-                    max-w-[400px] 
-                    p-[5%]"
-      >
+      <div className="w-[90%] max-w-[360px]">
         <HeaderText
           props={{
             title: "Création d'un profil cheval",
-            subtitle: "Nous allons avoir besoin de quelques informations.",
+            subtitle: "Nous allons avoir besoin d'informations.",
           }}
         />
 
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-y-2 mt-3 mb-2">
           <TextInput
             props={nameHorse}
             value={name}
@@ -107,11 +95,20 @@ function AddHorse() {
           />
           <SelectInput value={category} onValueChange={handleCategoryChange} />
         </div>
-        <Button name="Ajouter" onSubmit={() => onSubmit()} />
+        <div className="mt-6">
+          <Button name="Ajouter" onSubmit={() => onSubmit()} />
+        </div>
       </div>
-
-      <div className="mt-5">
-        <HomeButton />
+      <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
+        <div className="mx-auto w-full max-w-[360px] flex justify-center">
+          <HomeButton
+            className="
+              fixed z-50
+              left-1/2 -translate-x-1/2
+              bottom-[max(env(safe-area-inset-bottom),0.75rem)]
+            "
+          />
+        </div>
       </div>
     </div>
   );

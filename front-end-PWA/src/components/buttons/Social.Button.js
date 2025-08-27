@@ -1,6 +1,7 @@
 export default function SocialButton({ icon, text, onClick }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className="
         w-full flex items-center 

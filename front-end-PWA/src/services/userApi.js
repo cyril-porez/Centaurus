@@ -25,11 +25,21 @@ async function login(email, password) {
       password: password,
     });
     console.log(response.data);
-    return response.data;
+    return {
+      ok: response.status >= 200 && response.status < 300,
+      status: response.status,
+      data: response.data,
+      error: null,
+    };
   } catch (error) {
     console.log(error.response.data);
 
-    return error.response.data;
+    return {
+      ok: false,
+      status: error?.response?.status ?? 0,
+      data: error?.response?.data,
+      error: error,
+    };
   }
 }
 

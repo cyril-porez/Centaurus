@@ -17,7 +17,7 @@ function FollowWeight() {
   };
 
   const goToAddHorse = () => {
-    navigate(`/AddHorse/`);
+    navigate(`/horses/my-horse/add-horse`);
   };
 
   const getHorseByUser = async (id) => {

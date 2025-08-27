@@ -29,11 +29,11 @@ function App() {
   }
 
   function PrivateRoute({ children }) {
-    return isAuthenticated() ? children : <Navigate to="/signin" />;
+    return isAuthenticated() ? children : <Navigate to="/auth/sign-in" />;
   }
 
   return (
-    <div className="">
+    <div className="h-screen">
       <Header />
       <Router>
         <Routes>

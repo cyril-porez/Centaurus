@@ -12,12 +12,22 @@ function SignIn() {
   const [error, setError] = useState("");
   let navigate = useNavigate();
 
-  const authUser = async (data) => {
-    const response = await userApi.login(data.email, data.password);
-    if (response.header.code === 200) {
-      navigate("/", { replace: true });
+  const authUser = async (formData) => {
+    const response = await userApi.login(formData.email, formData.password);
+
+    const status = response?.status ?? response?.header?.code;
+    const payload = response?.data ?? response?.body ?? response;
+
+    console.log("✓ login response", { status, payload });
+
+    if (status === 200) {
+      //navigate("/", { replace: true });
     } else {
-      setError(response?.body?.details?.[0]?.issue);
+      setError(
+        payload?.details?.[0]?.issue ||
+          payload?.message ||
+          "Échec de la connexion."
+      );
     }
   };
 
@@ -42,8 +52,8 @@ function SignIn() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
-    authUser(data);
+  const onSubmit = (formData) => {
+    authUser(formData);
   };
 
   const data = {
@@ -51,12 +61,12 @@ function SignIn() {
     subtitle: "On est content de te revoir !",
   };
   return (
-    <div className="min-h-screen flex justify-center">
+    <div className="max-h-screen flex justify-center">
       <div className="w-[90%] max-w-[360px] p-[5%]">
         <HeaderText props={data} />
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-          <div className="flex flex-col gap-y-4 mt-3 mb-2">
+          <div className="flex flex-col gap-y-4 mt-1 mb-2">
             <div className="w-full">
               <label className="block mb-1 text-sm text-centaurus-oxford-blue">
                 E-mail:
@@ -130,7 +140,7 @@ function SignIn() {
 
           <div
             className="
-            my-5
+            my-3
             flex 
             items-center
             text-centaurus-oxford-blue
@@ -163,7 +173,7 @@ function SignIn() {
           </div>
 
           <Link
-            className="mx-auto mt-6 text-centaurus-oxford-blue underline text-base"
+            className="mx-auto mt-2 text-centaurus-oxford-blue underline text-base"
             to="/auth/sign-up"
           >
             Pas encore de compte ?
