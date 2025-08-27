@@ -8,6 +8,7 @@ type Horses struct {
 	FkUserId  int    `json:"fk_user_id" binding:"required"`
 	CreatedAt string `json:"createdAt"`
 	UpdatedAt string `json:"updatedAt,omitempty"`
+	Links     Links  `json:"_links"`
 }
 
 type HorseInput struct {
@@ -40,8 +41,11 @@ type Link struct {
 }
 
 type Links struct {
-	Update Link `json:"update"`
-	Get    Link `json:"get"`
+	Self    *Link `json:"self,omitempty"`
+	Create  *Link `json:"create,omitempty"`
+	Update  *Link `json:"update,omitempty"`
+	Delete  *Link `json:"delete,omitempty"`
+	Weights *Link `json:"weights,omitempty"`
 }
 
 type Meta struct {
@@ -66,7 +70,13 @@ type HorseUpdateResponse struct {
 }
 
 type HorsesResponse struct {
-	Horse HorseData `json:"horse"`
-	Links Links     `json:"_links"`
-	Meta  Meta      `json:"meta"`
+	Data  Horses `json:"horse"`
+	Links Links  `json:"_links"`
+	Meta  Meta   `json:"meta"`
+}
+
+type HorseListResponse struct {
+	Data  []Horses `json:"data"`
+	Links Links    `json:"_links"`
+	Meta  Meta     `json:"meta"`
 }
