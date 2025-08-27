@@ -273,7 +273,7 @@ func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, horseService *service.H
 			Details: []model.ErrorDetail{{Field: "id", Issue: "User ID must be an integer"}},
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Self: &model.Link{Method:"GET", Href: fmt.Sprintf("/api/v1/users/%d/horses", userIdStr)},
+				Self: &model.Link{Method:"GET", Href: fmt.Sprintf("/api/v1/users/%d/horses", userId)},
 			},
 		})
 		return
@@ -285,7 +285,7 @@ func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, horseService *service.H
 			Details: nil,
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Self: &model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/users/%d/horses", userIdStr)},
+				Self: &model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/users/%d/horses", userId)},
 			},
 		})
 		return
@@ -295,7 +295,7 @@ func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, horseService *service.H
 			Details: details,
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Self: &model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/users/%d/horses", userIdStr)},
+				Self: &model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/users/%d/horses", userId)},
 			},
 		})
 		return
