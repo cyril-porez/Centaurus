@@ -55,9 +55,9 @@ export default function Mensurations() {
       );
     }
   }
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
 
   const addWeight = async (weight, horseId, date) => {
     try {
@@ -127,7 +127,7 @@ export default function Mensurations() {
   };
 
   const hgarot = {
-    legend: "Hauteur au garrot",
+    label: "Hauteur au garrot",
     colorBorder: "border-homa-beige",
     textColor: "text-homa-beige",
     placeholder: "... cm",
@@ -135,7 +135,7 @@ export default function Mensurations() {
   };
 
   const lcorp = {
-    legend: "Longueur du corps",
+    label: "Longueur du corps",
     colorBorder: "border-red",
     textColor: "text-red",
     placeholder: "... cm",
@@ -143,7 +143,7 @@ export default function Mensurations() {
   };
 
   const circThoracique = {
-    legend: "Circonférence thoracique",
+    label: "Circonférence thoracique",
     colorBorder: "border-green-apple",
     textColor: "text-green-apple",
     placeholder: "... cm",
@@ -151,7 +151,7 @@ export default function Mensurations() {
   };
 
   const circEncolure = {
-    legend: "Circonférence de l'encolure",
+    label: "Circonférence de l'encolure",
     colorBorder: "border-orange",
     textColor: "text-orange",
     placeholder: "... cm",
@@ -159,22 +159,30 @@ export default function Mensurations() {
   };
 
   const dateMeasure = {
-    legend: "Date de la prise de mesure",
+    label: "Date de la prise de mesure",
     colorBorder: "border-homa-brown",
     textColor: "text-homa-brown",
     type: "date",
   };
 
+  horse.race = "";
+  const isPureSang = horse?.race?.toLowerCase() === "pure sang";
+
   return (
     <div
-      className="flex flex-col 
-                  items-center
-                  max-h-screen"
+      className={[
+        "flex justify-center px-4",
+        isPureSang
+          ? "max-h-screen overflow-hidden" // aucun scroll
+          : "min-h-[100svh] overflow-y-auto pb-[calc(max(env(safe-area-inset-bottom),0.75rem)+5rem)]", // scroll si contenu long
+      ].join(" ")}
     >
       <div
-        className="w-[90%] 
-                    max-w-[400px] 
-                    p-[5%]"
+        className="
+          w-[90%] 
+          max-w-[360px] 
+          
+        "
       >
         <HeaderText
           props={{
@@ -183,7 +191,7 @@ export default function Mensurations() {
           }}
         />
         {horse?.race === "pure sang" ? (
-          <>
+          <div className="mt-3 mb-2 space-y-2">
             <TextInput
               props={lcorp}
               value={horseMesure.body}
@@ -199,9 +207,9 @@ export default function Mensurations() {
               value={horseMesure}
               onValueChange={handleDateChange}
             />
-          </>
+          </div>
         ) : (
-          <>
+          <div className="mt-3 mb-2 space-y-2">
             {/* <div className="flex flex-col h-1/2"> */}
             <TextInput
               props={hgarot}
@@ -228,11 +236,11 @@ export default function Mensurations() {
               value={horseMesure.date}
               onValueChange={handleDateChange}
             />
-          </>
+          </div>
         )}
         <img
           src="/images/cheval_lignes_mesure.png"
-          width={150}
+          width={110}
           className="mx-auto my-4"
           alt=""
         />
@@ -240,8 +248,8 @@ export default function Mensurations() {
         <Button name={"Calculons"} onSubmit={() => handleSubmit()} />
       </div>
 
-      <div className="flex flex-col justify-center items-center">
-        <div className="mt-5">
+      <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
+        <div className="mx-auto w-full max-w-[360px] flex justify-center">
           <HomeButton />
         </div>
       </div>

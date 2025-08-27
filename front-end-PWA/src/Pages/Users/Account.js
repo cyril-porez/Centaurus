@@ -14,7 +14,7 @@ export default function Profile() {
   };
 
   const email = {
-    legend: "Email",
+    label: "Email",
     colorBorder: "border-homa-beige",
     textColor: "text-homa-beige",
     inputBoderColor: "focus:ring-homa-beige",
@@ -23,7 +23,7 @@ export default function Profile() {
   };
 
   const Pseudo = {
-    legend: "Pseudo",
+    label: "Pseudo",
     colorBorder: "border-homa-beige",
     textColor: "text-homa-beige",
     inputBoderColor: "focus:ring-homa-beige",
@@ -32,7 +32,7 @@ export default function Profile() {
   };
 
   const password = {
-    legend: "Mot de passe",
+    label: "Mot de passe",
     colorBorder: "border-homa-beige",
     textColor: "text-homa-beige",
     inputBoderColor: "focus:ring-homa-beige",
@@ -41,21 +41,15 @@ export default function Profile() {
   };
   return (
     <div
-      className="flex flex-col 
-                  items-center
-                  max-h-screen"
+      className="
+        flex justify-center
+        max-h-screen
+        px-[5%]
+        pb-[max(env(safe-area-inset-bottom),5rem)]
+        pt-[max(env(safe-area-inset-top),1rem)]
+      "
     >
-      <img
-        src="/icons/casque.png"
-        width={50}
-        className="absolute top-8 right-8"
-        alt="logo casque cavalier"
-      />
-      <div
-        className="w-[90%] 
-                    max-w-[400px] 
-                    p-[5%]"
-      >
+      <div className="w-[90%] max-w-[360px]">
         <HeaderText
           props={{
             title: "Mes informations",
@@ -63,37 +57,40 @@ export default function Profile() {
           }}
         />
 
-        <div
-          className="flex 
-                      flex-col 
-                      items-center 
-                      justify-center 
-                      min-h-[400px]"
-        >
-          <TextInput props={email} />
-          <TextInput props={Pseudo} />
-          <TextInput props={password} />
+        <div className="flex flex-col gap-y-4 mt-3 mb-2 py-8 my-auto">
+          <TextInput
+            props={email}
+            value={""}
+            onValueChange={console.log("eail")}
+          />
+          <TextInput
+            props={Pseudo}
+            value={""}
+            onValueChange={console.log("pseudos")}
+          />
+          <TextInput
+            props={password}
+            value={""}
+            onValueChange={console.log("pass")}
+          />
         </div>
+
+        <button
+          className="flex items-center justify-evenly py-8 w-56 mx-auto"
+          type="submit"
+          onClick={() => handlesubmit()}
+        >
+          <img
+            className="h-8 w-8"
+            src="/icons/deconnexion.png"
+            alt="deconexion"
+          />
+          Déconnexion
+        </button>
       </div>
-      <button
-        className="
-                    flex
-                    items-center
-                    justify-evenly
-                    py-1 w-56
-                    mx-auto"
-        type="submit"
-        onClick={() => handlesubmit()}
-      >
-        <img
-          className="h-8 w-8"
-          src="/icons/deconnexion.png"
-          alt="deconexion"
-        />
-        Déconnexion
-      </button>
-      <div className="flex flex-col justify-center items-center">
-        <div className="mt-5">
+
+      <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
+        <div className="mx-auto w-full max-w-[360px] flex justify-center">
           <HomeButton />
         </div>
       </div>

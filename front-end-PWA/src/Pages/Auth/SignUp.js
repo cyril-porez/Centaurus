@@ -78,18 +78,12 @@ function SignUp() {
   };
 
   return (
-    <div
-      className="
-        flex justify-center
-        min-h-screen
-        
-      "
-    >
+    <div className="flex justify-center max-h-screen">
       <div className="w-[90%] max-w-[360px] p-[5%]">
         <HeaderText props={data} />
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-          <div className="flex flex-col gap-y-4 mt-3 mb-2">
+          <div className="flex flex-col gap-y-3 mt-3 mb-2">
             <div className="w-full">
               <label className="*block mb-1 text-sm text-centaurus-oxford-blue">
                 E-mail
@@ -181,7 +175,7 @@ function SignUp() {
 
           <button
             className="
-              mt-6 mb-3
+              mt-4 mb-1
               inline-flex items-center justify-center
               w-full h-12
               rounded-md
