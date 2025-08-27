@@ -32,7 +32,7 @@ func AddWeight(c *gin.Context, db *sql.DB, weightService *service.Weightservice)
 			Details: []model.ErrorDetail{{Field: "id", Issue: "Horse ID must be a valid integer"}},
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Get: model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"},
+				Self: &model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"},
 			},
 		})
 		return
@@ -44,7 +44,7 @@ func AddWeight(c *gin.Context, db *sql.DB, weightService *service.Weightservice)
 			Details: []model.ErrorDetail{{Field: "body", Issue: "The provided weight data is not valid"}},
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Get: model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"},
+				Self: &model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"},
 			},
 		})
 		return
@@ -54,7 +54,8 @@ func AddWeight(c *gin.Context, db *sql.DB, weightService *service.Weightservice)
 	if err != nil {
 		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal Server Error", model.ErrorResponseInput{
 			Meta:  map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
-			Links: model.Links{Get: model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"}},
+			Links: model.Links{
+				Self: &model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"}},
 		})
 		return
 	}
@@ -62,7 +63,8 @@ func AddWeight(c *gin.Context, db *sql.DB, weightService *service.Weightservice)
 		utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", model.ErrorResponseInput{
 			Details: details,
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
-			Links:   model.Links{Get: model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"}},
+			Links:   model.Links{
+				Self: &model.Link{Method: "POST", Href: "/api/v1/horses/" + horseIdStr + "/weights"}},
 		})
 		return
 	}
@@ -74,7 +76,7 @@ func AddWeight(c *gin.Context, db *sql.DB, weightService *service.Weightservice)
 		CreatedAt: weight.CreatedAt,
 	},
 	Links: model.Links{
-		Get: model.Link{
+		Self: &model.Link{
 			Method: "GET",
 			Href:   fmt.Sprintf("/api/v1/horses/%d/weights", weight.FkHorseId), 
 		},
@@ -112,7 +114,7 @@ func GetHoreseWeights(c *gin.Context, db *sql.DB, weightService *service.Weights
 			Details: []model.ErrorDetail{{Field: "id", Issue: "Must be an integer"}},
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Get: model.Link{Method: "GET", Href: "/api/v1/horses/" + idParam + "/weights"},
+				Self: &model.Link{Method: "GET", Href: "/api/v1/horses/" + idParam + "/weights"},
 			},
 		})
 		return
@@ -128,7 +130,7 @@ func GetHoreseWeights(c *gin.Context, db *sql.DB, weightService *service.Weights
 			Details: details,
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Get: model.Link{Method: "GET", Href: "/api/v1/horses/" + idParam + "/weights"},
+				Self: &model.Link{Method: "GET", Href: "/api/v1/horses/" + idParam + "/weights"},
 			},
 		})
 		return
@@ -149,7 +151,7 @@ func GetHoreseWeights(c *gin.Context, db *sql.DB, weightService *service.Weights
 			Data: weightsData,
 		},
 		Links: model.Links{
-			Get: model.Link{Method: "GET", Href: "/api/v1/horses/" + idParam + "/weights"},
+			Self: &model.Link{Method: "GET", Href: "/api/v1/horses/" + idParam + "/weights"},
 		},
 		Meta: model.Meta{
 			Count:   len(weights),

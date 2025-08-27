@@ -581,17 +581,6 @@ const docTemplate = `{
                 }
             }
         },
-        "model.HorseData": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Horses"
-                    }
-                }
-            }
-        },
         "model.HorseInput": {
             "type": "object",
             "required": [
@@ -678,6 +667,9 @@ const docTemplate = `{
                 "race"
             ],
             "properties": {
+                "_links": {
+                    "$ref": "#/definitions/model.Links"
+                },
                 "age": {
                     "type": "integer"
                 },
@@ -708,7 +700,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/model.Links"
                 },
                 "horse": {
-                    "$ref": "#/definitions/model.HorseData"
+                    "$ref": "#/definitions/model.Horses"
                 },
                 "meta": {
                     "$ref": "#/definitions/model.Meta"
@@ -729,10 +721,19 @@ const docTemplate = `{
         "model.Links": {
             "type": "object",
             "properties": {
-                "get": {
+                "create": {
+                    "$ref": "#/definitions/model.Link"
+                },
+                "delete": {
+                    "$ref": "#/definitions/model.Link"
+                },
+                "self": {
                     "$ref": "#/definitions/model.Link"
                 },
                 "update": {
+                    "$ref": "#/definitions/model.Link"
+                },
+                "weights": {
                     "$ref": "#/definitions/model.Link"
                 }
             }
