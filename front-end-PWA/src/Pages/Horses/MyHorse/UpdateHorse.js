@@ -22,9 +22,9 @@ function UpdateHorse() {
     }));
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
 
   const handleNameChange = (/** @type {any} */ newName) => {
     setHorse((prevHorse) => ({ ...prevHorse, name: newName }));
@@ -52,7 +52,7 @@ function UpdateHorse() {
   };
 
   const nameHorse = {
-    legend: "Nom du cheval",
+    label: "Nom du cheval",
     colorBorder: "border-homa-beige",
     textColor: "text-homa-beige",
     inputBoderColor: "focus:ring-homa-beige",
@@ -61,7 +61,7 @@ function UpdateHorse() {
   };
 
   const ageHorse = {
-    legend: "Âge du cheval",
+    label: "Âge du cheval",
     colorBorder: "border-homa-beige",
     textColor: "text-homa-beige",
     inputBoderColor: "focus:ring-homa-beige",
@@ -71,21 +71,13 @@ function UpdateHorse() {
 
   return (
     <div
-      className="flex flex-col 
-                  items-center
-                  max-h-screen"
+      className="
+        flex justify-center
+        max-h-screen
+        px-[5%]
+      "
     >
-      <img
-        src="/icons/horseHead.png"
-        width={50}
-        className="absolute top-8 right-8"
-        alt="icon horse head"
-      />
-      <div
-        className="w-[90%] 
-                    max-w-[400px] 
-                    p-[5%]"
-      >
+      <div className="w-[90%] max-w-[360px]">
         <HeaderText
           props={{
             title: "Modification d’un profil cheval",
@@ -93,7 +85,7 @@ function UpdateHorse() {
           }}
         />
 
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-y-2 mt-3 mb-2">
           <TextInput
             props={nameHorse}
             value={horse.name}
@@ -105,12 +97,16 @@ function UpdateHorse() {
             onValueChange={handleAgeChange}
           />
           <SelectInput value={horse.race} onValueChange={handleRaceChange} />
+        </div>
+
+        <div className="mt-6">
           <Button name="Modifier" onSubmit={() => handleSubmit()} />
         </div>
-        <div className="flex flex-col justify-center items-center">
-          <div className="mt-5">
-            <HomeButton />
-          </div>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
+        <div className="mx-auto w-full max-w-[360px] flex justify-center">
+          <HomeButton />
         </div>
       </div>
     </div>
