@@ -209,17 +209,20 @@ func SignInHandler(c *gin.Context, db *sql.DB, userService *service.UserService)
 
 
 func LogoutHandler(c *gin.Context) {
+	utils.ClearRefreshCookie(c)
+	c.Header("Cache-Control", "no-store")
+	c.Header("Pragma", "no-cache")
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     "refresh_token",
-		Value:    "",
-		Path:     "/",
-		Expires:  time.Unix(0, 0),
-		MaxAge:   -1,
-		HttpOnly: true,
-		Secure:   true,                 // adapte selon dev
-		SameSite: http.SameSiteNoneMode, // adapte selon contexte
-	})
-	c.Status(http.StatusNoContent)
+        Name:     "refresh_token",
+        Value:    "",
+        Path:     "/",
+        Expires:  time.Unix(0, 0),
+        MaxAge:   -1,
+        HttpOnly: true,
+        Secure:   false,                    // local
+        SameSite: http.SameSiteLaxMode,     // local
+    })
+    c.Status(http.StatusNoContent)
 }
 
 

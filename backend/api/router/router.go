@@ -59,8 +59,8 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 		handlers.RefreshHandler(c)
 	})
 
-	r.POST("/auth/logout", func(c *gin.Context) {
-
+	r.POST("/api/v1/auth/logout", func(c *gin.Context) {
+		handlers.LogoutHandler(c)
 	})
 
 
