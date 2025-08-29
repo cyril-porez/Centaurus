@@ -4,13 +4,27 @@ import HomeButton from "../../components/buttons/HomeButton";
 import userApi from "../../services/userApi";
 import { useNavigate } from "react-router-dom";
 import TextInput from "../../components/inputs/TextInput";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Profile() {
   let navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const [busy, setBusy] = React.useState(false);
 
-  const handlesubmit = async () => {
-    await userApi.logout();
-    navigate("../SignIn", { replace: true });
+  const [form, setForm] = React.useState({
+    email: user?.email || "",
+    username: user?.username || "",
+    password: "",
+  });
+
+  const handleLogout = async () => {
+    setBusy(true);
+    try {
+      await logout(); // 👈 appelle POST /auth/logout + clear context
+      navigate("/auth/sign-in", { replace: true }); // 👈 bonne route
+    } finally {
+      setBusy(false);
+    }
   };
 
   const email = {
@@ -22,7 +36,7 @@ export default function Profile() {
     placeholder: "marie.dupont@gmail.com",
   };
 
-  const Pseudo = {
+  const username = {
     label: "Pseudo",
     colorBorder: "border-homa-beige",
     textColor: "text-homa-beige",
@@ -60,25 +74,25 @@ export default function Profile() {
         <div className="flex flex-col gap-y-4 mt-3 mb-2 py-8 my-auto">
           <TextInput
             props={email}
-            value={""}
-            onValueChange={console.log("eail")}
+            value={form.email}
+            onValueChange={(v) => setForm((f) => ({ ...f, email: v }))}
           />
           <TextInput
-            props={Pseudo}
-            value={""}
-            onValueChange={console.log("pseudos")}
+            props={username}
+            value={form.username}
+            onValueChange={(v) => setForm((f) => ({ ...f, username: v }))}
           />
           <TextInput
             props={password}
             value={""}
-            onValueChange={console.log("pass")}
+            onValueChange={(v) => setForm((f) => ({ ...f, password: v }))}
           />
         </div>
 
         <button
           className="flex items-center justify-evenly py-8 w-56 mx-auto"
           type="submit"
-          onClick={() => handlesubmit()}
+          onClick={() => handleLogout()}
         >
           <img
             className="h-8 w-8"

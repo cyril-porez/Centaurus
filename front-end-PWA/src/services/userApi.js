@@ -51,13 +51,8 @@ async function getuser(userId) {
   } catch (error) {}
 }
 
-async function logout() {
-  localStorage.removeItem("user");
-}
-
 export default {
   register,
   login,
-  logout,
   getuser,
 };
