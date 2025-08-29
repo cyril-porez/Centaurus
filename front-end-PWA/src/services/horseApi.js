@@ -1,27 +1,35 @@
+// @ts-nocheck
 import axios from "axios";
-import {
-  URL_ADD_HORSE,
-  URL,
-  URL_HORSE,
-  URL_HORSES,
-  URL_WEIGHTS,
-} from "../config/url_api";
+import { URL_ADD_HORSE, URL, URL_HORSE, URL_WEIGHTS } from "../config/url_api";
 
-async function AddHorse(name, age, race, userId) {
-  console.log(
-    `name => ${name}\nage => ${age}\nrace => ${race}\nuserId => ${userId}`
-  );
+const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
+
+/**
+ * Route privée: le Bearer est mis ICI dans le service.
+ * @param {object} p
+ * @param {string} p.name
+ * @param {number|string} p.age
+ * @param {string} p.race
+ * @param {number} [p.userId]   // optionnel si ton back lit l'id depuis le JWT
+ * @param {string} p.token      // <-- le JWT à mettre en Bearer
+ * @returns {Promise<import('axios').AxiosResponse>}
+ */
+async function AddHorse(name, age, race, token) {
+  console.log(`${name}, ${age}, ${race}`);
 
   try {
-    const response = await axios.post(URL_ADD_HORSE, {
-      name: name,
-      age: parseInt(age, 10),
-      race: race,
-      fk_user_id: userId,
-    });
-    return response.data;
+    const response = await axios.post(
+      URL_ADD_HORSE,
+      {
+        name: name,
+        age: age,
+        race: race,
+      },
+      { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+    );
+
+    return response;
   } catch (error) {
-    console.log("error", error);
     return error;
   }
 }
@@ -40,12 +48,14 @@ async function UpdateHorse(name, age, race, horseId) {
   }
 }
 
-async function getHorsesByUser(id) {
+async function getHorsesByUser({ userId, token }) {
   try {
-    const response = await axios.get(`${URL_HORSES}/${id}`);
-    return response.data;
+    const response = await axios.get(`${BASE}/users/${userId}/horses`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response;
   } catch (error) {
-    return error.response.data;
+    return error.response;
   }
 }
 

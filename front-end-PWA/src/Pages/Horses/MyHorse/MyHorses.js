@@ -1,51 +1,55 @@
-import React, { useEffect, useState } from "react";
+// @ts-nocheck
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { HeaderText } from "../../../components/texts/HeaderText";
 import AddHorseButton from "../../../components/buttons/AddHorseButton";
 import HomeButton from "../../../components/buttons/HomeButton";
 import horseApi from "../../../services/horseApi";
-import { jwtDecode } from "jwt-decode";
 import Button from "../../../components/buttons/ButtonCenter";
+import { useAuth } from "../../../contexts/AuthContext";
 
 function MyHorses() {
   let navigate = useNavigate();
-  // const [userId, setUserId] = useState(null);
-  const [userHorses, setUserHorses] = useState([]);
-  // const [nbrHorses, setNbrHorses] = useState();
+  const { user, token, initializing } = useAuth();
+  const [userHorses, setUserHorses] = React.useState([]);
+  const [error, setError] = React.useState("");
 
   const goToUpdateHorse = (horseId) => {
     navigate(`/horses/my-horse/update-horse/${horseId}`, { replace: false });
   };
 
-  const getHorseByUser = async (id) => {
-    try {
-      const getHorsesByUser = await horseApi.getHorsesByUser(id);
-      setUserHorses(getHorsesByUser.body.horse.data);
-
-      return getHorsesByUser;
-    } catch (error) {
-      console.error(error);
+  React.useEffect(() => {
+    if (initializing) return;
+    if (!user?.id) {
+      navigate("/auth/sign-in", { replace: true });
+      return;
     }
-  };
 
-  useEffect(() => {
-    var token = localStorage.getItem("user");
-    const decoded = jwtDecode(token);
-    getHorseByUser(decoded.id);
-  }, []);
+    (async () => {
+      try {
+        const res = await horseApi.getHorsesByUser({
+          userId: user.id,
+          token,
+        });
+
+        const list = res?.data?.data;
+        setUserHorses(Array.isArray(list) ? list : []);
+      } catch (e) {
+        setError(
+          e?.response?.data?.message ||
+            e?.message ||
+            "Impossible de charger vos chevaux."
+        );
+      }
+    })();
+  }, [initializing, user?.id, token, navigate]);
 
   const handleClick = () => {
-    navigate("/AddHorse", { replace: false });
+    navigate("/horses/my-horse/add-horse", { replace: false });
   };
 
   return (
     <div className="flex flex-col h-full justify-center">
-      <img
-        src="/icons/horseHead.png"
-        width={50}
-        className="absolute top-8 right-8"
-        alt="head horse"
-      />
       <div className="flex flex-col h-1/2 justify-between">
         <HeaderText
           props={{
