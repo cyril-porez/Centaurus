@@ -1,0 +1,11 @@
+.env
+certbot/conf/
+certbot/www/
+mysql_data/
+**/node_modules/
+node_modules/
+*.log
+*.pem
+*.key
+*.crt
+.DS_Store
