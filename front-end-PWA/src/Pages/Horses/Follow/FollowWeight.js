@@ -1,71 +1,57 @@
-import React, { useEffect, useState } from "react";
+// @ts-nocheck
+import React from "react";
 import Button from "../../../components/buttons/ButtonCenter";
 import AddHorseButton from "../../../components/buttons/AddHorseButton";
 import HomeButton from "../../../components/buttons/HomeButton";
 import { HeaderText } from "../../../components/texts/HeaderText";
-import { jwtDecode } from "jwt-decode";
-import horseApi from "../../../services/horseApi";
 import { useNavigate } from "react-router";
+import { useAuth } from "../../../contexts/AuthContext";
+import horseApi from "../../../services/horseApi";
 
 function FollowWeight() {
   let navigate = useNavigate();
-  const [userId, setUserId] = useState(null);
-  const [userHorses, setUserHorses] = useState([]);
+  const { user, token, initializing } = useAuth();
+  const [userHorses, setUserHorses] = React.useState([]);
+  const [error, setError] = React.useState("");
 
   const goToWeightPage = (horseId) => {
-    navigate(`/WeightTable/${horseId}`, { replace: false });
+    navigate(`/horses/follow/evolution/weight/table/${horseId}`, {
+      replace: false,
+    });
   };
 
   const goToAddHorse = () => {
     navigate(`/horses/my-horse/add-horse`);
   };
 
-  const getHorseByUser = async (id) => {
-    try {
-      const getHorsesByUser = await horseApi.getHorseByUser(id);
-      return getHorsesByUser;
-    } catch (error) {
-      console.error(error);
+  React.useEffect(() => {
+    if (initializing) return;
+    if (!user?.id) {
+      navigate("/auth/sign-in", { replace: true });
+      return;
     }
-  };
 
-  useEffect(() => {
-    var token = localStorage.getItem("user");
-    console.log(token);
-    if (token) {
+    (async () => {
       try {
-        const decoded = jwtDecode(token);
-        if (decoded && typeof decoded === "object" && "id" in decoded) {
-          setUserId(decoded.id);
-          getHorseByUser(decoded.id)
-            .then((ressponse) => {
-              setUserHorses(ressponse.horses);
-              console.log(ressponse.horses);
-            })
-            .catch((error) => {
-              console.error(error);
-              console.log(decoded.id);
-            });
-        } else {
-          console.log("Le token JWT n'a pas la propriété 'id'");
-        }
-      } catch (error) {
-        console.error("Erreur de décodage du token :", error);
+        const res = await horseApi.getHorsesByUser({
+          userId: user.id,
+          token,
+        });
+
+        const list = res?.data?.data;
+        setUserHorses(Array.isArray(list) ? list : []);
+      } catch (e) {
+        setError(
+          e?.response?.data?.message ||
+            e?.message ||
+            "Impossible de charger vos chevaux."
+        );
       }
-    } else {
-      console.log("Aucun token trouvé");
-    }
-  }, []);
+    })();
+  }, [initializing, user?.id, token, navigate]);
 
   return (
     <div className="flex flex-col justify-evenly h-full">
-      <img
-        src="/icons/courbe.png"
-        width={50}
-        className="absolute top-8 right-8"
-        alt=""
-      />
-
       <HeaderText
         props={{
           title: "Suivi du poids",

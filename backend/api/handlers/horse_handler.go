@@ -80,11 +80,11 @@ func AddHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseServ
 	resp := model.HorseCreateResponse{
 		Horse: *horse,
 		Links: model.Links{
-        Update: model.Link{
+        Update: &model.Link{
 					Href:"/api/v1/horses/" + strconv.Itoa(horse.Id),
 					Method: "PUT", 
 				},
-				Get:model.Link{
+				Self: &model.Link{
 					Href:"/api/v1/horses/" + strconv.Itoa(horse.Id),
 					Method: "GET", 
 				},
@@ -121,7 +121,7 @@ func UpdateHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseS
 				{Field: "body", Issue: "Malformed JSON or missing required fields"},
 			},
 			Meta:  map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
-			Links: model.Links{Get: model.Link{Method: "GET", Href: "/api/v1/horses"}},
+			Links: model.Links{Self: &model.Link{Method: "GET", Href: "/api/v1/horses"}},
 		})
 		return
 	}
@@ -186,8 +186,8 @@ func UpdateHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseS
 	resp := model.HorseCreateResponse{
 		Horse: *horse,
 		Links: model.Links{
-			Update: model.Link{Method: "PUT", Href: fmt.Sprintf("/api/v1/horses/%d", horse.Id)},
-			Get:    model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/horses/%d", horse.Id)},
+			Update: &model.Link{Method: "PUT", Href: fmt.Sprintf("/api/v1/horses/%d", horse.Id)},
+			Self:    &model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/horses/%d", horse.Id)},
 		},
 		Meta: model.MetaSimple{Message: "Horse updated successfully"},
 	}
@@ -215,7 +215,7 @@ func GetHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseServ
 			Details: []model.ErrorDetail{{Field: "id", Issue: "Must be an integer"}},
 			Meta: map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Get:    model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/horses/%d", horseId)},
+				Self:    &model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/horses/%d", horseId)},
 			},
 		})
 		return
@@ -235,7 +235,7 @@ func GetHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseServ
 				"timestamp": time.Now().Format(time.RFC3339),
 			},
 			Links: model.Links{
-				Get:    model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/horses/%d", horseId)},
+				Self:    &model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/horses/%d", horseId)},
 			},
 		})
 		return
@@ -244,8 +244,8 @@ func GetHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseServ
 	resp := model.HorseCreateResponse{
 		Horse: *horse,
 		Links: model.Links{
-			Update: model.Link{Method: "PUT", Href: "/api/v1/horses/" + strconv.Itoa(horse.Id)},
-			Get:    model.Link{Method: "GET", Href: "/api/v1/horses/" + strconv.Itoa(horse.Id)},
+			Update: &model.Link{Method: "PUT", Href: "/api/v1/horses/" + strconv.Itoa(horse.Id)},
+			Self:   &model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/horses/" + strconv.Itoa(horse.Id))},
 		},
 		Meta: model.MetaSimple{Message: "Horse retrieved successfully"},
 	}
@@ -273,7 +273,7 @@ func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, horseService *service.H
 			Details: []model.ErrorDetail{{Field: "id", Issue: "User ID must be an integer"}},
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Get: model.Link{Method: "GET", Href: "/api/v1/users/" + userIdStr + "/horses"},
+				Self: &model.Link{Method:"GET", Href: fmt.Sprintf("/api/v1/users/%d/horses", userId)},
 			},
 		})
 		return
@@ -285,7 +285,7 @@ func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, horseService *service.H
 			Details: nil,
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Get: model.Link{Method: "GET", Href: "/api/v1/users/" + userIdStr + "/horses"},
+				Self: &model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/users/%d/horses", userId)},
 			},
 		})
 		return
@@ -295,17 +295,38 @@ func GetHorsesByUserHanndler(c *gin.Context, db *sql.DB, horseService *service.H
 			Details: details,
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Get: model.Link{Method: "GET", Href: "/api/v1/users/" + userIdStr + "/horses"},
+				Self: &model.Link{Method: "GET", Href: fmt.Sprintf("/api/v1/users/%d/horses", userId)},
 			},
 		})
 		return
 	}
 
-	resp := model.HorsesResponse{
-		Horse: model.HorseData{Data: horses},
+	base := "/api/v1"
+	items := make([]model.Horses, 0, len(horses))
+	for _, h := range horses {
+		createdAt := h.CreatedAt // assume time.Time depuis repo (idéalement UTC)
+		items = append(items, model.Horses{
+			Id:        h.Id,
+			Name:      h.Name,
+			Age:       h.Age,
+			Race:      h.Race,
+			FkUserId:  h.FkUserId,
+			CreatedAt: createdAt,
+			Links: model.Links{
+				Self:    &model.Link{Method: "GET", Href: fmt.Sprintf("%s/horses/%d", base, h.Id)},
+				Update:  &model.Link{Method: "PUT", Href: fmt.Sprintf("%s/horses/%d", base, h.Id)},
+				Delete:  &model.Link{Method: "DELETE", Href: fmt.Sprintf("%s/horses/%d", base, h.Id)},
+				Weights: &model.Link{Method:"GET", Href: fmt.Sprintf("%s/horses/%d/weights", base, h.Id)},
+			},
+		})
+	}
+
+
+	resp := model.HorseListResponse{
+		Data:  items,
 		Links: model.Links{
-			Update: model.Link{Method: "PUT", Href: "/api/v1/horses/" + userIdStr + "/horses"},
-			Get:    model.Link{Method: "GET", Href: "/api/v1/users/" + userIdStr + "/horses"},
+			Create: &model.Link{Method: "POST", Href: fmt.Sprintf("%s/horses", base)},
+			Self:   &model.Link{Method: "GET", Href: "/api/v1/users/" + userIdStr + "/horses"},
 		},
 		Meta: model.Meta{
 			Count:   len(horses),
@@ -336,7 +357,7 @@ func DeleteHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseS
 			Details: []model.ErrorDetail{{Field: "id", Issue: "Horse ID must be an integer"}},
 			Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
 			Links: model.Links{
-				Get: model.Link{
+				Self: &model.Link{
 					Method: "DELETE",
 					Href:   "/api/v1/horses/" + idParam,
 				},
@@ -352,12 +373,12 @@ func DeleteHorseHandler(c *gin.Context, db *sql.DB, horseService *service.HorseS
 			utils.WriteErrorResponse(c, http.StatusNotFound, "Horse not found", model.ErrorResponseInput{
 				Details: []model.ErrorDetail{{Field: "id", Issue: "No horse found with the given ID"}},
 				Meta:    map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
-				Links:   model.Links{Get: model.Link{Method: "DELETE", Href: "/api/v1/horses/" + idParam}},
+				Links:   model.Links{Self: &model.Link{Method: "DELETE", Href: "/api/v1/horses/" + idParam}},
 			})
 		default:
 			utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal Server Error", model.ErrorResponseInput{
 				Meta:  map[string]string{"timestamp": time.Now().Format(time.RFC3339)},
-				Links: model.Links{Get: model.Link{Method: "DELETE", Href: "/api/v1/horses/" + idParam}},
+				Links: model.Links{Self: &model.Link{Method: "DELETE", Href: "/api/v1/horses/" + idParam}},
 			})
 		}
 		return

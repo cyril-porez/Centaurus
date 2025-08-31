@@ -5,6 +5,7 @@ import (
 	"back-end-go/repository"
 	"back-end-go/service"
 	"database/sql"
+	"time"
 
 	middleware "back-end-go/api/middleware"
 
@@ -16,7 +17,20 @@ import (
 
 func SetupRouter(db *sql.DB) *gin.Engine {
 	r := gin.Default();
-	r.Use(cors.Default());
+
+	cfg := cors.Config{
+    // ⚠️ mets ici exactement l’origine de ton front
+    // (pas de "*"). En dev vite/CRA: http://localhost:5173 ou 3000
+    AllowOrigins:     []string{"http://localhost:5173", "http://localhost:3000"},
+    AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+    AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-CSRF-Token"},
+    ExposeHeaders:    []string{"Content-Length"},
+    AllowCredentials: true, // indispensable pour cookies
+    MaxAge:           12 * time.Hour,
+  }
+
+	r.Use(cors.New(cfg))
+	// r.Use(cors.Default());
 
 	horseRepo := &repository.SQLHorseRepository{}
 	horseService := service.NewHorseService(horseRepo)
@@ -39,6 +53,14 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 	})
 	r.POST("/api/v1/auth/sign-in", func(c *gin.Context) {
 		handlers.SignInHandler(c, db, userService);
+	})
+
+	r.POST("/api/v1/auth/refresh", func(c *gin.Context) {
+		handlers.RefreshHandler(c)
+	})
+
+	r.POST("/api/v1/auth/logout", func(c *gin.Context) {
+		handlers.LogoutHandler(c)
 	})
 
 

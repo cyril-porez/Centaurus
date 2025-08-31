@@ -157,7 +157,7 @@ func SignInHandler(c *gin.Context, db *sql.DB, userService *service.UserService)
 			return
 	}
 
-	acceptToken, err := utils.GenerateAccesToken(user.Id, user.Username)
+	accessToken, err := utils.GenerateAccessToken(user.Id, user.Username)
 	if err != nil {
 		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Token Generation Failed", model.ErrorResponseInput{
 			Meta: map[string]string{
@@ -176,6 +176,12 @@ func SignInHandler(c *gin.Context, db *sql.DB, userService *service.UserService)
 		})
 		return
 	}
+	
+	if err := utils.SetRefreshCookie(c, refreshToken); err != nil {
+		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Cannot set refresh cookie", model.ErrorResponseInput{
+			Meta: map[string]string{ "timestamp": time.Now().UTC().Format(time.RFC3339) },
+		})
+	}
 
 	resp := gin.H{
 		"user": model.PublicUser{
@@ -185,9 +191,8 @@ func SignInHandler(c *gin.Context, db *sql.DB, userService *service.UserService)
 			CreatedAt: user.CreatedAt,
 		},
 		"meta": gin.H{
-			"acces_token": acceptToken,
-			"refresh_token": refreshToken,
-			"createdAt": time.Now(),
+			"access_token": accessToken,
+			"createdAt": time.Now().UTC().Format(time.RFC3339),
 			"message": "You have successfully logged in",
 		},
 		"_links": gin.H{
@@ -197,6 +202,68 @@ func SignInHandler(c *gin.Context, db *sql.DB, userService *service.UserService)
 			},
 		},
 	}
-
+	c.Header("Cache-Control", "no-store")
+	c.Header("Pragma", "no-cache")
 	utils.WriteSuccesResponse(c, http.StatusOK, resp)
+}
+
+
+func LogoutHandler(c *gin.Context) {
+	utils.ClearRefreshCookie(c)
+	c.Header("Cache-Control", "no-store")
+	c.Header("Pragma", "no-cache")
+	http.SetCookie(c.Writer, &http.Cookie{
+        Name:     "refresh_token",
+        Value:    "",
+        Path:     "/",
+        Expires:  time.Unix(0, 0),
+        MaxAge:   -1,
+        HttpOnly: true,
+        Secure:   false,                    // local
+        SameSite: http.SameSiteLaxMode,     // local
+    })
+    c.Status(http.StatusNoContent)
+}
+
+
+func RefreshHandler(c *gin.Context) {
+	ck, err := c.Request.Cookie("refresh_token")
+	if err != nil || ck.Value == "" {
+		utils.WriteErrorResponse(c, http.StatusUnauthorized, "No refresh cookie", model.ErrorResponseInput{
+			Meta: map[string]string{ "timestamp": time.Now().UTC().Format(time.RFC3339) },
+		})
+		return
+	}
+
+	// TODO: valider le refresh, vérifier révocation/rotation, etc.
+	claims, err := utils.ParseRefreshToken(ck.Value)
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusUnauthorized, "Invalid refresh token", model.ErrorResponseInput{
+			Meta: map[string]string{ "timestamp": time.Now().UTC().Format(time.RFC3339) },
+		})
+		return
+	}
+
+	userID := int(claims["sub"].(float64))
+	username := claims["name"].(string)
+
+	accessToken, err := utils.GenerateAccessToken(userID, username)
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Token Generation Failed", model.ErrorResponseInput{
+			Meta: map[string]string{ "timestamp": time.Now().UTC().Format(time.RFC3339) },
+		})
+		return
+	}
+
+	// Optionnel : rotation du refresh → regénérer et reposer un cookie
+	// newRefresh, _ := utils.GenerateRefreshToken(userID, username)
+	// _ = setRefreshCookie(c, newRefresh)
+	c.Header("Cache-Control", "no-store")
+	c.Header("Pragma", "no-cache")
+	c.Header("Vary", "Origin")
+
+	c.JSON(http.StatusOK, gin.H{
+		"access_token": accessToken,
+		"createdAt":    time.Now().UTC().Format(time.RFC3339),
+	})
 }

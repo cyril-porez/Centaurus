@@ -6,30 +6,14 @@ import { Link, useNavigate } from "react-router-dom";
 import userApi from "../../services/userApi";
 import { HeaderText } from "../../components/texts/HeaderText";
 import SocialButton from "../../components/buttons/Social.Button";
+import { useAuth } from "../../contexts/AuthContext";
 // import SocialButton from "../../components/buttons/SocialButton";
 
 function SignIn() {
+  const { login } = useAuth();
   const [error, setError] = useState("");
   let navigate = useNavigate();
-
-  const authUser = async (formData) => {
-    const response = await userApi.login(formData.email, formData.password);
-
-    const status = response?.status ?? response?.header?.code;
-    const payload = response?.data ?? response?.body ?? response;
-
-    console.log("✓ login response", { status, payload });
-
-    if (status === 200) {
-      //navigate("/", { replace: true });
-    } else {
-      setError(
-        payload?.details?.[0]?.issue ||
-          payload?.message ||
-          "Échec de la connexion."
-      );
-    }
-  };
+  const [apiError, setApiError] = useState("");
 
   const schema = yup.object({
     email: yup
@@ -52,8 +36,22 @@ function SignIn() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (formData) => {
-    authUser(formData);
+  const onSubmit = async ({ email, password }) => {
+    console.log(email);
+
+    setApiError("");
+    try {
+      await login(email, password); // ← appelle TON service via le Context
+      navigate("/", { replace: true }); // ← redirection si OK
+    } catch (e) {
+      const msg =
+        e?.response?.data?.details?.[0]?.issue ||
+        e?.response?.data?.message ||
+        e?.message ||
+        "Échec de la connexion.";
+      setApiError(msg);
+    }
+    // authUser(formData);
   };
 
   const data = {

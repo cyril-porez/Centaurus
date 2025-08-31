@@ -1,26 +1,33 @@
+// @ts-nocheck
 import axios from "axios";
-import { URL_LOGIN, URL_REGISTER, URL } from "../config/url_api";
+import client from "./apiClient";
+
+const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
 
 async function register(email, password, pseudo) {
   try {
-    const response = await axios.post(URL_REGISTER, {
-      username: pseudo,
+    const res = await client.post("/auth/sign-up", {
       email: email,
       password: password,
+      username: pseudo,
     });
-    console.log(response.data);
-
-    return response.data;
-  } catch (error) {
-    console.log(error.response);
-
-    return error.response.data;
+    return {
+      ok: res.status >= 200 && res.status < 300,
+      status: res.status,
+      data: res.data,
+    };
+  } catch (e) {
+    return {
+      ok: false,
+      status: e?.response?.status ?? 0,
+      data: e?.response?.data,
+    };
   }
 }
 
 async function login(email, password) {
   try {
-    const response = await axios.post(URL_LOGIN, {
+    const response = await axios.post(`${BASE}/auth/sign-in`, {
       email: email,
       password: password,
     });
@@ -46,18 +53,33 @@ async function login(email, password) {
 async function getuser(userId) {
   console.log(URL);
   try {
-    const response = await axios.get(`${URL}/api/users/${userId}`);
+    const response = await axios.get(`${BASE}/api/users/${userId}`);
     return response.data;
   } catch (error) {}
 }
 
 async function logout() {
-  localStorage.removeItem("user");
+  try {
+    const res = await client.post("/auth/logout");
+    return {
+      ok: res.status >= 200 && res.status < 300,
+      status: res.status,
+      data: res.data,
+    };
+  } catch (e) {
+    return {
+      ok: false,
+      status: e?.response?.status ?? 0,
+      data: e?.response?.data,
+    };
+  }
 }
 
-export default {
+const userApi = {
   register,
   login,
-  logout,
   getuser,
+  logout,
 };
+
+export default userApi;

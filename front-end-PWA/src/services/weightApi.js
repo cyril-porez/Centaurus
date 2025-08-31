@@ -1,38 +1,90 @@
+// @ts-nocheck
 import axios from "axios";
-import { URL_WEIGHTS, URL_WEIGHTSS, URL_WEIGHTSSS } from "../config/url_api";
 
-async function addHorseWeihgt(weight, horseId, date) {
+const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
+
+async function addHorseWeight(horseId, weight, token) {
+  console.log("w", weight);
+  console.log("t", token);
+  console.log("hid", horseId);
+
   try {
-    const response = await axios.post(`${URL_WEIGHTS}/${horseId}`, {
-      weight: weight,
-      date: date,
+    const response = await axios.post(
+      `${BASE}/horses/${horseId}/weights`,
+      {
+        weight: weight,
+      },
+      { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+    );
+    console.log(response);
+
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+}
+
+async function getWeightHorseForTable(
+  id,
+  token,
+  { sort = "desc", compare = true, limit = 6 } = {}
+) {
+  try {
+    const response = await axios.get(`${BASE}/horses/${id}/weights`, {
+      withCredentials: true,
+      headers: { Authorization: `Bearer ${token}` },
+      params: { sort, compare, limit },
     });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+}
+
+async function getWeightHorseForGraph(horseId, token, { sort = "asc" } = {}) {
+  try {
+    const response = await axios.get(
+      `${BASE}/horses/${horseId}/weights?sort=desc`,
+      {
+        withCredentials: true,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        params: { sort },
+      }
+    );
+    console.log(response);
     return response.data;
   } catch (error) {
+    return error.response;
+  }
+}
+
+async function getWeightHorse(
+  horseId,
+  token,
+  { sort = "desc", compare = true, limit = 1 } = {}
+) {
+  try {
+    const response = await axios.get(
+      `${BASE}/horses/${horseId}/weights?sort=desc&compare=true&limit=1`,
+      {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` },
+        params: { sort, compare, limit },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+
     return error.response.data;
   }
 }
 
-async function getWeightHorseForTable(id) {
-  try {
-    const response = await axios.get(`${URL_WEIGHTSS}/${id}`);
-    return response.data;
-  } catch (error) {
-    return error;
-  }
-}
-
-async function getWeightHorseForGraph(id) {
-  try {
-    const response = await axios.get(`${URL_WEIGHTSSS}/${id}`);
-    return response.data;
-  } catch (error) {
-    return error.response.data;
-  }
-}
-
-export default {
-  addHorseWeihgt,
+const weightApi = {
+  addHorseWeight,
   getWeightHorseForTable,
   getWeightHorseForGraph,
+  getWeightHorse,
 };
+
+export default weightApi;
