@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from "react";
 import LineChart from "../../../components/listChart";
 import HomeButton from "../../../components/buttons/HomeButton";
@@ -5,56 +6,49 @@ import { useParams } from "react-router-dom";
 import weightApi from "../../../services/weightApi";
 import ContactText from "../../../components/texts/ContactText";
 import MailFieldset from "../../../components/texts/ContactMailFieldset";
+import { useAuth } from "../../../contexts/AuthContext";
 
 export default function WeightGraph() {
   const { id } = useParams();
-  const [horse, sethorse] = useState({
-    weight: [],
-    name: "",
-  });
+  const { token } = useAuth();
 
-  const tabWeightsHorse = (horse) => {
-    let tabWeightsHorse = [];
-    horse?.weight.forEach((tab) => {
-      tabWeightsHorse.push(parseInt(tab.weight));
-    });
-    return tabWeightsHorse;
-  };
+  const [name, setName] = React.useState("");
+  const [rows, setRows] = React.useState([]);
 
-  const tabWeighDate = (horse) => {
-    let tabWeighDate = [];
-    horse?.weight.forEach((tab) => {
-      tabWeighDate.push(tab.date);
-    });
-    return tabWeighDate;
-  };
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const json = await weightApi.getWeightHorseForGraph(id, token, {
+          sort: "asc", // pour lire de gauche à droite
+        });
+        console.log(json);
 
-  async function fetchData() {
-    try {
-      const horse = await weightApi.getWeightHorseForGraph(id);
-      sethorse((prevHorse) => ({
-        ...prevHorse,
-        weight: horse.body.horse.data,
-        name: horse.body.horse.name,
-      }));
-    } catch (error) {
-      console.error("Erreur lors de la récupération du cheval:", error);
-    }
-  }
+        const h = json?.horse ?? {};
+        setName(h.name ?? "");
+        setRows(Array.isArray(h.data) ? h.data : []);
+      } catch (e) {
+        console.error("Erreur chargement poids:", e);
+      }
+    })();
+  }, [id, token]);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const toWeights = (rows = []) =>
+    rows.map((r) => Number(r.weight)).filter(Number.isFinite);
+
+  const toDates = (items = []) =>
+    items
+      .map((r) => (r?.created_at ? new Date(r.created_at).toISOString() : null))
+      .filter(Boolean);
 
   return (
     <div>
       <h1 className="text-blue-900 text-4xl font-bold text-center">
-        <strong>{horse.name}</strong>
+        <strong>{name}</strong>
       </h1>
       <h3 className="ml-5 mr-3 text-blue-900 text-3xl italic text-center">
         Comment a évolué <span className="text-blue-600">son poids </span>?
       </h3>
-      <LineChart weights={tabWeightsHorse(horse)} date={tabWeighDate(horse)} />
+      <LineChart weights={toWeights(rows)} date={toDates(rows)} />
       <ContactText />
       <MailFieldset />
       <div className="flex flex-col justify-center items-center">

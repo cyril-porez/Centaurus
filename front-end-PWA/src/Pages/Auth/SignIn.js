@@ -15,25 +15,6 @@ function SignIn() {
   let navigate = useNavigate();
   const [apiError, setApiError] = useState("");
 
-  const authUser = async (formData) => {
-    const response = await userApi.login(formData.email, formData.password);
-
-    const status = response?.status ?? response?.header?.code;
-    const payload = response?.data ?? response?.body ?? response;
-
-    console.log("✓ login response", { status, payload });
-
-    if (status === 200) {
-      //navigate("/", { replace: true });
-    } else {
-      setError(
-        payload?.details?.[0]?.issue ||
-          payload?.message ||
-          "Échec de la connexion."
-      );
-    }
-  };
-
   const schema = yup.object({
     email: yup
       .string()

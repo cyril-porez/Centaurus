@@ -20,8 +20,8 @@ export default function Profile() {
   const handleLogout = async () => {
     setBusy(true);
     try {
-      await logout(); // 👈 appelle POST /auth/logout + clear context
-      navigate("/auth/sign-in", { replace: true }); // 👈 bonne route
+      await logout();
+      navigate("/auth/sign-in", { replace: true });
     } finally {
       setBusy(false);
     }

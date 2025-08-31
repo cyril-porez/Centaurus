@@ -1,46 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import horseApi from "../../../services/horseApi";
-import { jwtDecode } from "jwt-decode";
 import { HeaderText } from "../../../components/texts/HeaderText";
 import HomeButton from "../../../components/buttons/HomeButton";
 import TextInput from "../../../components/inputs/TextInput";
 import SelectInput from "../../../components/SelectInput";
 import Button from "../../../components/buttons/Button";
+import { useAuth } from "../../../contexts/AuthContext";
 
 function AddHorse() {
+  let navigate = useNavigate();
+  const { user, token, initializing } = useAuth();
+
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [category, setCategory] = useState("");
-  const [userId, setUserId] = useState("");
-  let navigate = useNavigate();
-
-  useEffect(() => {
-    var token = localStorage.getItem("user");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        if (decoded && typeof decoded === "object" && "id" in decoded) {
-          setUserId(decoded.id);
-        } else {
-          console.log("Le token JWT n'a pas la propriété 'id'");
-        }
-      } catch (error) {
-        console.error("Erreur de décodage du token :", error);
-      }
-    } else {
-      console.log("Aucun token trouvé");
-    }
-  }, []);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [apiError, setApiError] = React.useState("");
 
   const handleNameChange = (newName) => {
     setName(newName);
   };
-
   const handleAgeChange = (newAge) => {
     setAge(newAge);
   };
-
   const handleCategoryChange = (newCategory) => {
     setCategory(newCategory);
   };
@@ -48,9 +31,40 @@ function AddHorse() {
   const onSubmit = async () => {
     console.log("test");
 
-    const AddHorse = await horseApi.AddHorse(name, age, category, userId);
-    if (AddHorse.header.code === 201) {
-      navigate("/horses/my-horse/my-horses", { replace: false });
+    setApiError("");
+    if (!user?.id) {
+      // pas d'utilisateur chargé → on renvoie vers la connexion
+      navigate("/auth/sign-in", { replace: true });
+      return;
+    }
+    if (!name || !age || !category) {
+      setApiError("Veuillez renseigner tous les champs.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      console.log("avant res dans try");
+
+      // adapte si ton service attend d'autres noms de champs (race vs category)
+      const res = await horseApi.AddHorse(name, Number(age), category, token);
+      console.log(res);
+
+      // compat: selon ton wrapper (axios vs fetch):
+      const status = res?.status;
+      if (status === 201) {
+        navigate("/horses/my-horse/my-horses", { replace: false });
+      } else {
+        const msg = res?.data?.message || "Échec de la création du cheval.";
+        setApiError(msg);
+      }
+    } catch (e) {
+      const msg =
+        e?.response?.data?.message ||
+        e?.message ||
+        "Échec de la création du cheval.";
+      setApiError(msg);
+    } finally {
+      setSubmitting(false);
     }
   };
 
