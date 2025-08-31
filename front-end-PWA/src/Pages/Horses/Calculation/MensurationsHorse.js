@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from "react";
+// @ts-nocheck
+import React, { useState } from "react";
 import { HeaderText } from "../../../components/texts/HeaderText";
-import { Await, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import horseApi from "../../../services/horseApi";
 import weightApi from "../../../services/weightApi";
 import HomeButton from "../../../components/buttons/HomeButton";
 import TextInput from "../../../components/inputs/TextInput";
 import Button from "../../../components/buttons/Button";
+import { useAuth } from "../../../contexts/AuthContext";
+
 export default function Mensurations() {
-  const { id } = useParams();
-  const [horse, sethorse] = useState({ name: "", age: 0, race: "" });
+  const { token } = useAuth();
+  const { id: horseId } = useParams();
+  const [horse, setHorse] = React.useState({ name: "", age: 0, race: "" });
+  const [apiError, setApiError] = React.useState("");
   const [horseMesure, setHorseMesure] = useState({
     garrot: 0,
     body: 0,
@@ -35,38 +40,32 @@ export default function Mensurations() {
     setHorseMesure((prevHorse) => ({ ...prevHorse, date: newDate }));
   };
 
-  const navigateResult = () => {
-    navigate(`/horses/calculation/ResultWeight/${id}`, { replace: false });
-  };
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const res = await horseApi.getHorse(horseId, token);
+        // format attendu: { horse: {...} }
+        console.log(res);
 
-  async function fetchData() {
-    try {
-      const horseData = await horseApi.getHorse(id);
-      sethorse((prevHorse) => ({
-        ...prevHorse,
-        name: horseData.body.horse.name,
-        age: horseData.body.horse.age,
-        race: horseData.body.horse.race,
-      }));
-    } catch (error) {
-      console.error(
-        "Erreur lors de la récupération du cheval:",
-        error.response
-      );
-    }
-  }
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+        const h = res?.data?.horse ?? {};
+        setHorse({ name: h.name ?? "", age: h.age ?? 0, race: h.race ?? "" });
+      } catch (e) {
+        setApiError(
+          e?.response?.data?.message ||
+            e?.message ||
+            "Erreur lors de la récupération du cheval."
+        );
+      }
+    })();
+  }, [horseId, token]);
 
-  const addWeight = async (weight, horseId, date) => {
-    try {
-      const addWeight = await weightApi.addHorseWeihgt(weight, horseId, date);
-      return addWeight;
-    } catch (error) {
-      return error;
-    }
-  };
+  // Normalisation de la race (insensible à la casse/espaces)
+  const normalized = (horse?.race || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+  const isPureSang = normalized === "pur sang";
+  const raceKey = normalized.replace(/\s+/g, "-"); // "pur-sang" | "trait/attelage" | "autre"
 
   /**
    * pure sang
@@ -88,41 +87,62 @@ export default function Mensurations() {
     - H = la hauteur au garrot (en cm)
     - N = la circonférence de l’encolure (en cm)
    */
-  const calculateWeightHorse = async () => {
-    let G = horseMesure.chest;
-    let L = horseMesure.body;
-    let H = horseMesure.garrot;
-    let N = horseMesure.neck;
-    const dateIso =
-      horseMesure.date instanceof Date
-        ? horseMesure.date.toISOString()
-        : new Date(horseMesure.date).toISOString();
+  const calculateAndSaveWeight = async () => {
+    const G = horseMesure.chest;
+    const L = horseMesure.body;
+    const H = horseMesure.garrot;
+    const N = horseMesure.neck;
 
-    switch (horse?.race) {
-      case "pure sang":
-        const weight = Math.ceil((G ** 2 * L) / 11877);
-        return await addWeight(weight, id, dateIso);
-      case "Trait/Attelage":
-        const weightTraitAttelage = Math.ceil(
-          (G ** 1.486 * L ** 0.554 * H ** 0.599 * N ** 0.173) / 3441
-        );
-        return await addWeight(weightTraitAttelage, id, dateIso);
-      case "Autre":
-        const weightAutre = Math.ceil(
-          (G ** 1.486 * L ** 0.554 * H ** 0.599 * N ** 0.173) / 3596
-        );
-        return await addWeight(weightAutre, id, dateIso);
-      default:
-        break;
+    let weight = null;
+    if (raceKey === "pur-sang" || raceKey === "pure-sang") {
+      console.log("pure sang");
+
+      weight = Math.ceil((G ** 2 * L) / 11877);
+    } else if (raceKey === "trait/attelage") {
+      console.log("trait");
+
+      weight = Math.ceil(
+        (G ** 1.486 * L ** 0.554 * H ** 0.599 * N ** 0.173) / 3441
+      );
+    } else {
+      // "autre" et défaut
+      console.log("autre");
+
+      weight = Math.ceil(
+        (G ** 1.486 * L ** 0.554 * H ** 0.599 * N ** 0.173) / 3596
+      );
+      console.log(weight);
     }
+    console.log(horseId);
+
+    const res = await weightApi.addHorseWeight(horseId, weight, token);
+    console.log(res);
+
+    return res;
   };
 
   const handleSubmit = async () => {
-    const response = await calculateWeightHorse();
-    if (response.header.code === 201) {
-      navigateResult();
-    } else {
-      console.error(response);
+    console.log("test");
+
+    setApiError("");
+    try {
+      const res = await calculateAndSaveWeight();
+      console.log(res);
+
+      if ((res?.status ?? 0) === 201) {
+        navigate(`/horses/calculation/ResultWeight/${horseId}`, {
+          replace: false,
+        });
+      } else {
+        const msg = res?.data?.message || "Échec de l’enregistrement du poids.";
+        setApiError(msg);
+      }
+    } catch (e) {
+      setApiError(
+        e?.response?.data?.message ||
+          e?.message ||
+          "Échec de l’enregistrement du poids."
+      );
     }
   };
 
@@ -165,8 +185,8 @@ export default function Mensurations() {
     type: "date",
   };
 
-  horse.race = "";
-  const isPureSang = horse?.race?.toLowerCase() === "pure sang";
+  // horse.race = "";
+  // const isPureSang = horse?.race?.toLowerCase() === "pur sang";
 
   return (
     <div
@@ -190,7 +210,7 @@ export default function Mensurations() {
             subtitle: "Nous avons besoin de ses nouvelles mensurations",
           }}
         />
-        {horse?.race === "pure sang" ? (
+        {isPureSang ? (
           <div className="mt-3 mb-2 space-y-2">
             <TextInput
               props={lcorp}

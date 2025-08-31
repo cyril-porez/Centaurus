@@ -6,49 +6,61 @@ import horseApi from "../../../services/horseApi";
 import TextInput from "../../../components/inputs/TextInput";
 import SelectInput from "../../../components/SelectInput";
 import Button from "../../../components/buttons/Button";
+import { useAuth } from "../../../contexts/AuthContext";
 
 function UpdateHorse() {
   const { id } = useParams();
-  const [horse, setHorse] = useState({ name: "", age: 0, race: "" });
+  const { token } = useAuth();
   let navigate = useNavigate();
 
-  const fetchData = async () => {
-    const response = await horseApi.getHorse(id);
-    setHorse((prevHorse) => ({
-      ...prevHorse,
-      name: response.body.horse.name,
-      age: response.body.horse.age,
-      race: response.body.horse.race,
-    }));
-  };
+  const [horse, setHorse] = React.useState({ name: "", age: 0, race: "" });
+  const [apiError, setApiError] = React.useState("");
+  const [saving, setSaving] = React.useState(false);
 
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+  React.useEffect(() => {
+    (async () => {
+      setApiError("");
+      const res = await horseApi.getHorse(id, token);
+      if (res?.status === 200) {
+        // Le back renvoie généralement { horse: {...} }
+        const h = res?.data?.horse ?? res?.data ?? {};
+        setHorse({
+          name: h?.name ?? "",
+          age: Number(h?.age ?? 0),
+          race: h?.race ?? "",
+        });
+      } else {
+        const msg = res?.data?.message || "Impossible de charger le cheval.";
+        setApiError(msg);
+      }
+    })();
+  }, [id, token]);
 
-  const handleNameChange = (/** @type {any} */ newName) => {
-    setHorse((prevHorse) => ({ ...prevHorse, name: newName }));
-  };
-
-  const handleAgeChange = (/** @type {any} */ newAge) => {
-    setHorse((prevHorse) => ({ ...prevHorse, age: newAge }));
-  };
-
-  const handleRaceChange = (/** @type {any} */ newRace) => {
-    setHorse((prevHorse) => ({ ...prevHorse, race: newRace }));
-  };
+  const handleNameChange = (v) => setHorse((p) => ({ ...p, name: v }));
+  const handleAgeChange = (v) => setHorse((p) => ({ ...p, age: v }));
+  const handleRaceChange = (v) => setHorse((p) => ({ ...p, race: v }));
 
   const handleSubmit = async () => {
-    const response = await horseApi.UpdateHorse(
+    setApiError("");
+    setSaving(true);
+    console.log("test");
+
+    const res = await horseApi.UpdateHorse(
       horse.name,
       horse.age,
       horse.race,
-      id
+      id,
+      token
     );
-    console.log(response);
-    if (response.header.code === 201) {
-      navigate(`/horses/my-horse/my-horses`, { replace: true });
+    console.log(res);
+
+    if ([200, 201, 204].includes(res?.status)) {
+      navigate("/horses/my-horse/my-horses", { replace: true });
+    } else {
+      const msg = res?.data?.message || "Échec de la mise à jour du cheval.";
+      setApiError(msg);
     }
+    setSaving(false);
   };
 
   const nameHorse = {

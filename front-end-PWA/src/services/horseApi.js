@@ -34,15 +34,28 @@ async function AddHorse(name, age, race, token) {
   }
 }
 
-async function UpdateHorse(name, age, race, horseId) {
+async function UpdateHorse(name, age, race, horseId, token) {
   try {
-    const response = await axios.put(`${URL}/horse/${horseId}`, {
-      name: name,
-      age: parseInt(age, 10),
-      race: race,
-      fk_user_id: 68,
-    });
-    return response.data;
+    console.log(name);
+    console.log(age);
+    console.log(race);
+    console.log(horseId);
+
+    const response = await axios.put(
+      `${BASE}/horses/${horseId}`,
+      {
+        name: name,
+        age: parseInt(age, 10),
+        race: race,
+      },
+      {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    console.log(response);
+
+    return response;
   } catch (error) {
     return error.response.data;
   }
@@ -59,23 +72,16 @@ async function getHorsesByUser({ userId, token }) {
   }
 }
 
-async function getHorse(id) {
-  try {
-    const response = await axios.get(`${URL_HORSE}/${id}`);
-    return response.data;
-  } catch (error) {
-    return error;
-  }
-}
+async function getHorse(id, token) {
+  console.log("id", id);
 
-async function getWeightHorse(id) {
   try {
-    const response = await axios.get(`${URL_WEIGHTS}/${id}`);
-    return response.data;
+    const response = await axios.get(`${BASE}/horses/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response;
   } catch (error) {
-    console.log(error);
-
-    return error.response.data;
+    return error.response;
   }
 }
 
@@ -84,5 +90,4 @@ export default {
   UpdateHorse,
   getHorsesByUser,
   getHorse,
-  getWeightHorse,
 };

@@ -1,73 +1,82 @@
+// @ts-nocheck
 import React, { useEffect, useState } from "react";
 import DisplayWeight from "../../../components/DisplayWeight";
 import HomeButton from "../../../components/buttons/HomeButton";
-import horseApi from "../../../services/horseApi";
 import { useNavigate, useParams } from "react-router-dom";
+import weightApi from "../../../services/weightApi";
+import { useAuth } from "../../../contexts/AuthContext";
 
 function ResultWeight() {
   const { id } = useParams();
-  const [horse, sethorse] = useState({});
-
+  const { token } = useAuth(); // ⬅️ JWT
+  const [data, setData] = useState(null);
+  const [err, setErr] = useState("");
   let navigate = useNavigate();
 
   const navigateResult = () => {
     navigate(`/horses/follow/evolution/weight/table/${id}`, { replace: false });
   };
 
-  const formatDate = (/** @type {string | number | Date} */ dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("fr-FR");
-  };
-
-  async function fetchData() {
-    try {
-      const horse = await horseApi.getWeightHorse(id);
-      horse.body.horse.date = formatDate(horse?.body?.horse.date);
-      horse.body.horse.previous_date = formatDate(
-        horse.body.horse.previous_date
-      );
-      sethorse(horse);
-    } catch (error) {
-      console.error("Erreur lors de la récupération du cheval:", error);
-    }
-  }
-
-  function signResult() {
-    let sign = "";
-    if (horse?.body?.horse.weight > horse?.body?.horse.last_weight) {
-      sign = "+";
-    } else {
-      sign = "-";
-    }
-    return sign;
-  }
+  const fmt = (d) => new Date(d).toLocaleDateString("fr-FR");
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    (async () => {
+      const res = await weightApi.getWeightHorse(id, token, {
+        sort: "desc",
+        compare: true,
+        limit: 1,
+      });
+      console.log("test");
+
+      if (res?.status === 200) {
+        const h = res.data?.horse || {};
+        const currentEntry = Array.isArray(h.data) ? h.data[0] : null;
+        const currentWeight = currentEntry?.weight ?? null;
+        const currentDate = currentEntry?.created_at ?? h.created_at ?? null;
+
+        setData({
+          name: h.name ?? "",
+          weight: currentWeight,
+          lastWeight: h.last_weight ?? null,
+          diff: h.difference_weight ?? null,
+          date: currentDate ? fmt(currentDate) : "",
+          lastDate: h.last_date ? fmt(h.last_date) : "",
+        });
+      } else {
+        setErr(res?.data?.message || "Impossible de récupérer le poids.");
+      }
+    })();
+  }, [id, token]);
+
+  const sign = () => {
+    if (!data) return "";
+    if (data.lastWeight == null || data.weight == null) return "";
+    return data.weight >= data.lastWeight ? "+" : "-";
+  };
+
+  const diffStr =
+    data?.diff == null ? "—" : `${data.diff > 0 ? "+" : ""}${data.diff}`;
+
+  if (err) {
+    return <p className="text-center text-red-600 mt-6">{err}</p>;
+  }
+  if (!data) {
+    return <p className="text-center mt-6">Chargement…</p>;
+  }
 
   return (
     <div className="flex flex-col justify-evenly h-full">
-      <img
-        src="/icons/calcul.png"
-        width={50}
-        className="absolute top-8 right-8"
-        alt="Calculator"
-      />
       <h1 className="text-blue-900 text-4xl font-bold text-center">
-        <strong>{horse?.body?.horse.name}</strong>
+        <strong>{data?.name || ""}</strong>
       </h1>
       <h3 className="ml-5 mr-3 text-blue-900 text-3xl italic text-center">
-        Son poids le{" "}
-        <span className="text-blue-600">{horse?.body?.horse.date + " "}</span>
+        Son poids le <span className="text-blue-600">{data?.date + " "}</span>
         est de :
       </h3>
 
-      <DisplayWeight props={{ title: horse?.body?.horse.weight + " kg" }} />
+      <DisplayWeight props={{ title: (data?.weight ?? "—") + " kg" }} />
       <h3 className="ml-5 text-2xl text-center">
-        Soit {signResult()}
-        {horse?.body?.horse.difference_weight} Kg depuis la dernière fois (
-        {horse?.body?.horse.previous_date})
+        Soit {diffStr} Kg depuis la dernière fois ({data?.lastDate || "—"})
       </h3>
       <p className="ml-5">
         En terme de fréquence, pour un cheval “sain” nous recommandons de
