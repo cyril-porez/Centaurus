@@ -80,9 +80,11 @@ async function getWeightHorse(
   }
 }
 
-export default {
+const weightApi = {
   addHorseWeight,
   getWeightHorseForTable,
   getWeightHorseForGraph,
   getWeightHorse,
 };
+
+export default weightApi;

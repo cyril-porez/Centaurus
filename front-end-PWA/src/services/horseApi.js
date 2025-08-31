@@ -1,6 +1,5 @@
 // @ts-nocheck
 import axios from "axios";
-import { URL_ADD_HORSE, URL, URL_HORSE, URL_WEIGHTS } from "../config/url_api";
 
 const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
 
@@ -15,11 +14,9 @@ const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
  * @returns {Promise<import('axios').AxiosResponse>}
  */
 async function AddHorse(name, age, race, token) {
-  console.log(`${name}, ${age}, ${race}`);
-
   try {
     const response = await axios.post(
-      URL_ADD_HORSE,
+      `${BASE}/horses`,
       {
         name: name,
         age: age,
@@ -36,11 +33,6 @@ async function AddHorse(name, age, race, token) {
 
 async function UpdateHorse(name, age, race, horseId, token) {
   try {
-    console.log(name);
-    console.log(age);
-    console.log(race);
-    console.log(horseId);
-
     const response = await axios.put(
       `${BASE}/horses/${horseId}`,
       {
@@ -53,8 +45,6 @@ async function UpdateHorse(name, age, race, horseId, token) {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    console.log(response);
-
     return response;
   } catch (error) {
     return error.response.data;
@@ -73,8 +63,6 @@ async function getHorsesByUser({ userId, token }) {
 }
 
 async function getHorse(id, token) {
-  console.log("id", id);
-
   try {
     const response = await axios.get(`${BASE}/horses/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -85,9 +73,11 @@ async function getHorse(id, token) {
   }
 }
 
-export default {
+const horseApi = {
   AddHorse,
   UpdateHorse,
   getHorsesByUser,
   getHorse,
 };
+
+export default horseApi;
