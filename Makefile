@@ -6,6 +6,13 @@ COMPOSE_DEV := docker compose -f docker-compose.yml -f docker-compose.override.y
 COMPOSE_PREPROD := docker compose -f docker-compose.yml -f docker-compose.preprod.yml
 SUDO ?= sudo
 
+
+
+DOCKER_TTY :=
+ifneq ($(shell test -t 1 && echo yes),)
+  DOCKER_TTY=-t
+endif
+
 # ------------------------ DEV -----------------------
 
 ## Lancer l'app en mode développement avec hot reload (backend Air + React)
@@ -47,8 +54,8 @@ preprod:
 	@echo "?? Lancement PREPROD (build + up)"
 	@$(COMPOSE_PREPROD) up -d --build
 	@echo "?? V�rif Nginx dans frontend_pwa"
-	@docker exec -it frontend_pwa nginx -t
-	@docker exec -it frontend_pwa nginx -s reload
+	@docker exec $(DOCKER_TTY) frontend_pwa nginx -t
+	@docker exec $(DOCKER_TTY) frontend_pwa nginx -s reload
 	@echo "? Tests rapides"
 	-@echo "HTTP:  " && curl -sI http://$(DOMAIN)  | head -n1 || true
 	-@echo "HTTPS: " && curl -sI https://$(DOMAIN) | head -n1 || true
