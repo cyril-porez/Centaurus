@@ -2,12 +2,12 @@ name: Preprod CI/CD
 
 on:
   pull_request:
-    branches: [ preprod ]   # CI � l'ouverture/mise � jour d'une PR vers preprod
+    branches: [ preprod ]
   push:
-    branches: [ preprod ]   # D�ploiement automatique apr�s merge sur preprod
+    branches: [ preprod ]
 
 concurrency:
-  group: preprod
+  group: preprod-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -16,15 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: V�rif rapide des fichiers compose
-        run: |
-          docker --version
-          docker compose version
-          test -f docker-compose.yml
-          test -f docker-compose.preprod.yml
+      - name: V�rifier la config Docker Compose
+        run: docker compose -f docker-compose.yml -f docker-compose.preprod.yml config > /dev/null
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/preprod'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,9 +30,10 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.RPI_SSH_PRIVATE_KEY }}
 
-      - name: Ajouter le Pi en known_hosts
+      - name: Ajouter le Pi dans known_hosts
         run: |
-          ssh-keyscan -p "${{ secrets.RPI_PORT }}" "${{ secrets.RPI_HOST }}" >> ~/.ssh/known_hosts
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "${{ secrets.RPI_PORT }}" -H "${{ secrets.RPI_HOST }}" >> ~/.ssh/known_hosts
 
       - name: D�ployer sur le Raspberry Pi
         env:
@@ -44,29 +41,12 @@ jobs:
           RPI_PORT: ${{ secrets.RPI_PORT }}
           RPI_USER: ${{ secrets.RPI_USER }}
           RPI_PATH: ${{ secrets.RPI_PATH }}
-          DOMAIN: ${{ secrets.DOMAIN }} # optionnel si tu l�as cr��
         run: |
           set -euo pipefail
-          ssh -p "$RPI_PORT" -o StrictHostKeyChecking=no "$RPI_USER@$RPI_HOST" \
-            "RPI_PATH='$RPI_PATH' DOMAIN='${DOMAIN:-}' bash -s" <<'SSH'
-          set -euo pipefail
-          : "${RPI_PATH:?RPI_PATH non d�fini}"
-
-          cd "$RPI_PATH"
-
-          # Mettre � jour le d�p�t
-          if [ ! -d .git ]; then
-            echo "::error::Le dossier $RPI_PATH n'est pas un d�p�t git"
-            exit 1
-          fi
-          git fetch --all --prune
-          git checkout preprod || git checkout -B preprod origin/preprod
-          git pull --rebase
-
-          # D�ploiement
-          if [ -n "${DOMAIN:-}" ]; then
-            DOMAIN="$DOMAIN" make SUDO= preprod
-          else
-            make SUDO= preprod
-          fi
-SSH
+          ssh -p "$RPI_PORT" "$RPI_USER@$RPI_HOST" <<'SSH'
+            set -euo pipefail
+            cd "$RPI_PATH"
+            git fetch --all
+            git reset --hard origin/preprod
+            make preprod
+          SSH
