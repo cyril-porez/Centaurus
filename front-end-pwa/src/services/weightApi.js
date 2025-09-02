@@ -1,13 +1,13 @@
 // @ts-nocheck
 import axios from "axios";
-import { setAccessToken } from "./apiClient";
+import client, { setAccessToken } from "./apiClient";
 
 const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
 
 async function addHorseWeight(horseId, weight, token) {
    try {
     setAccessToken(token)
-    const response = await axios.post(
+    const response = await client.post(
       `/horses/${horseId}/weights`,
       {
         weight: weight,
@@ -28,7 +28,7 @@ async function getWeightHorseForTable(
 ) {
   try {
     setAccessToken(token)
-    const response = await axios.get(`/horses/${id}/weights`, {
+    const response = await client.get(`/horses/${id}/weights`, {
       withCredentials: true,
       //headers: { Authorization: `Bearer ${token}` },
       params: { sort, compare, limit },
@@ -42,7 +42,7 @@ async function getWeightHorseForTable(
 async function getWeightHorseForGraph(horseId, token, { sort = "asc" } = {}) {
   try {
     setAccessToken(token)
-    const response = await axios.get(
+    const response = await client.get(
       `/horses/${horseId}/weights?sort=desc`,
       {
         withCredentials: true,
@@ -64,7 +64,7 @@ async function getWeightHorse(
 ) {
   try {
     setAccessToken(token)
-    const response = await axios.get(
+    const response = await client.get(
       `/horses/${horseId}/weights?sort=desc&compare=true&limit=1`,
       {
         withCredentials: true,

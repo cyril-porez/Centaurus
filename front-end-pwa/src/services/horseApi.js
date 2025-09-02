@@ -39,7 +39,7 @@ async function AddHorse(name, age, race, token) {
 async function UpdateHorse(name, age, race, horseId, token) {
   try {
     setAccessToken(token)
-    const response = await axios.put(
+    const response = await client.put(
       `/horses/${horseId}`,
       {
         name: name,
@@ -60,7 +60,7 @@ async function UpdateHorse(name, age, race, horseId, token) {
 async function getHorsesByUser({ userId, token }) {
   try {
     setAccessToken(token)
-    const response = await axios.get(`/users/${userId}/horses`//, 
+    const response = await client.get(`/users/${userId}/horses`//, 
       //{
     //  headers: { Authorization: `Bearer ${token}` },
     //}
@@ -74,7 +74,7 @@ async function getHorsesByUser({ userId, token }) {
 async function getHorse(id, token) {
   try {
     setAccessToken(token)
-    const response = await axios.get(`${BASE}/horses/${id}`//, {
+    const response = await client.get(`${BASE}/horses/${id}`//, {
       //headers: { Authorization: `Bearer ${token}` },
     //}
     );
