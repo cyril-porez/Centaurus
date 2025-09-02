@@ -76,7 +76,7 @@ async function getHorsesByUser({ userId, token }) {
 async function getHorse(id, token) {
   try {
     setAccessToken(token)
-    const response = await client.get(`${BASE}/horses/${id}`//, {
+    const response = await client.get(`/horses/${id}`//, {
       //headers: { Authorization: `Bearer ${token}` },
     //}
     );
