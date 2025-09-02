@@ -65,6 +65,8 @@ async function getHorsesByUser({ userId, token }) {
     //  headers: { Authorization: `Bearer ${token}` },
     //}
     );
+    console.log(response);
+    
     return response;
   } catch (error) {
     return error.response;
