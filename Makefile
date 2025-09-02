@@ -4,6 +4,7 @@ EMAIL  ?= cyril.porez@laplateforme.io
 
 COMPOSE_DEV := docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.dev.yml
 COMPOSE_PREPROD := docker compose -f docker-compose.yml -f docker-compose.preprod.yml
+SUDO ?= sudo
 
 # ------------------------ DEV -----------------------
 
@@ -41,8 +42,8 @@ clean:
 preprod:
 	@echo "Déploiement PREPROD"
 	@echo "?? Pr�paration dossiers certbot"
-	@sudo install -d -o "$(USER)" -g "$(USER)" -m 755 certbot/www/.well-known/acme-challenge
-	@sudo install -d -o "$(USER)" -g "$(USER)" -m 755 certbot/conf/live/$(DOMAIN)
+	@$(SUDO) install -d -o "$(USER)" -g "$(USER)" -m 755 certbot/www/.well-known/acme-challenge
+	@$(SUDO) install -d -o "$(USER)" -g "$(USER)" -m 755 certbot/conf/live/$(DOMAIN)
 	@echo "?? Lancement PREPROD (build + up)"
 	@$(COMPOSE_PREPROD) up -d --build
 	@echo "?? V�rif Nginx dans frontend_pwa"
