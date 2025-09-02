@@ -1,23 +1,20 @@
 // @ts-nocheck
 import axios from "axios";
+import { setAccessToken } from "./apiClient";
 
 const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
 
 async function addHorseWeight(horseId, weight, token) {
-  console.log("w", weight);
-  console.log("t", token);
-  console.log("hid", horseId);
-
-  try {
+   try {
+    setAccessToken(token)
     const response = await axios.post(
-      `${BASE}/horses/${horseId}/weights`,
+      `/horses/${horseId}/weights`,
       {
         weight: weight,
-      },
-      { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+      }//,
+      //{ headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
     );
     console.log(response);
-
     return response;
   } catch (error) {
     return error.response;
@@ -30,9 +27,10 @@ async function getWeightHorseForTable(
   { sort = "desc", compare = true, limit = 6 } = {}
 ) {
   try {
-    const response = await axios.get(`${BASE}/horses/${id}/weights`, {
+    setAccessToken(token)
+    const response = await axios.get(`/horses/${id}/weights`, {
       withCredentials: true,
-      headers: { Authorization: `Bearer ${token}` },
+      //headers: { Authorization: `Bearer ${token}` },
       params: { sort, compare, limit },
     });
     return response;
@@ -43,11 +41,12 @@ async function getWeightHorseForTable(
 
 async function getWeightHorseForGraph(horseId, token, { sort = "asc" } = {}) {
   try {
+    setAccessToken(token)
     const response = await axios.get(
-      `${BASE}/horses/${horseId}/weights?sort=desc`,
+      `/horses/${horseId}/weights?sort=desc`,
       {
         withCredentials: true,
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        //headers: token ? { Authorization: `Bearer ${token}` } : {},
         params: { sort },
       }
     );
@@ -64,11 +63,12 @@ async function getWeightHorse(
   { sort = "desc", compare = true, limit = 1 } = {}
 ) {
   try {
+    setAccessToken(token)
     const response = await axios.get(
-      `${BASE}/horses/${horseId}/weights?sort=desc&compare=true&limit=1`,
+      `/horses/${horseId}/weights?sort=desc&compare=true&limit=1`,
       {
         withCredentials: true,
-        headers: { Authorization: `Bearer ${token}` },
+        //headers: { Authorization: `Bearer ${token}` },
         params: { sort, compare, limit },
       }
     );

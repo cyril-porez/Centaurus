@@ -38,17 +38,18 @@ async function AddHorse(name, age, race, token) {
 
 async function UpdateHorse(name, age, race, horseId, token) {
   try {
+    setAccessToken(token)
     const response = await axios.put(
-      `${BASE}/horses/${horseId}`,
+      `/horses/${horseId}`,
       {
         name: name,
         age: parseInt(age, 10),
         race: race,
-      },
-      {
-        withCredentials: true,
-        headers: { Authorization: `Bearer ${token}` },
-      }
+      }//,
+      //{/
+      //  withCredentials: true,
+      //  headers: { Authorization: `Bearer ${token}` },
+      //}
     );
     return response;
   } catch (error) {
@@ -58,9 +59,12 @@ async function UpdateHorse(name, age, race, horseId, token) {
 
 async function getHorsesByUser({ userId, token }) {
   try {
-    const response = await axios.get(`${BASE}/users/${userId}/horses`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    setAccessToken(token)
+    const response = await axios.get(`/users/${userId}/horses`//, 
+      //{
+    //  headers: { Authorization: `Bearer ${token}` },
+    //}
+    );
     return response;
   } catch (error) {
     return error.response;
@@ -69,9 +73,11 @@ async function getHorsesByUser({ userId, token }) {
 
 async function getHorse(id, token) {
   try {
-    const response = await axios.get(`${BASE}/horses/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    setAccessToken(token)
+    const response = await axios.get(`${BASE}/horses/${id}`//, {
+      //headers: { Authorization: `Bearer ${token}` },
+    //}
+    );
     return response;
   } catch (error) {
     return error.response;
