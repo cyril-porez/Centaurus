@@ -29,7 +29,7 @@ async function getWeightHorseForTable(
   try {
     setAccessToken(token)
     const response = await client.get(`/horses/${id}/weights`, {
-      withCredentials: true,
+      //withCredentials: true,
       //headers: { Authorization: `Bearer ${token}` },
       params: { sort, compare, limit },
     });
@@ -43,9 +43,9 @@ async function getWeightHorseForGraph(horseId, token, { sort = "asc" } = {}) {
   try {
     setAccessToken(token)
     const response = await client.get(
-      `/horses/${horseId}/weights?sort=desc`,
+      `/horses/${horseId}/weights?`,
       {
-        withCredentials: true,
+        //withCredentials: true,
         //headers: token ? { Authorization: `Bearer ${token}` } : {},
         params: { sort },
       }
@@ -65,9 +65,9 @@ async function getWeightHorse(
   try {
     setAccessToken(token)
     const response = await client.get(
-      `/horses/${horseId}/weights?sort=desc&compare=true&limit=1`,
+      `/horses/${horseId}/weights`,
       {
-        withCredentials: true,
+        //withCredentials: true,
         //headers: { Authorization: `Bearer ${token}` },
         params: { sort, compare, limit },
       }
