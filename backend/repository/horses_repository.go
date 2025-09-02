@@ -11,8 +11,8 @@ type SQLHorseRepository struct {}
 
 func (r *SQLHorseRepository) InsertHorse(db *sql.DB, horse *model.Horses) error{
 	horse.CreatedAt = time.Now().Format(time.RFC3339);
-	query := "INSERT INTO horses (name, race, age, fk_user_id, created_at) VALUES (?, ?, ?, ?, ?)";
-	result, err := db.Exec(query, horse.Name, horse.Race, horse.Age, horse.FkUserId, horse.CreatedAt);
+	query := "INSERT INTO horses (name, age, race, fk_user_id, created_at) VALUES (?, ?, ?, ?, ?)";
+	result, err := db.Exec(query, horse.Name, horse.Age, horse.Race, horse.FkUserId, horse.CreatedAt);
 	if err != nil {
 		return err
 	}
