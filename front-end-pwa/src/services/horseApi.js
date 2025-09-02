@@ -15,6 +15,7 @@ const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
  * @returns {Promise<import('axios').AxiosResponse>}
  */
 async function AddHorse(name, age, race, token) {
+  console.log("token,", token);
   try {
     const response = await client.post(
       `horses`,
