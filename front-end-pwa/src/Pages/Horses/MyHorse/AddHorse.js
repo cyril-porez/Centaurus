@@ -47,7 +47,7 @@ function AddHorse() {
 
       // adapte si ton service attend d'autres noms de champs (race vs category)
       const res = await horseApi.AddHorse(name, Number(age), category, token);
-      console.log(res);
+      console.log("res =>",res);
 
       // compat: selon ton wrapper (axios vs fetch):
       const status = res?.status;
