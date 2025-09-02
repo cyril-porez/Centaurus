@@ -10,8 +10,8 @@ import (
 type SQLWeightRepository struct {}
 
 func (r *SQLWeightRepository) AddWeightHorse(db *sql.DB, weight *model.Weights) error {	
-	query := "INSERT INTO weights (weight, fk_horse_id, created_at) VALUES (?, ?, ?)"
-	_, err := db.Exec(query, weight.Weight, weight.FkHorseId, weight.CreatedAt)
+	query := "INSERT INTO weights (weight, fk_horse_id) VALUES (?, ?)"
+	_, err := db.Exec(query, weight.Weight, weight.FkHorseId)
 	return err
 }
 
