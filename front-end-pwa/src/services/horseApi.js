@@ -1,5 +1,6 @@
 // @ts-nocheck
 import axios from "axios";
+import client from "./apiClient";
 
 const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
 
@@ -15,7 +16,7 @@ const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
  */
 async function AddHorse(name, age, race, token) {
   try {
-    const response = await axios.post(
+    const response = await client.post(
       `horses`,
       {
         name: name,
