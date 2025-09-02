@@ -31,7 +31,8 @@ function MyHorses() {
           userId: user.id,
           token,
         });
-
+        console.log("res",res);
+        
         const list = res?.data?.data;
         setUserHorses(Array.isArray(list) ? list : []);
       } catch (e) {
