@@ -43,10 +43,12 @@ jobs:
           RPI_PATH: ${{ secrets.RPI_PATH }}
         run: |
           set -euo pipefail
-          ssh -p "$RPI_PORT" "$RPI_USER@$RPI_HOST" <<'SSH'
+          # Cl�/known_hosts: d�j� fait dans les �tapes pr�c�dentes
+          ssh -o StrictHostKeyChecking=no -p "$RPI_PORT" "$RPI_USER@$RPI_HOST" bash -s <<EOF
             set -euo pipefail
-            cd "$RPI_PATH"
+            cd "$RPI_PATH"          # <� ici la valeur est d�j� r�solue par le runner
+            echo "Dans: \$(pwd)"
             git fetch --all
             git reset --hard origin/preprod
             make preprod
-          SSH
+          EOF
