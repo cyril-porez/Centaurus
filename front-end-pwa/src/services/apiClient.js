@@ -12,6 +12,9 @@ const client = axios.create({
 });
 console.log("tets", client.defaults.baseURL);
 
+export const authHeader = (token?: string) =>
+  token ? { Authorization: `Bearer ${token.trim()}` } : {};
+
 client.interceptors.request.use((config) => {
   const hdrs = config.headers || {};
   if (accessToken) {

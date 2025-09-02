@@ -1,6 +1,6 @@
 // @ts-nocheck
 import axios from "axios";
-import client from "./apiClient";
+import client, { authHeader } from "./apiClient";
 
 const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
 
@@ -15,21 +15,22 @@ const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
  * @returns {Promise<import('axios').AxiosResponse>}
  */
 async function AddHorse(name, age, race, token) {
-  console.log("token,", token);
+  console.log("token length =>", token.length, "prefix =>", token.slice(0,10));
   try {
     const response = await client.post(
-      `horses`,
+      `/horses`,
       {
         name: name,
         age: age,
         race: race,
       },
-      { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+      { headers: authHeader(token), withCredentials: true }
     );
     console.log("response =>",response);
     
     return response;
   } catch (error) {
+    console.log("AddHorse error =>", e?.response || e);
     return error;
   }
 }
