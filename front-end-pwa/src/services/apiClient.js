@@ -5,8 +5,9 @@ export function setAccessToken(token) {
   accessToken = token || null;
 }
 
+const BASE = (process.env.REACT_APP_API_URL || "/api").replace(/\/+$/, "");
 const client = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "ht tp://localhost:8080/api/v1",
+  baseURL: BASE,
   withCredentials: true,
 });
 console.log("tets", client.defaults.baseURL);

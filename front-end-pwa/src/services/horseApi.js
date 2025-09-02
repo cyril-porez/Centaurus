@@ -24,7 +24,8 @@ async function AddHorse(name, age, race, token) {
       },
       { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
     );
-
+    console.log("response =>",response);
+    
     return response;
   } catch (error) {
     return error;

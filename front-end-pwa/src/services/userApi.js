@@ -2,15 +2,16 @@
 import axios from "axios";
 import client from "./apiClient";
 
-const BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api/v1";
-
+const BASE = (process.env.REACT_APP_API_URL || "/api").replace(/\/+$/, "");
 async function register(email, password, pseudo) {
-  try {
-    const res = await client.post("/auth/sign-up", {
+  try {    
+    const res = await client.post(`/auth/sign-up`, {
       email: email,
       password: password,
       username: pseudo,
     });
+    console.log("res",res);
+    
     return {
       ok: res.status >= 200 && res.status < 300,
       status: res.status,

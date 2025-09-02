@@ -4,12 +4,17 @@ services:
       context: ./backend
       target: runtime
     image: backend:preprod
+    volumes:
+      - ./.env:/app/.env 
     environment:
+      - APP_ENV=docker
+      - PORT=8080               
+      - ENV_FILE=/app/.env  
       - DATABASE_URL=root:root@tcp(mysql_container:3306)/centaurus?charset=utf8mb4&parseTime=True&loc=Local
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     networks:
-      - app_network
+      app_network: {}  
     depends_on:
       - mysql
 
@@ -19,10 +24,10 @@ services:
       dockerfile: Dockerfile
       target: prod
       args:
-        REACT_APP_API_URL: /api
+        REACT_APP_API_URL: /api/v1/
     image: frontend-pwa:preprod
     environment:
-      - REACT_APP_API_URL=/api
+      - REACT_APP_API_URL=/api/v1/
     ports: 
       - "80:80"
       - "443:443"
@@ -45,12 +50,15 @@ services:
       - app_network
 
   phpmyadmin:
-    image: phpmyadmin
-    container_name: phpmyadmin
+    image: phpmyadmin:latest
+    #container_name: phpmyadmin
     ports:
-      - "8081:80"
+      - "127.0.0.1:8081:80"
     environment:
       - PMA_HOST=mysql
+      - PMA_PORT=3306
+    depends_on:
+      - mysql
     restart: unless-stopped
     networks:
       - app_network
