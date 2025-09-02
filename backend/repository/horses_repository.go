@@ -31,7 +31,7 @@ func (r *SQLHorseRepository) InsertHorse(db *sql.DB, horse *model.Horses) error{
 }
 
 func (r *SQLHorseRepository) UpdateHorse(db *sql.DB, input *model.HorseUpdateInput, id int) error {
-	updatedAt := time.Now().Format(time.RFC3339)
+	updatedAt := time.Now()
 	query := "UPDATE horses SET name = ?, age = ?, race = ?, updated_at = ?  WHERE id = ?";
 	_,err := db.Exec(query, input.Name, input.Age, input.Race, updatedAt, id);
 	return err;
