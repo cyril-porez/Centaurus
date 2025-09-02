@@ -11,11 +11,11 @@ import (
 type SQLHorseRepository struct {}
 
 func (r *SQLHorseRepository) InsertHorse(db *sql.DB, horse *model.Horses) error{
-	horse.CreatedAt = time.Now().Format(time.RFC3339);
-	query := "INSERT INTO horses (name, age, race, fk_user_id, created_at) VALUES (?, ?, ?, ?, ?)";
+	//horse.CreatedAt = time.Now().Format(time.RFC3339);
+	query := "INSERT INTO horses (name, age, race, fk_user_id) VALUES (?, ?, ?, ?)";
 	log.Printf("[DEBUG] Insertion horse: name=%s, age=%d, race=%s, fk_user_id=%d", 
 		horse.Name, horse.Age, horse.Race, horse.FkUserId)
-	result, err := db.Exec(query, horse.Name, horse.Age, horse.Race, horse.FkUserId, horse.CreatedAt);
+	result, err := db.Exec(query, horse.Name, horse.Age, horse.Race, horse.FkUserId);
 	if err != nil {
 		log.Printf("[ERROR] SQL insertion failed: %v", err)
 		return err
