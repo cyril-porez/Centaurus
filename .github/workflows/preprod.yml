@@ -1,0 +1,86 @@
+name: Preprod CI/CD
+
+on:
+  # CI sur PR vers preprod
+  pull_request:
+    branches: [ preprod ]
+    types: [opened, synchronize, reopened, closed]
+  # D�ploiement auto quand un push arrive sur preprod (ex: merge)
+  push:
+    branches: [ preprod ]
+  # Lancement manuel
+  workflow_dispatch:
+
+concurrency:
+  group: preprod-deploy
+  cancel-in-progress: true
+
+jobs:
+  # ---- CI (ex�cut� pour PR ouvertes/synchronis�es) ----
+  ci:
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: V�rifier la config Compose
+        run: docker compose -f docker-compose.yml -f docker-compose.preprod.yml config -q
+      # Facultatif : mini build front/back si tu veux aller plus loin
+      # - name: Build front (optionnel)
+      #   run: |
+      #     cd front-end-pwa
+      #     npm ci
+      #     npm run build
+
+  # ---- DEPLOIEMENT ----
+  deploy:
+    # D�ploie si :
+    # - push sur preprod (apr�s merge), OU
+    # - PR "closed" ET "merged == true"
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' &&
+       github.event.action == 'closed' &&
+       github.event.pull_request.merged == true)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: D�marrer agent SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.RPI_SSH_PRIVATE_KEY }}
+
+      - name: Ajouter le Pi dans known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "${{ secrets.RPI_PORT }}" "${{ secrets.RPI_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: D�ployer sur le Raspberry Pi
+        env:
+          HOST:   ${{ secrets.RPI_HOST }}
+          PORT:   ${{ secrets.RPI_PORT }}
+          USER:   ${{ secrets.RPI_USER }}
+          PATH_DIR: ${{ secrets.RPI_PATH }}
+          BRANCH: preprod
+        run: |
+          set -euo pipefail
+          ssh -p "$PORT" "$USER@$HOST" bash << 'EOF'
+            set -euo pipefail
+            cd "$PATH_DIR"
+
+            echo "??  Git fetch + checkout $BRANCH"
+            git fetch --all --prune
+            git checkout "$BRANCH"
+            git pull --ff-only origin "$BRANCH"
+
+            echo "??  Build & up"
+            docker compose -f docker-compose.yml -f docker-compose.preprod.yml pull
+            docker compose -f docker-compose.yml -f docker-compose.preprod.yml up -d --build
+
+            echo "??  Nginx reload"
+            docker exec frontend_pwa nginx -t || true
+            docker exec frontend_pwa nginx -s reload || true
+
+            echo "? D�ploiement termin�"
+          EOF
