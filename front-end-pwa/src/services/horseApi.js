@@ -30,7 +30,7 @@ async function AddHorse(name, age, race, token) {
     
     return response;
   } catch (error) {
-    console.log("AddHorse error =>", e?.response || e);
+    console.log("AddHorse error =>", error?.response || error);
     return error;
   }
 }
