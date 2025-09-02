@@ -28,7 +28,7 @@ async function register(email, password, pseudo) {
 
 async function login(email, password) {
   try {
-    const response = await axios.post(`${BASE}/auth/sign-in`, {
+    const response = await client.post(`/auth/sign-in`, {
       email: email,
       password: password,
     });
