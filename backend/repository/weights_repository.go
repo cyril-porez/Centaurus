@@ -46,26 +46,28 @@ func (r *SQLWeightRepository) GetHorseWeights(db *sql.DB, horseId int, limit str
 
 func (r *SQLWeightRepository) GetLastWeightHorse(db *sql.DB, horseId int, weight *model.Weights, horse *model.Horses) error {
 	query := `
-			SELECT 
-				h.name,
-				w1.weight AS weight,
-				w2.weight AS LastWeight,
-				w1.weight - w2.weight AS DifferenceWeight,
-				w1.created_at AS date,
-				w2.created_at AS LastDate,
-				w1.fk_horse_id
-			FROM horses AS h
-			INNER JOIN weights AS w1 ON h.id = w1.fk_horse_id
-			LEFT JOIN weights AS w2 ON w2.fk_horse_id = w1.fk_horse_id 
-				AND w2.created_at = (
-					SELECT MAX(w3.created_at)
-					FROM weights AS w3
-					WHERE w3.fk_horse_id = w1.fk_horse_id
-						AND w3.created_at < w1.created_at
-				)
-			WHERE h.id = ?
-			ORDER BY w1.created_at DESC 
-			LIMIT 1`;
+		SELECT 
+  			h.name,
+  			w1.weight                                     AS weight,
+  			COALESCE(w2.weight, 0)                        AS LastWeight,         -- 0 s'il n'y a pas d'historique
+  			w1.weight - COALESCE(w2.weight, 0)            AS DifferenceWeight,   -- diff vs 0
+  			w1.created_at                                  AS date,
+  			w2.created_at                                  AS LastDate,           -- peut rester NULL
+  			w1.fk_horse_id
+		FROM horses AS h
+		JOIN weights AS w1
+  			ON h.id = w1.fk_horse_id
+		LEFT JOIN weights AS w2
+	  		ON  w2.fk_horse_id = w1.fk_horse_id
+  			AND w2.created_at = (
+       			SELECT MAX(w3.created_at)
+       			FROM weights AS w3
+       			WHERE w3.fk_horse_id = w1.fk_horse_id
+         			AND w3.created_at < w1.created_at
+     		)
+		WHERE h.id = ?
+		ORDER BY w1.created_at DESC
+		LIMIT 1`;
 
 	err := db.QueryRow(query, horseId).Scan(
 				&horse.Name,
