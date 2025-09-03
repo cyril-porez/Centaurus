@@ -65,7 +65,7 @@ function WeightTable() {
           <strong>{name}</strong>
         </h1>
         <h3 className="mt-1 text-centaurus-oxford-blue text-2xl italic text-center">
-          Comment a �volu�{" "}
+          Comment a évolué{" "}
           <span className="text-centaurus-dark-cerelean">son poids</span> ?
         </h3>
 
