@@ -7,6 +7,8 @@ import courbe from "../../assets/icons/courbe.png";
 import { HeaderText } from "../../components/texts/HeaderText";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { StatCard } from "../../components/cards/StatCard";
+import { ProfileHeaderCard } from "../../components/cards/ProfileHeaderCard";
 
 function Home() {
   let navigate = useNavigate();
