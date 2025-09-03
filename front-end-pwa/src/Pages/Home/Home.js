@@ -34,38 +34,68 @@ function Home() {
   if (initializing) return null;
 
   return (
-    <div className="flex flex-col mx-1">
-      <div className="my-4">
-        <HeaderText
-          props={{
-            title: `Bienvenue ${username ? username : ""}${
-              username ? "" : ""
-            }, on est ravis de te revoir !`,
-            subtitle: "Que veux-tu faire ?",
-          }}
-        />
-      </div>
+    <div
+      className="
+      flex justify-center
+      min-h-[100svh]
+      px-4
+      pt-[max(env(safe-area-inset-top),1rem)]
+      pb-[calc(max(env(safe-area-inset-bottom),0.75rem)+5rem)]
+    "
+    >
+      <div className="w-full max-w-[360px]">
+        {/* --- TES CARDS --- */}
+        <div className="space-y-3">
+          <ProfileHeaderCard
+            initials="BB"
+            name="TEST"
+            lastUpdated="15/08/2025"
+          />
 
-      <ButtonCenter
-        props={{
-          onClick: goToWeightCalculation,
-          title: "Calcul du poids",
-          src: calcul,
-        }}
-      />
-      <ButtonCenter
-        props={{
-          onClick: goToFollowWeight,
-          title: "Suivi du poids",
-          src: courbe,
-        }}
-      />
-      <ButtonCenter
-        props={{ onClick: goToMyHorses, title: "Mes chevaux", src: horseHead }}
-      />
-      <ButtonCenter
-        props={{ onClick: goToProfile, title: "Mon compte", src: casque }}
-      />
+          <div className="grid grid-cols-2 gap-3">
+            <StatCard
+              iconSrc="/icons/scale.png" // remplace par ton ic�ne
+              value="200"
+              suffix="kg"
+              subtitle="kg actuel"
+            />
+            <StatCard
+              iconSrc="/icons/scale.png"
+              value="+12"
+              suffix="kg"
+              subtitle="kg ce mois"
+            />
+          </div>
+        </div>
+
+        {/* Tes boutons centraux d�j� existants */}
+        <div className="mt-4 space-y-3">
+          <ButtonCenter
+            props={{
+              onClick: goToWeightCalculation,
+              title: "Calcul du poids",
+              src: calcul,
+            }}
+          />
+          <ButtonCenter
+            props={{
+              onClick: goToFollowWeight,
+              title: "Suivi du poids",
+              src: courbe,
+            }}
+          />
+          <ButtonCenter
+            props={{
+              onClick: goToMyHorses,
+              title: "Mes chevaux",
+              src: horseHead,
+            }}
+          />
+          <ButtonCenter
+            props={{ onClick: goToProfile, title: "Mon compte", src: casque }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
