@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
+  "time"
 )
 
 type SQLWeightRepository struct {}
@@ -69,9 +70,9 @@ func (r *SQLWeightRepository) GetLastWeightHorse(db *sql.DB, horseId int, weight
     switch {
     case cnt == 0:
         // Aucun poids en BDD
-        weight.Weight           = intPtr(0)
-        weight.LastWeight       = nil          // ou intPtr(0) si tu pr�f�res
-        weight.DifferenceWeight = intPtr(0)
+        weight.Weight           = 0
+        weight.LastWeight       = 0        // ou intPtr(0) si tu pr�f�res
+        weight.DifferenceWeight = 0
         weight.CreatedAt        = time.Time{}  // ou time.Now()
         weight.LastDate         = ""
         weight.FkHorseId        = horseId
@@ -92,9 +93,9 @@ func (r *SQLWeightRepository) GetLastWeightHorse(db *sql.DB, horseId int, weight
             return fmt.Errorf("get single weight: %w", err)
         }
 
-        weight.Weight           = intPtr(w)
+        weight.Weight           = w
         weight.LastWeight       = nil          // ou intPtr(0) si tu veux 0 au lieu de null
-        weight.DifferenceWeight = intPtr(w)    // diff�rence = w - 0
+        weight.DifferenceWeight = w            // diff�rence = w - 0
         weight.CreatedAt        = created
         weight.LastDate         = ""
         weight.FkHorseId        = horseId
@@ -134,9 +135,9 @@ func (r *SQLWeightRepository) GetLastWeightHorse(db *sql.DB, horseId int, weight
             return fmt.Errorf("query weights diff: %w", err)
         }
 
-        weight.Weight           = intPtr(w)
-        weight.LastWeight       = intPtr(lw)
-        weight.DifferenceWeight = intPtr(dw)
+        weight.Weight           = w
+        weight.LastWeight       = lw
+        weight.DifferenceWeight = dw
         weight.CreatedAt        = created
         weight.FkHorseId        = fk
         if lastDate.Valid {
