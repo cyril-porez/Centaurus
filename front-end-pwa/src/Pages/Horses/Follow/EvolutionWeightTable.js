@@ -95,7 +95,7 @@ function WeightTable() {
                     className="border border-black p-2 text-center"
                     colSpan={2}
                   >
-                    Aucun poids enregistr�.
+                    Aucun poids enregistré.
                   </td>
                 </tr>
               )}
