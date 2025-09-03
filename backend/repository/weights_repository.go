@@ -44,54 +44,106 @@ func (r *SQLWeightRepository) GetHorseWeights(db *sql.DB, horseId int, limit str
 	return rows, err
 }
 
+func intPtr(v int) *int {
+    p := new(int)
+    *p = v
+    return p
+}
+
 func (r *SQLWeightRepository) GetLastWeightHorse(db *sql.DB, horseId int, weight *model.Weights, horse *model.Horses) error {
-	 // 1) On r�cup�re le nom (si tu veux ignorer l�erreur quand il n�y a aucun poids)
-    if err := db.QueryRow("SELECT name FROM horses WHERE id = ?", horseId).Scan(&horse.Name); err != nil {
+  // R�cup�rer le nom (m�me s�il n�y a aucun poids)
+    if err := db.QueryRow(`SELECT name FROM horses WHERE id = ?`, horseId).
+        Scan(&horse.Name); err != nil {
         return fmt.Errorf("horse not found: %w", err)
     }
 
-    const q = `
-      SELECT
-        (w1.weight + 0)                                   AS weight,
-        (COALESCE(w2.weight, 0) + 0)                      AS LastWeight,
-        ((w1.weight - COALESCE(w2.weight, 0)) + 0)        AS DifferenceWeight,
-        w1.created_at,
-        w2.created_at                                     AS LastDate,
-        w1.fk_horse_id
-      FROM weights w1
-      LEFT JOIN weights w2 ON w2.fk_horse_id = w1.fk_horse_id
-        AND w2.created_at = (
-          SELECT MAX(w3.created_at)
-          FROM weights w3
-          WHERE w3.fk_horse_id = w1.fk_horse_id
-            AND w3.created_at < w1.created_at
-        )
-      WHERE w1.fk_horse_id = ?
-      ORDER BY w1.created_at DESC
-      LIMIT 1`
+    // 1) Compter les lignes
+    var cnt int
+    if err := db.QueryRow(
+        `SELECT COUNT(*) FROM weights WHERE fk_horse_id = ?`,
+        horseId,
+    ).Scan(&cnt); err != nil {
+        return fmt.Errorf("count weights: %w", err)
+    }
 
-    var lastDate sql.NullTime
-    err := db.QueryRow(q, horseId).Scan(
-        &weight.Weight,
-        &weight.LastWeight,
-        &weight.DifferenceWeight,
-        &weight.CreatedAt,
-        &lastDate,
-        &weight.FkHorseId,
-    )
-    if err != nil {
-        if err == sql.ErrNoRows {
-            // Aucun poids enregistr� : renvoyer 0/0 et diff 0 comme convenu
-            weight.Weight = 0
-            weight.LastWeight = 0
-            weight.DifferenceWeight = 0
-            weight.FkHorseId = horseId
-            return nil
+    switch {
+    case cnt == 0:
+        // Aucun poids en BDD
+        weight.Weight           = intPtr(0)
+        weight.LastWeight       = nil          // ou intPtr(0) si tu pr�f�res
+        weight.DifferenceWeight = intPtr(0)
+        weight.CreatedAt        = time.Time{}  // ou time.Now()
+        weight.LastDate         = ""
+        weight.FkHorseId        = horseId
+        return nil
+
+    case cnt == 1:
+        // Un seul poids ? pas de comparaison possible
+        var w int
+        var created time.Time
+        if err := db.QueryRow(
+            `SELECT weight, created_at
+             FROM weights
+             WHERE fk_horse_id = ?
+             ORDER BY created_at DESC
+             LIMIT 1`,
+            horseId,
+        ).Scan(&w, &created); err != nil {
+            return fmt.Errorf("get single weight: %w", err)
         }
-        return fmt.Errorf("error querying weights: %w", err)
+
+        weight.Weight           = intPtr(w)
+        weight.LastWeight       = nil          // ou intPtr(0) si tu veux 0 au lieu de null
+        weight.DifferenceWeight = intPtr(w)    // diff�rence = w - 0
+        weight.CreatedAt        = created
+        weight.LastDate         = ""
+        weight.FkHorseId        = horseId
+        return nil
+
+    default:
+        // = 2 poids ? requ�te compl�te
+        const q = `
+            SELECT 
+                w1.weight,
+                COALESCE(w2.weight, 0)                             AS LastWeight,
+                (w1.weight - COALESCE(w2.weight, 0))               AS DifferenceWeight,
+                w1.created_at                                      AS CreatedAt,
+                w2.created_at                                      AS LastDate,
+                w1.fk_horse_id
+            FROM weights AS w1
+            LEFT JOIN weights AS w2
+              ON w2.fk_horse_id = w1.fk_horse_id
+             AND w2.created_at = (
+                    SELECT MAX(w3.created_at)
+                    FROM weights AS w3
+                    WHERE w3.fk_horse_id = w1.fk_horse_id
+                      AND w3.created_at < w1.created_at
+                )
+            WHERE w1.fk_horse_id = ?
+            ORDER BY w1.created_at DESC
+            LIMIT 1;
+        `
+        var (
+            w, lw, dw, fk int
+            created       time.Time
+            lastDate      sql.NullTime
+        )
+        if err := db.QueryRow(q, horseId).Scan(
+            &w, &lw, &dw, &created, &lastDate, &fk,
+        ); err != nil {
+            return fmt.Errorf("query weights diff: %w", err)
+        }
+
+        weight.Weight           = intPtr(w)
+        weight.LastWeight       = intPtr(lw)
+        weight.DifferenceWeight = intPtr(dw)
+        weight.CreatedAt        = created
+        weight.FkHorseId        = fk
+        if lastDate.Valid {
+            weight.LastDate = lastDate.Time.Format(time.RFC3339)
+        } else {
+            weight.LastDate = ""
+        }
+        return nil
     }
-    if lastDate.Valid {
-        weight.LastDate = lastDate.Time
-    }
-    return nil
 }
