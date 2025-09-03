@@ -50,48 +50,77 @@ function WeightTable() {
   }, [id, token]);
 
   return (
-    <div className="flex flex-col justify-evenly h-screen">
-      <h1 className="text-blue-900 text-4xl font-bold text-center">
-        <strong>{name}</strong>
-      </h1>
-      <h3 className="ml-5 mr-3 text-blue-900 text-3xl italic text-center">
-        Comment a évolué <span className="text-blue-600">son poids </span>?
-      </h3>
+   <div
+      className="
+      flex justify-center
+      min-h-[100svh]
+      px-4
+      pt-[max(env(safe-area-inset-top),1rem)]
+      pb-[calc(max(env(safe-area-inset-bottom),0.75rem)+5rem)]
+    "
+    >
+      <div className="w-full max-w-[360px] flex flex-col">
+        {/* Titre */}
+        <h1 className="text-centaurus-oxford-blue text-4xl font-bold text-center">
+          <strong>{name}</strong>
+        </h1>
+        <h3 className="mt-1 text-centaurus-oxford-blue text-2xl italic text-center">
+          Comment a �volu�{" "}
+          <span className="text-centaurus-dark-cerelean">son poids</span> ?
+        </h3>
 
-      {apiError && <p className="text-red-600 text-center mt-2">{apiError}</p>}
+        {apiError && <p className="text-red mt-2 text-center">{apiError}</p>}
 
-      <div className="mx-auto p-4">
-        <table className="border border-black">
-          <tbody>
-            {rows.map((w, idx) => {
-              return (
-                <tr key={`${w?.date || "n/a"}-${idx}`}>
-                  <td className="border p-2 border-black w-1/2">
-                    {formatDate(w?.date)}
-                  </td>
-                  <td className="border p-2 border-black w-1/2">
-                    {w.weight != null ? `${w.weight}` : "—"} kg
+        {/* Tableau */}
+        <div className="mt-4">
+          <table className="w-full border-collapse border border-black rounded-md overflow-hidden">
+            <tbody>
+              {rows.length > 0 ? (
+                rows.map((w, idx) => (
+                  <tr
+                    key={`${w?.date || "n/a"}-${idx}`}
+                    className="even:bg-centaurus-dark-cerelean/20"
+                  >
+                    <td className="border border-black p-2 w-1/2 align-middle">
+                      {formatDate(w?.date)}
+                    </td>
+                    <td className="border border-black p-2 w-1/2 align-middle text-right">
+                      {w?.weight != null ? `${w.weight} kg` : "� kg"}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    className="border border-black p-2 text-center"
+                    colSpan={2}
+                  >
+                    Aucun poids enregistr�.
                   </td>
                 </tr>
-              );
-            })}
-            {!rows.length && (
-              <tr>
-                <td className="border p-2 border-black text-center" colSpan={2}>
-                  Aucun poids enregistré.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      <ContactText />
-      <MailFieldset />
-      <div className="flex flex-col justify-center items-center">
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Texte et champ e-mail (garde tes composants) */}
+        <div className="mt-4 space-y-3">
+          <ContactText />
+          <MailFieldset />
+        </div>
+
+        {/* Bouton action */}
         <div className="mt-6">
           <Button name="Tracer le graphique" onSubmit={() => handleSubmit()} />
         </div>
-        <div className="mt-5">
+
+        {/* Petit espace pour ne pas coller au bas */}
+        <div className="h-6" aria-hidden />
+      </div>
+
+      {/* Bouton Home fixe, comme sur les autres pages */}
+      <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
+        <div className="mx-auto w-full max-w-[360px] flex justify-center">
           <HomeButton />
         </div>
       </div>

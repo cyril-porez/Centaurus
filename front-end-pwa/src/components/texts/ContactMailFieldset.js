@@ -7,11 +7,11 @@ export default function MailFieldset() {
                         my-2 mx-auto 
                         rounded-lg 
                         border 
-                        border-homa-beige
+                        centaurus-oxford-blue
                         px-8 "
     >
-      <legend className="text-homa-beige">mail:</legend>
-      <p className="text-homa-beige">homalink.app@gmail.com</p>
+      <legend className="centaurus-oxford-blue">mail:</legend>
+      <p className="centaurus-oxford-blue">homalink.app@gmail.com</p>
     </fieldset>
   );
 }
