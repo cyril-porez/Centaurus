@@ -55,7 +55,7 @@ func (r *SQLWeightRepository) GetLastWeightHorse(db *sql.DB, horseId int, weight
   			w2.created_at                                  AS LastDate,           -- peut rester NULL
   			w1.fk_horse_id
 		FROM horses AS h
-		JOIN weights AS w1
+		LEFT JOIN weights AS w1
   			ON h.id = w1.fk_horse_id
 		LEFT JOIN weights AS w2
 	  		ON  w2.fk_horse_id = w1.fk_horse_id
