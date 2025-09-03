@@ -41,18 +41,47 @@ export default function WeightGraph() {
       .filter(Boolean);
 
   return (
-    <div>
-      <h1 className="text-blue-900 text-4xl font-bold text-center">
-        <strong>{name}</strong>
-      </h1>
-      <h3 className="ml-5 mr-3 text-blue-900 text-3xl italic text-center">
-        Comment a évolué <span className="text-blue-600">son poids </span>?
-      </h3>
-      <LineChart weights={toWeights(rows)} date={toDates(rows)} />
-      <ContactText />
-      <MailFieldset />
-      <div className="flex flex-col justify-center items-center">
-        <div className="mt-5">
+    <div
+      className="
+      flex justify-center
+      min-h-[100svh]
+      px-4
+      pt-[max(env(safe-area-inset-top),1rem)]
+      pb-[calc(max(env(safe-area-inset-bottom),0.75rem)+5rem)]
+    "
+    >
+      <div className="w-full max-w-[360px]">
+        <h1 className="text-centaurus-oxford-blue text-4xl font-bold text-center">
+          <strong>{name}</strong>
+        </h1>
+        <h3 className="mt-1 text-centaurus-oxford-blue text-2xl italic text-center">
+          Comment a �volu�{" "}
+          <span className="text-centaurus-dark-cerelean">son poids</span> ?
+        </h3>
+
+        {/* Graphique responsive */}
+        <div className="mt-4">
+          {/* si ton composant accepte className/height, sinon adapte */}
+          <LineChart
+            weights={toWeights(rows)}
+            date={toDates(rows)}
+            className="w-full"
+            height={220}
+          />
+        </div>
+
+        <div className="mt-4 space-y-3">
+          <ContactText />
+          <MailFieldset />
+        </div>
+
+        {/* petit espace pour respirer au-dessus de la barre fixe */}
+        <div className="h-6" aria-hidden />
+      </div>
+
+      {/* HomeButton fixe, identique aux autres pages */}
+      <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
+        <div className="mx-auto w-full max-w-[360px] flex justify-center">
           <HomeButton />
         </div>
       </div>
