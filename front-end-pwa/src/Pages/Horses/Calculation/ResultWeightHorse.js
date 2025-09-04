@@ -5,6 +5,7 @@ import HomeButton from "../../../components/buttons/HomeButton";
 import { useNavigate, useParams } from "react-router-dom";
 import weightApi from "../../../services/weightApi";
 import { useAuth } from "../../../contexts/AuthContext";
+import Button from "../../../components/buttons/ButtonCenter";
 
 function ResultWeight() {
   const { id } = useParams();
