@@ -51,29 +51,40 @@ function FollowWeight() {
   }, [initializing, user?.id, token, navigate]);
 
   return (
-    <div className="flex flex-col justify-evenly h-full">
-      <HeaderText
-        props={{
-          title: "Suivi du poids",
-          subtitle: "Qui sera l'heureux élu ?",
-        }}
-      />
-
-      {userHorses.map((horse) => (
-        <Button
+    <div
+      className="
+        flex justify-center
+        min-h-[100svh]
+        px-4
+        pt-[max(env(safe-area-inset-top),1rem)]
+        pb-[calc(max(env(safe-area-inset-bottom),0.75rem)+5rem)]
+      "
+    >
+      <div className="w-full max-w-[360px]">
+        <HeaderText
           props={{
-            key: horse.id,
-            onClick: () => goToWeightPage(horse.id),
-            title: horse.name,
+            title: "Suivi du poids",
+            subtitle: "Qui sera l'heureux �lu ?",
           }}
         />
-      ))}
-
-      <div className="flex flex-col justify-center items-center">
-        <div className="mt-6">
-          <AddHorseButton onClick={() => goToAddHorse()} />
+        <div className="mt-4 space-y-3">
+          {userHorses.map((horse) => (
+            <Button
+              props={{
+                key: horse.id,
+                onClick: () => goToWeightPage(horse.id),
+                title: horse.name,
+              }}
+            />
+          ))}
         </div>
-        <div className="mt-5">
+        <div className="mt-4">
+          <AddHorseButton onClick={goToAddHorse} />
+        </div>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
+        <div className="mx-auto w-full max-w-[360px] flex justify-center">
           <HomeButton />
         </div>
       </div>
