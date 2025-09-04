@@ -65,53 +65,54 @@ function ResultWeight() {
   }
 
   return (
-    <div
-    className={[
-      "flex justify-center px-4",
-      isPureSang
-        ? "h-[100svh] overflow-hidden pt-[max(env(safe-area-inset-top),1rem)]"
-        : "min-h-[100svh] overflow-y-auto pt-[max(env(safe-area-inset-top),1rem)] pb-[calc(max(env(safe-area-inset-bottom),0.75rem)+5rem)]",
-    ].join(" ")}
-  >
+     <div
+        className="
+          flex justify-center
+          min-h-[100svh]
+          px-4
+          pt-[max(env(safe-area-inset-top),1rem)]
+          pb-[calc(max(env(safe-area-inset-bottom),0.75rem)+5rem)]
+        "
+      >
     <div className="w-full max-w-[360px]">
-      <HeaderText
-        props={{
-          title: `${horse?.name}`,
-          subtitle: "Nous avons besoin de ses nouvelles mensurations",
-        }}
-      />
+      <h1 className="text-centaurus-oxford-blue text-4xl font-bold text-center">
+        {data?.name ?? ""}
+      </h1>
 
-      {isPureSang ? (
-        <div className="mt-3 mb-2 space-y-2">
-          <TextInput props={lcorp}          value={horseMesure.body}  onValueChange={handleBodyChange} />
-          <TextInput props={circThoracique} value={horseMesure.chest} onValueChange={handleChestChange} />
-          {/* ?? on passe bien la date, pas tout l'objet */}
-          <TextInput props={dateMeasure}    value={horseMesure.date ?? ""} onValueChange={handleDateChange} />
-        </div>
-      ) : (
-        <div className="mt-3 mb-2 space-y-2">
-          <TextInput props={hgarot}         value={horseMesure.garrot} onValueChange={handleGarrotChange} />
-          <TextInput props={lcorp}          value={horseMesure.body}   onValueChange={handleBodyChange} />
-          <TextInput props={circThoracique} value={horseMesure.chest}  onValueChange={handleChestChange} />
-          <TextInput props={circEncolure}   value={horseMesure.neck}   onValueChange={handleNeckChange} />
-          <TextInput props={dateMeasure}    value={horseMesure.date ?? ""} onValueChange={handleDateChange} />
-        </div>
-      )}
+      <h3 className="mt-1 text-centaurus-oxford-blue text-2xl italic text-center">
+        Son poids le{" "}
+        <span className="text-centaurus-dark-cerelean">
+          {data?.date ?? "�"}
+        </span>{" "}
+        est de :
+      </h3>
 
-      <img
-        src="/images/cheval_lignes_mesure.png"
-        width={110}
-        className="mx-auto my-4"
-        alt="Zones de mesure du cheval"
-      />
+      <div className="mt-3">
+        <DisplayWeight props={{ title: `${data?.weight ?? "�"} kg` }} />
+      </div>
 
-      <Button className="mt-2" name="Calculons" onSubmit={handleSubmit} />
+      <h3 className="mt-4 text-xl text-center">
+        Soit {diffStr} kg depuis la derni�re fois (
+        {data?.lastDate ?? "�"})
+      </h3>
 
-      {/* petit espace suppl�mentaire uniquement quand on a du scroll */}
-      {!isPureSang && <div className="h-6" aria-hidden />}
+      <p className="mt-4 text-sm leading-snug">
+        En termes de fréquence, pour un cheval " sain "", nous recommandons de
+        réaliser cette estimation <strong>toutes les deux semaines</strong> ;
+        en cas de particularité ou de problème, la répéter
+        <strong> toutes les semaines</strong>.
+      </p>
+
+      {/* Bouton action (m�me style que partout) */}
+      <div className="mt-6">
+        <Button name="Accéder au suivi" onSubmit={navigateResult} />
+      </div>
+
+      {/* petit espace avant la barre fixe */}
+      <div className="h-6" aria-hidden />
     </div>
 
-    {/* HomeButton fixe, identique aux autres pages */}
+    {/* Home fixe en bas, identique aux autres pages */}
     <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
       <div className="mx-auto w-full max-w-[360px] flex justify-center">
         <HomeButton />
