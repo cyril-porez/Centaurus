@@ -14,7 +14,7 @@ const baseStyle = `
     text-gray-500
     py-7 px-5
     my-2 mx-auto
-    w-11/12 
+    w-full
     border
     border-neutral-400 
     rounded-2xl
