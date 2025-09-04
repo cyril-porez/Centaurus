@@ -5,7 +5,6 @@ import HomeButton from "../../../components/buttons/HomeButton";
 import { useNavigate, useParams } from "react-router-dom";
 import weightApi from "../../../services/weightApi";
 import { useAuth } from "../../../contexts/AuthContext";
-import Button from "../../../components/buttons/ButtonCenter";
 
 function ResultWeight() {
   const { id } = useParams();
@@ -66,60 +65,45 @@ function ResultWeight() {
   }
 
   return (
-     <div
-        className="
-          flex justify-center
-          min-h-[100svh]
-          px-4
-          pt-[max(env(safe-area-inset-top),1rem)]
-          pb-[calc(max(env(safe-area-inset-bottom),0.75rem)+5rem)]
-        "
-      >
-    <div className="w-full max-w-[360px]">
-      <h1 className="text-centaurus-oxford-blue text-4xl font-bold text-center">
-        {data?.name ?? ""}
+    <div className="flex flex-col justify-evenly h-full">
+      <h1 className="text-blue-900 text-4xl font-bold text-center">
+        <strong>{data?.name || ""}</strong>
       </h1>
-
-      <h3 className="mt-1 text-centaurus-oxford-blue text-2xl italic text-center">
-        Son poids le{" "}
-        <span className="text-centaurus-dark-cerelean">
-          {data?.date ?? "�"}
-        </span>{" "}
+      <h3 className="ml-5 mr-3 text-blue-900 text-3xl italic text-center">
+        Son poids le <span className="text-blue-600">{data?.date + " "}</span>
         est de :
       </h3>
 
-      <div className="mt-3">
-        <DisplayWeight props={{ title: `${data?.weight ?? "�"} kg` }} />
-      </div>
-
-      <h3 className="mt-4 text-xl text-center">
-        Soit {diffStr} kg depuis la derni�re fois (
-        {data?.lastDate ?? "�"})
+      <DisplayWeight props={{ title: (data?.weight ?? "—") + " kg" }} />
+      <h3 className="ml-5 text-2xl text-center">
+        Soit {diffStr} Kg depuis la dernière fois ({data?.lastDate || "—"})
       </h3>
-
-      <p className="mt-4 text-sm leading-snug">
-        En termes de fréquence, pour un cheval " sain "", nous recommandons de
-        réaliser cette estimation <strong>toutes les deux semaines</strong> ;
-        en cas de particularité ou de problème, la répéter
-        <strong> toutes les semaines</strong>.
+      <p className="ml-5">
+        En terme de fréquence, pour un cheval “sain” nous recommandons de
+        réaliser cette estimation toute les deux semaines si particularité ou
+        problème, la répéter toute les semaines
       </p>
-
-      {/* Bouton action (m�me style que partout) */}
-      <div className="mt-6">
-        <Button name="Accéder au suivi" onSubmit={navigateResult} />
+      <div className="flex flex-col justify-center items-center">
+        <div className="mt-6">
+          <input
+            type="submit"
+            onClick={() => navigateResult()}
+            className="bg-blue-500
+                hover:bg-blue-700
+                text-white
+                font-bold
+                rounded-full
+                shadow-xl
+                py-5 w-80
+                mx-auto mt-2"
+            value="Accéder au suivi"
+          />
+        </div>
+        <div className="mt-5">
+          <HomeButton />
+        </div>
       </div>
-
-      {/* petit espace avant la barre fixe */}
-      <div className="h-6" aria-hidden />
     </div>
-
-    {/* Home fixe en bas, identique aux autres pages */}
-    <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
-      <div className="mx-auto w-full max-w-[360px] flex justify-center">
-        <HomeButton />
-      </div>
-    </div>
-  </div>
   );
 }
 
