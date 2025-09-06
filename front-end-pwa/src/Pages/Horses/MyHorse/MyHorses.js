@@ -7,6 +7,7 @@ import HomeButton from "../../../components/buttons/HomeButton";
 import horseApi from "../../../services/horseApi";
 import Button from "../../../components/buttons/ButtonCenter";
 import { useAuth } from "../../../contexts/AuthContext";
+import HorseCard from "../../../components/cards/HorseCard";
 
 function MyHorses() {
   let navigate = useNavigate();
