@@ -96,55 +96,73 @@ jobs:
             make preprod
           EOF
   notify:
-    if: always()                         # on notifie m�me si un job a �chou�
+    if: always()
     needs: [docker-validate, backend-tests, deploy]
     runs-on: ubuntu-latest
     env:
-      GCHAT_WEBHOOK: ${{ secrets.GCHAT_WEBHOOK }}   # URL du webhook Google Chat
-      APP_URL:       ${{ secrets.APP_URL }}         # URL de l'app d�ploy�e
+      GCHAT_WEBHOOK: ${{ secrets.GCHAT_WEBHOOK }}
+      APP_URL:       ${{ secrets.APP_URL }}
     steps:
       - name: Notify Google Chat
         shell: bash
         run: |
           set -euo pipefail
+          export LANG=C.UTF-8
 
-          # Statut lisible
-          STATUS="? Déploiement réussi"
+          # Nettoyage éventuel du webhook
+          GCHAT_WEBHOOK="${GCHAT_WEBHOOK//$'\r'/}"
+          GCHAT_WEBHOOK="$(echo -n "$GCHAT_WEBHOOK" | tr -d '[:space:]')"
+
+          # Statut (unicode, pas d'emoji bruts)
+          STATUS="\u2705 Déploiement réussi"
           if [[ "${{ needs.deploy.result }}" != "success" ]]; then
-            STATUS="? Déploiement échoué"
+            STATUS="\u274c Déploiement échoué"
           fi
 
-          PROJECT="${{ github.repository }}"                # org/repo
-          ACTOR="${{ github.actor }}"                       # auteur de la PR/commit
+          PROJECT="${{ github.repository }}"
+          ACTOR="${{ github.actor }}"
           PR_LINK="${{ github.event.pull_request.html_url }}"
           if [[ -z "${PR_LINK}" || "${PR_LINK}" == "null" ]]; then
             PR_LINK="(push direct sans PR)"
           fi
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-          # Envoi de la carte Google Chat (cardsV2)
-          curl -sS -X POST -H 'Content-Type: application/json' -d @- "$GCHAT_WEBHOOK" <<JSON
+          # Fallback text + carte cardsV2
+          cat >payload.json <<JSON
           {
-            "cardsV2": [{
-              "cardId": "ci-cd-preprod",
-              "card": {
-                "header": {
-                  "title": "${PROJECT}",
-                  "subtitle": "${STATUS}",
-                  "imageUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-                  "imageType": "CIRCLE"
-                },
-                "sections": [{
-                  "widgets": [
-                    { "decoratedText": { "startIcon": { "knownIcon": "PERSON" },       "text": "*Auteur* : ${ACTOR}" } },
-                    { "decoratedText": { "startIcon": { "knownIcon": "DESCRIPTION" },  "text": "*Pull Request* : ${PR_LINK}" } },
-                    { "buttonList": { "buttons": [
-                      { "text": "Voir Workflow", "onClick": { "openLink": { "url": "${RUN_URL}" } } },
-                      { "text": "App déployée",  "onClick": { "openLink": { "url": "${APP_URL}" } } }
-                    ]}}
+            "text": "${PROJECT} - ${STATUS}\nAuteur: ${ACTOR}\nPR: ${PR_LINK}\nWorkflow: ${RUN_URL}\nApp: ${APP_URL}",
+            "cardsV2": [
+              {
+                "cardId": "ci-cd-preprod",
+                "card": {
+                  "header": {
+                    "title": "${PROJECT}",
+                    "subtitle": "${STATUS}",
+                    "imageUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                    "imageType": "CIRCLE"
+                  },
+                  "sections": [
+                    {
+                      "widgets": [
+                        { "decoratedText": { "startIcon": { "knownIcon": "PERSON" },      "text": "*Auteur* : ${ACTOR}" } },
+                        { "decoratedText": { "startIcon": { "knownIcon": "DESCRIPTION" }, "text": "*Pull Request* : ${PR_LINK}" } },
+                        { "buttonList": { "buttons": [
+                          { "text": "Voir Workflow", "onClick": { "openLink": { "url": "${RUN_URL}" } } },
+                          { "text": "App d�ploy�e",  "onClick": { "openLink": { "url": "${APP_URL}" } } }
+                        ]}}
+                      ]
+                    }
                   ]
-                }]
+                }
               }
-            }]
+            ]
           }
           JSON
+
+          # (Optionnel) vérifier rapidement que le JSON est valide
+          # jq . payload.json >/dev/null
+
+          curl -sS -X POST \
+            -H 'Content-Type: application/json; charset=UTF-8' \
+            --data-binary @payload.json \
+            "$GCHAT_WEBHOOK"
