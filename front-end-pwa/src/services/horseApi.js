@@ -90,6 +90,7 @@ async function DeleteHorse(id, token) {
   try {
     setAccessToken(token)
     const response = await client.delete(`/horses/${id}`);
+    return response
   } catch (error) {
     return error.response
   }
