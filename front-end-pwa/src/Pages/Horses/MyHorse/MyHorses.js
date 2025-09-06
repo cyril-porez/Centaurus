@@ -50,7 +50,7 @@ function MyHorses() {
     navigate("/horses/my-horse/add-horse", { replace: false });
   };
 
-  const handleDelete = (horseId) => {
+  const handleDelete = async (horseId) => {
     console.log("delete =>", horseId);
 
     try {
