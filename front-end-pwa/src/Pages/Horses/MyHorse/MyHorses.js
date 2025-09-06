@@ -45,8 +45,18 @@ function MyHorses() {
     })();
   }, [initializing, user?.id, token, navigate]);
 
-  const handleClick = () => {
+  const goToAddHorse = () => {
     navigate("/horses/my-horse/add-horse", { replace: false });
+  };
+
+  const handleDelete = (horseId) => {
+    // 2) log avant navigate
+    console.log("delete =>", horseId);
+
+    // 3) d�cale la nav pour que le log s�imprime
+    setTimeout(() => {
+      navigate(`/horses/my-horse/update-horse/${horseId}`, { replace: false });
+    }, 0);
   };
 
   return (
