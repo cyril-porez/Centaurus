@@ -108,6 +108,15 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Nettoyage du secret (supprime CRLF et espaces)
+          GCHAT_WEBHOOK="${GCHAT_WEBHOOK//$'\r'/}"
+          GCHAT_WEBHOOK="$(echo -n "$GCHAT_WEBHOOK" | tr -d '[:space:]')"
+
+          # Petit test avant envoi
+          curl -sS -X POST -H 'Content-Type: application/json' \
+          -d '{"text":"Ping depuis GitHub Actions ?"}' \
+          "$GCHAT_WEBHOOK"
+
           STATUS="? Déploiement réussi"
           COLOR="green"
           if [[ "${{ needs.deploy.result }}" != "success" ]]; then
