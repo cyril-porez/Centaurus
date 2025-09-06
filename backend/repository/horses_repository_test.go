@@ -25,7 +25,7 @@ func TestInsertHorse_Success(t *testing.T) {
 	}
 
 	mock.ExpectExec("INSERT INTO horses").
-		WithArgs(input.Name, input.Race, input.Age, input.FkUserId, sqlmock.AnyArg()).
+		WithArgs(input.Name, input.Age, input.Race, input.FkUserId).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	repo := &repository.SQLHorseRepository{}
