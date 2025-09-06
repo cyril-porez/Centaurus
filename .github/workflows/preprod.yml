@@ -21,7 +21,7 @@ jobs:
   
   docker-validate:
     name: Docker Compose - validate
-    runs-on: unbuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Vérifier la config Docker Compose
