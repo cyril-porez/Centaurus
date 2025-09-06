@@ -11,7 +11,7 @@ export default function MailFieldset() {
                         px-8 "
     >
       <legend className="text-homa-beige">mail:</legend>
-      <p className="text-homa-beige">homalink.app@gmail.com</p>
+      <p className="text-centaurus-oxford-blue">centaurus.contact@gmail.com</p>
     </fieldset>
   );
 }
