@@ -96,56 +96,56 @@ jobs:
             make preprod
           EOF
   notify:
-  if: always() # on notifie m�me si un job en amont a �chou�
-  needs: [docker-validate, backend-tests, deploy]
-  runs-on: ubuntu-latest
-  env:
-    GCHAT_WEBHOOK: ${{ secrets.GCHAT_WEBHOOK }} # <-- URL du webhook (seul, sans texte autour)
-    APP_URL: ${{ secrets.APP_URL }}             # <-- mets l'URL de ton app en secret
-  steps:
-    - name: Notify Google Chat
-      shell: bash
-      run: |
-        set -euo pipefail
+    if: always() # on notifie m�me si un job en amont a �chou�
+    needs: [docker-validate, backend-tests, deploy]
+    runs-on: ubuntu-latest
+    env:
+      GCHAT_WEBHOOK: ${{ secrets.GCHAT_WEBHOOK }} # <-- URL du webhook (seul, sans texte autour)
+      APP_URL: ${{ secrets.APP_URL }}             # <-- mets l'URL de ton app en secret
+    steps:
+      - name: Notify Google Chat
+        shell: bash
+        run: |
+          set -euo pipefail
 
-        STATUS="? D�ploiement r�ussi"
-        COLOR="green"
-        if [[ "${{ needs.deploy.result }}" != "success" ]]; then
-          STATUS="? D�ploiement �chou�"
-          COLOR="red"
-        fi
+          STATUS="? Déploiement réussi"
+          COLOR="green"
+          if [[ "${{ needs.deploy.result }}" != "success" ]]; then
+            STATUS="? Déploiement échoué"
+            COLOR="red"
+          fi
 
-        PR_LINK="${{ github.event.pull_request.html_url }}"
-        if [[ -z "${PR_LINK}" || "${PR_LINK}" == "null" ]]; then
-          PR_LINK="(Push direct sans PR)"
-        fi
+          PR_LINK="${{ github.event.pull_request.html_url }}"
+          if [[ -z "${PR_LINK}" || "${PR_LINK}" == "null" ]]; then
+            PR_LINK="(Push direct sans PR)"
+          fi
 
-        ACTOR="${{ github.actor }}"
-        RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          ACTOR="${{ github.actor }}"
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-        # Envoi d'une carte Google Chat (cardsV2) via heredoc
-        curl -sS -X POST -H 'Content-Type: application/json' -d @- "$GCHAT_WEBHOOK" <<'JSON'
-        {
-          "cardsV2": [{
-            "cardId": "ci-cd-preprod",
-            "card": {
-              "header": {
-                "title": "CI/CD Preprod",
-                "subtitle": "'"$STATUS"'",
-                "imageUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-                "imageType": "CIRCLE"
-              },
-              "sections": [{
-                "widgets": [
-                  { "decoratedText": { "startIcon": { "knownIcon": "PERSON" }, "text": "*Auteur* : '"$ACTOR"'" } },
-                  { "decoratedText": { "startIcon": { "knownIcon": "DESCRIPTION" }, "text": "*Pull Request* : '"$PR_LINK"'" } },
-                  { "buttonList": { "buttons": [
-                    { "text": "Voir Workflow",  "onClick": { "openLink": { "url": "'"$RUN_URL"'" } } },
-                    { "text": "App d�ploy�e",   "onClick": { "openLink": { "url": "'"$APP_URL"'" } } }
-                  ]}}
-                ]
-              }]
-            }
-          }]
-        }
-        JSON
+          # Envoi d'une carte Google Chat (cardsV2) via heredoc
+          curl -sS -X POST -H 'Content-Type: application/json' -d @- "$GCHAT_WEBHOOK" <<'JSON'
+          {
+            "cardsV2": [{
+              "cardId": "ci-cd-preprod",
+              "card": {
+                "header": {
+                  "title": "CI/CD Preprod",
+                  "subtitle": "'"$STATUS"'",
+                  "imageUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                  "imageType": "CIRCLE"
+                },
+                "sections": [{
+                    "widgets": [
+                      { "decoratedText": { "startIcon": { "knownIcon": "PERSON" }, "text": "*Auteur* : '"$ACTOR"'" } },
+                      { "decoratedText": { "startIcon": { "knownIcon": "DESCRIPTION" }, "text": "*Pull Request* : '"$PR_LINK"'" } },
+                      { "buttonList": { "buttons": [
+                      { "text": "Voir Workflow",  "onClick": { "openLink": { "url": "'"$RUN_URL"'" } } },
+                      { "text": "App déployée",   "onClick": { "openLink": { "url": "'"$APP_URL"'" } } }
+                    ]}}
+                  ]
+                }]
+              }
+            }]
+          }
+          JSON
