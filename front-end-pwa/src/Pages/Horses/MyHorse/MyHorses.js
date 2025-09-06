@@ -55,6 +55,8 @@ function MyHorses() {
 
     try {
       const res = await horseApi.DeleteHorse(horseId, token);
+      console.log(res);
+      
 
       if (res?.status === 200 || res?.status === 204) {
         // suppression c�t� front (met � jour ton state)
