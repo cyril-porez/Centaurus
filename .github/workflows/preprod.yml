@@ -108,28 +108,19 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Nettoyage du secret (supprime CRLF et espaces)
-          GCHAT_WEBHOOK="${GCHAT_WEBHOOK//$'\r'/}"
-          GCHAT_WEBHOOK="$(echo -n "$GCHAT_WEBHOOK" | tr -d '[:space:]')"
-
-          # Petit test avant envoi
-          curl -sS -X POST -H 'Content-Type: application/json' \
-          -d '{"text":"Ping depuis GitHub Actions ?"}' \
-          "$GCHAT_WEBHOOK"
-
-          STATUS="? Déploiement réussi"
+          STATUS="? D�ploiement r�ussi"
           COLOR="green"
           if [[ "${{ needs.deploy.result }}" != "success" ]]; then
-            STATUS="? Déploiement échoué"
+            STATUS="? D�ploiement �chou�"
             COLOR="red"
           fi
 
-          PR_LINK="${{ github.event.pull_request.html_url }}"
+          PROJECT="${{ github.repository }}"                # nom du projet (repo)
+          ACTOR="${{ github.actor }}"                       # auteur de la PR / commit
+          PR_LINK="${{ github.event.pull_request.html_url }}" 
           if [[ -z "${PR_LINK}" || "${PR_LINK}" == "null" ]]; then
             PR_LINK="(Push direct sans PR)"
           fi
-
-          ACTOR="${{ github.actor }}"
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
           # Envoi d'une carte Google Chat (cardsV2) via heredoc
@@ -139,7 +130,7 @@ jobs:
               "cardId": "ci-cd-preprod",
               "card": {
                 "header": {
-                  "title": "CI/CD Preprod",
+                  "title": "$PROJECT",
                   "subtitle": "'"$STATUS"'",
                   "imageUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
                   "imageType": "CIRCLE"
@@ -157,4 +148,4 @@ jobs:
               }
             }]
           }
-          JSON
+          EOF
