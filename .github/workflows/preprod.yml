@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: V�rifier la config Docker Compose
+      - name: Vérifier la config Docker Compose
         run: docker compose -f docker-compose.yml -f docker-compose.preprod.yml config > /dev/null
 
   deploy:
@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: D�marrer l�agent SSH
+      - name: Démarrer l'agent SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.RPI_SSH_PRIVATE_KEY }}
@@ -35,7 +35,7 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -p "${{ secrets.RPI_PORT }}" -H "${{ secrets.RPI_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: D�ployer sur le Raspberry Pi
+      - name: Déployer sur le Raspberry Pi
         env:
           RPI_HOST: ${{ secrets.RPI_HOST }}
           RPI_PORT: ${{ secrets.RPI_PORT }}
@@ -43,10 +43,10 @@ jobs:
           RPI_PATH: ${{ secrets.RPI_PATH }}
         run: |
           set -euo pipefail
-          # Cl�/known_hosts: d�j� fait dans les �tapes pr�c�dentes
+          # Clé/known_hosts: déjà fait dans les étapes précédentes
           ssh -o StrictHostKeyChecking=no -p "$RPI_PORT" "$RPI_USER@$RPI_HOST" bash -s <<EOF
             set -euo pipefail
-            cd "$RPI_PATH"          # <� ici la valeur est d�j� r�solue par le runner
+            cd "$RPI_PATH"          # <� ici la valeur est déj& résolue par le runner
             echo "Dans: \$(pwd)"
             git fetch --all
             git reset --hard origin/preprod
