@@ -58,9 +58,9 @@ function MyHorses() {
 
       if (res?.status === 200 || res?.status === 204) {
         // suppression c�t� front (met � jour ton state)
-        setUserHorses((prev) => prev.filter((horse) => horse.id !== horseId));
-
-        console.log("Cheval supprim� avec succ�s");
+        // setUserHorses((prev) => prev.filter((horse) => horse.id !== horseId));
+        setUserHorses(refreshed?.data?.data || []);
+        console.log("Cheval supprimé avec succès");
       } else {
         console.error("Erreur lors de la suppression :", res);
         setError("Impossible de supprimer ce cheval.");
