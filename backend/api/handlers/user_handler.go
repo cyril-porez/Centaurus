@@ -5,11 +5,13 @@ import (
 	"back-end-go/service"
 	"back-end-go/utils"
 	"database/sql"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	// "golang.org/x/text/message"
 )
 
 //RegisterHandler godoc
@@ -18,21 +20,22 @@ import (
 //@Tags Credential
 //@Accept json
 //@Produce json
-//@Param user body model.User true "Username, Email and Password"
-//@Success 200 {object} model.User "User created successfully"
-//@Failure 400 {object} map[string]string
-//@Failure 500 {object} map[string]string
+//@Param user body model.RegisterInput true "Username, Email and Password"
+//@Success 200 {object} model.PublicUser "User created successfully"
+//@Failure 400 {object} model.ErrorResponse "Invalid input data"
+//@Failure 409 {object} model.ErrorResponse "Email or username already in use"
+//@Failure 500 {object} model.ErrorResponse "Internal Server error"
 //@Router /api/v1/auth/sign-up [post]
-func RegisterHandler(c *gin.Context, db *sql.DB) {
-	var newUser model.User
-	if err := c.ShouldBindJSON(&newUser); err != nil {
-		body := utils.ErrorResponseInput{
-			Details : []utils.ErrorDetail{
-				{
-					Field: "body",
-					Issue: "The provided data is not valid",
-				},
-			},
+func RegisterHandler(c *gin.Context, db *sql.DB, userService *service.UserService) {
+	var input model.RegisterInput
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid REquest", model.ErrorResponseInput{
+			Details : []model.ErrorDetail{
+			{
+				Field: "body",
+				Issue: "The provided data is not valid",
+			}},
 			Meta : map[string]string{
 				"timestamp": "2025-01-03T15:45:00Z",
 			},
@@ -40,59 +43,52 @@ func RegisterHandler(c *gin.Context, db *sql.DB) {
 				"self":   "/api/v1/auth/signin",
 				"Method": "POST",
 			},
-		}
-		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid REquest", body)
-		return
+		})
+		return			
 	}
 
-	if details, err := service.CreateUser(c, db, &newUser); err != nil || len(details) > 0 {
+	user, details, err := userService.CreateUser(c, db, &input)
+	if err != nil || len(details) > 0 {
+		code := http.StatusInternalServerError
+		message := "Internal Server Error"
 		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusBadRequest, "Validation Error", utils.ErrorResponseInput{
-				Details: details,
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/auth/signin",
-						"METHOD": "POST",
-					},
-				},
-			})
-		} else {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "internal Server Error", utils.ErrorResponseInput{
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-in": gin.H{
-						"self":   "/api/v1/auth/signin",
-						"METHOD": "POST",
-					},
-				},
-			})
+			code = http.StatusBadRequest
+			message = "Validation Error"
 		}
+		utils.WriteErrorResponse(c, code, message, model.ErrorResponseInput{
+			Details: details,
+				Meta: map[string]string{
+					"timestamp": time.Now().Format(time.RFC3339),
+				},
+				Links : gin.H{
+					"sign-in": gin.H{
+						"self":   "/api/v1/auth/signin",
+						"METHOD": "POST",
+					},
+				},
+			})		
 		return
 	}
 
-	body := gin.H{
-    "user": gin.H{
-      "email": newUser.Email,
-			"username": newUser.Username,
+	resp := gin.H{
+    "user": model.PublicUser{
+			Id: user.Id,
+      Email: user.Email,
+			Username: user.Username,
+			CreatedAt: user.CreatedAt,
+		},
+		"meta": gin.H{
+			"createdAt": user.CreatedAt,
+			"welcomeMessage": "Welcome to our community", 
 		},
 		"_links": gin.H{
         "sign-in": gin.H{
-					"href":"/api/v1/auth/sign-in",
+					"href":"/api/v1/auth/sign-in", 
 					"Method": "POST", 
 				},
 		},
-		"meta": gin.H{
-			"createdAt": newUser.CreatedAt,
-			"welcomeMessage": "Welcome to our community", 
-		},
 	}
-
-	utils.WriteSuccesResponse(c, http.StatusCreated, "Registration successful", body)
+	utils.WriteSuccesResponse(c, http.StatusCreated, resp)
 }
 
 //SignInHandler godoc
@@ -101,18 +97,18 @@ func RegisterHandler(c *gin.Context, db *sql.DB) {
 //@Tags Credential
 //@Accept json
 //@Produce json
-//@Param credential body model.Credential true "Email and password"
-//@Success 200 {object} model.Credential "User connected"
-//@Failure 400 {object} map[string]string
-//@Failure 401 {object} map[sting]string
-//@Failure 500 {object} map[string]string
+//@Param input body model.LoginInput true "Email and password"
+//@Success 200 {object} model.PublicUser "User connected"
+//@Failure 400 {object} model.ErrorResponse "Validation error"
+//@Failure 401 {object} model.ErrorResponse "Unauthorized (bad credentials)"
+//@Failure 500 {object} model.ErrorResponse "Internal error"
 //@Router /api/v1/auth/sign-in [post]
-func SignInHandler(c *gin.Context, db *sql.DB) {
-	var user model.Credential
+func SignInHandler(c *gin.Context, db *sql.DB, userService *service.UserService) {
+	var input model.LoginInput
 
-	if err := c.ShouldBindJSON(&user); err != nil {
-		body := utils.ErrorResponseInput{
-			Details : []utils.ErrorDetail{
+	if err := c.ShouldBindJSON(&input); err != nil {
+		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid Request", model.ErrorResponseInput{
+			Details : []model.ErrorDetail{
 				{
 					Field: "body",
 					Issue: "The provided data is not valid",
@@ -127,13 +123,25 @@ func SignInHandler(c *gin.Context, db *sql.DB) {
 					"METHOD": "POST",
 				},
 			},
-		}
-		utils.WriteErrorResponse(c, http.StatusBadRequest, "Invalid Request", body)
+		})
+		return
 	}
 
-	if details, err := service.AuthService(c, db, &user); err != nil || len(details) > 0 {
-		if len(details) > 0 {
-			utils.WriteErrorResponse(c, http.StatusUnauthorized, "Unauthorized", utils.ErrorResponseInput{
+	user, details, err := userService.AuthService(c, db, &input)
+	if err != nil || len(details) > 0 {
+			code := http.StatusInternalServerError
+			message := "Internal Server Error"
+
+			if len(details) > 0 {
+				code = http.StatusUnauthorized
+				message = "Unauthorized"
+			}
+
+			if err != nil && !errors.Is(err, sql.ErrNoRows) {
+				code = http.StatusUnauthorized
+				message = "Invalid credentials"
+			}
+			utils.WriteErrorResponse(c, code, message, model.ErrorResponseInput{
 				Details: details,
 				Meta: map[string]string{
 					"timestamp": time.Now().Format(time.RFC3339),
@@ -145,42 +153,46 @@ func SignInHandler(c *gin.Context, db *sql.DB) {
 					},
 				},
 			})
-		} else {
-			utils.WriteErrorResponse(c, http.StatusInternalServerError, "Internal server", utils.ErrorResponseInput{
-				Meta: map[string]string{
-					"timestamp": time.Now().Format(time.RFC3339),
-				},
-				Links : gin.H{
-					"sign-up": gin.H{
-						"self":   "/api/v1/auth/signup",
-						"METHOD": "POST",
-					},
-				},
-			})
-		}
-		return
+
+			return
 	}
 
-	acceptToken, err := utils.GenerateAccesToken(user.Id, user.Username)
+	accessToken, err := utils.GenerateAccessToken(user.Id, user.Username)
 	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Token Generation Failed", model.ErrorResponseInput{
+			Meta: map[string]string{
+				"timestamp": time.Now().Format(time.RFC3339),
+			},
+		})
 		return
 	}
 
 	refreshToken, err:= utils.GenerateRefreshToken(user.Id, user.Username)
 	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Token Generation Failed", model.ErrorResponseInput{
+			Meta: map[string]string{
+				"timestamp": time.Now().Format(time.RFC3339),
+			},
+		})
 		return
 	}
+	
+	if err := utils.SetRefreshCookie(c, refreshToken); err != nil {
+		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Cannot set refresh cookie", model.ErrorResponseInput{
+			Meta: map[string]string{ "timestamp": time.Now().UTC().Format(time.RFC3339) },
+		})
+	}
 
-	body := gin.H{
-		"user": gin.H{
-			"id": user.Id,
-			"email": user.Email,
-			"username": user.Username,
+	resp := gin.H{
+		"user": model.PublicUser{
+			Id: user.Id,
+			Email: user.Email,
+			Username: user.Username,
+			CreatedAt: user.CreatedAt,
 		},
 		"meta": gin.H{
-			"acces_token": acceptToken,
-			"refresh_token": refreshToken,
-			"createdAt": time.Now(),
+			"access_token": accessToken,
+			"createdAt": time.Now().UTC().Format(time.RFC3339),
 			"message": "You have successfully logged in",
 		},
 		"_links": gin.H{
@@ -190,6 +202,68 @@ func SignInHandler(c *gin.Context, db *sql.DB) {
 			},
 		},
 	}
+	c.Header("Cache-Control", "no-store")
+	c.Header("Pragma", "no-cache")
+	utils.WriteSuccesResponse(c, http.StatusOK, resp)
+}
 
-	utils.WriteSuccesResponse(c, http.StatusOK, "login successful", body)
+
+func LogoutHandler(c *gin.Context) {
+	utils.ClearRefreshCookie(c)
+	c.Header("Cache-Control", "no-store")
+	c.Header("Pragma", "no-cache")
+	http.SetCookie(c.Writer, &http.Cookie{
+        Name:     "refresh_token",
+        Value:    "",
+        Path:     "/",
+        Expires:  time.Unix(0, 0),
+        MaxAge:   -1,
+        HttpOnly: true,
+        Secure:   false,                    // local
+        SameSite: http.SameSiteLaxMode,     // local
+    })
+    c.Status(http.StatusNoContent)
+}
+
+
+func RefreshHandler(c *gin.Context) {
+	ck, err := c.Request.Cookie("refresh_token")
+	if err != nil || ck.Value == "" {
+		utils.WriteErrorResponse(c, http.StatusUnauthorized, "No refresh cookie", model.ErrorResponseInput{
+			Meta: map[string]string{ "timestamp": time.Now().UTC().Format(time.RFC3339) },
+		})
+		return
+	}
+
+	// TODO: valider le refresh, vérifier révocation/rotation, etc.
+	claims, err := utils.ParseRefreshToken(ck.Value)
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusUnauthorized, "Invalid refresh token", model.ErrorResponseInput{
+			Meta: map[string]string{ "timestamp": time.Now().UTC().Format(time.RFC3339) },
+		})
+		return
+	}
+
+	userID := int(claims["sub"].(float64))
+	username := claims["name"].(string)
+
+	accessToken, err := utils.GenerateAccessToken(userID, username)
+	if err != nil {
+		utils.WriteErrorResponse(c, http.StatusInternalServerError, "Token Generation Failed", model.ErrorResponseInput{
+			Meta: map[string]string{ "timestamp": time.Now().UTC().Format(time.RFC3339) },
+		})
+		return
+	}
+
+	// Optionnel : rotation du refresh → regénérer et reposer un cookie
+	// newRefresh, _ := utils.GenerateRefreshToken(userID, username)
+	// _ = setRefreshCookie(c, newRefresh)
+	c.Header("Cache-Control", "no-store")
+	c.Header("Pragma", "no-cache")
+	c.Header("Vary", "Origin")
+
+	c.JSON(http.StatusOK, gin.H{
+		"access_token": accessToken,
+		"createdAt":    time.Now().UTC().Format(time.RFC3339),
+	})
 }
