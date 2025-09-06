@@ -95,3 +95,44 @@ jobs:
             git reset --hard origin/preprod
             make preprod
           EOF
+  notify:
+    if: always() # Toujours notifier, m�me si le build ou le d�ploiement �choue
+    needs: [docker-validate, backend-tests, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Google Chat
+        run: |
+          STATUS="? D�ploiement r�ussi"
+          COLOR="green"
+          if [ "${{ needs.deploy.result }}" != "success" ]; then
+            STATUS="? D�ploiement �chou�"
+            COLOR="red"
+          fi
+
+          PR_LINK="${{ github.event.pull_request.html_url || '(Push direct sans PR)' }}"
+          ACTOR="${{ github.actor }}"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          APP_URL="${{ secrets.APP_URL }}"
+
+          curl -X POST \
+            -H 'Content-Type: application/json' \
+            -d "{
+              \"cards\": [{
+                \"header\": {
+                  \"title\": \"CI/CD Preprod\",
+                  \"subtitle\": \"${STATUS}\",
+                  \"imageUrl\": \"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png\"
+                },
+                \"sections\": [{
+                  \"widgets\": [
+                    {\"keyValue\": {\"topLabel\": \"Auteur\", \"content\": \"${ACTOR}\"}},
+                    {\"keyValue\": {\"topLabel\": \"Pull Request\", \"content\": \"${PR_LINK}\"}},
+                    {\"buttons\": [
+                      {\"textButton\": {\"text\": \"Voir Workflow\", \"onClick\": {\"openLink\": {\"url\": \"${RUN_URL}\"}}}},
+                      {\"textButton\": {\"text\": \"App D�ploy�e\", \"onClick\": {\"openLink\": {\"url\": \"${APP_URL}\"}}}}
+                    ]}
+                  ]
+                }]
+              }]
+            }" \
+            ${{ secrets.GCHAT_WEBHOOK }}
