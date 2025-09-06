@@ -89,7 +89,7 @@ function MyHorses() {
         <HeaderText
           props={{
             title: "Mes chevaux",
-            subtitle: "Tu peux ajouter jusqu�� 4 chevaux par compte",
+            subtitle: "Tu peux ajouter jusqu'à 4 chevaux par compte",
           }}
         />
 
