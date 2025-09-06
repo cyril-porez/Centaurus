@@ -224,7 +224,7 @@ export default function Mensurations() {
             />
             <TextInput
               props={dateMeasure}
-              value={horseMesure}
+              value={horseMesure.date}
               onValueChange={handleDateChange}
             />
           </div>
@@ -259,7 +259,7 @@ export default function Mensurations() {
           </div>
         )}
         <img
-          src="/images/cheval_lignes_mesure.png"
+          src="/images/cheval_lignes_mesure2.png"
           width={110}
           className="mx-auto my-4"
           alt=""
