@@ -10,8 +10,8 @@ export default function MailFieldset() {
                         centaurus-oxford-blue
                         px-8 "
     >
-      <legend className="centaurus-oxford-blue">mail:</legend>
-      <p className="centaurus-oxford-blue">homalink.app@gmail.com</p>
+      <legend className="text-centaurus-oxford-blue">mail:</legend>
+      <p className="text-centaurus-oxford-blue">centaurus.contact@gmail.com</p>
     </fieldset>
   );
 }
