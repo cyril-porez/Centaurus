@@ -50,28 +50,47 @@ function MyHorses() {
   };
 
   return (
-    <div className="flex flex-col h-full justify-center">
-      <div className="flex flex-col h-1/2 justify-between">
+    <div
+      className="
+      flex justify-center
+      min-h-[100svh]
+      px-4
+      pt-[max(env(safe-area-inset-top),1rem)]
+      pb-[calc(max(env(safe-area-inset-bottom),0.75rem)+5rem)]
+    "
+    >
+      <div className="w-full max-w-[360px]">
         <HeaderText
           props={{
             title: "Mes chevaux",
-            subtitle: "Vous pouvez avoir jusqu'à 4 chevaux.",
+            subtitle: "Tu peux ajouter jusqu�� 4 chevaux par compte",
           }}
         />
-        {userHorses.map((horse) => (
-          <Button
-            key={horse.id}
-            props={{
-              title: horse.name,
-              onClick: () => goToUpdateHorse(horse.id),
-            }}
-          />
-        ))}
-        {userHorses.length < 4 && <AddHorseButton onClick={handleClick} />}
-        <div className="flex flex-col justify-center items-center">
-          <div className="mt-5">
-            <HomeButton />
-          </div>
+
+        <div className="mt-4 space-y-3">
+          {userHorses.map((h) => (
+            <HorseCard
+              key={h.id}
+              name={h.name}
+              age={h.age} // ou calcule l��ge en amont
+              onEdit={() => goToUpdateHorse(h.id)}
+              onDelete={() => handleDelete(h.id)}
+            />
+          ))}
+        </div>
+
+        {/* Bouton �Ajouter un cheval� (style maquette) */}
+        <div className="mt-4">
+          <AddHorseButton onClick={goToAddHorse} />
+        </div>
+
+        <div className="h-6" aria-hidden />
+      </div>
+
+      {/* Barre / bouton fixe en bas comme ailleurs */}
+      <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
+        <div className="mx-auto w-full max-w-[360px] flex justify-center">
+          <HomeButton />
         </div>
       </div>
     </div>
