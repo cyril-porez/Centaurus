@@ -46,7 +46,7 @@ jobs:
         run: go mod download 
 
       - name: Go vet 
-        run: got ./... -v -race -covermode-atomic -coverprofile-cover.out
+        run: go test ./... -v -race -covermode=atomic -coverprofile=cover.out
         
       - name: Coverage summary
         run: go tool cover -func-cover.out
