@@ -96,56 +96,55 @@ jobs:
             make preprod
           EOF
   notify:
-    if: always() # on notifie m�me si un job en amont a �chou�
+    if: always()                         # on notifie m�me si un job a �chou�
     needs: [docker-validate, backend-tests, deploy]
     runs-on: ubuntu-latest
     env:
-      GCHAT_WEBHOOK: ${{ secrets.GCHAT_WEBHOOK }} # <-- URL du webhook (seul, sans texte autour)
-      APP_URL: ${{ secrets.APP_URL }}             # <-- mets l'URL de ton app en secret
+      GCHAT_WEBHOOK: ${{ secrets.GCHAT_WEBHOOK }}   # URL du webhook Google Chat
+      APP_URL:       ${{ secrets.APP_URL }}         # URL de l'app d�ploy�e
     steps:
       - name: Notify Google Chat
         shell: bash
         run: |
           set -euo pipefail
 
-          STATUS="? D�ploiement r�ussi"
-          COLOR="green"
+          # Statut lisible
+          STATUS="? Déploiement réussi"
           if [[ "${{ needs.deploy.result }}" != "success" ]]; then
-            STATUS="? D�ploiement �chou�"
-            COLOR="red"
+            STATUS="? Déploiement échoué"
           fi
 
-          PROJECT="${{ github.repository }}"                # nom du projet (repo)
-          ACTOR="${{ github.actor }}"                       # auteur de la PR / commit
-          PR_LINK="${{ github.event.pull_request.html_url }}" 
+          PROJECT="${{ github.repository }}"                # org/repo
+          ACTOR="${{ github.actor }}"                       # auteur de la PR/commit
+          PR_LINK="${{ github.event.pull_request.html_url }}"
           if [[ -z "${PR_LINK}" || "${PR_LINK}" == "null" ]]; then
-            PR_LINK="(Push direct sans PR)"
+            PR_LINK="(push direct sans PR)"
           fi
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-          # Envoi d'une carte Google Chat (cardsV2) via heredoc
-          curl -sS -X POST -H 'Content-Type: application/json' -d @- "$GCHAT_WEBHOOK" <<'JSON'
+          # Envoi de la carte Google Chat (cardsV2)
+          curl -sS -X POST -H 'Content-Type: application/json' -d @- "$GCHAT_WEBHOOK" <<JSON
           {
             "cardsV2": [{
               "cardId": "ci-cd-preprod",
               "card": {
                 "header": {
-                  "title": "$PROJECT",
-                  "subtitle": "'"$STATUS"'",
+                  "title": "${PROJECT}",
+                  "subtitle": "${STATUS}",
                   "imageUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
                   "imageType": "CIRCLE"
                 },
                 "sections": [{
-                    "widgets": [
-                      { "decoratedText": { "startIcon": { "knownIcon": "PERSON" }, "text": "*Auteur* : '"$ACTOR"'" } },
-                      { "decoratedText": { "startIcon": { "knownIcon": "DESCRIPTION" }, "text": "*Pull Request* : '"$PR_LINK"'" } },
-                      { "buttonList": { "buttons": [
-                      { "text": "Voir Workflow",  "onClick": { "openLink": { "url": "'"$RUN_URL"'" } } },
-                      { "text": "App déployée",   "onClick": { "openLink": { "url": "'"$APP_URL"'" } } }
+                  "widgets": [
+                    { "decoratedText": { "startIcon": { "knownIcon": "PERSON" },       "text": "*Auteur* : ${ACTOR}" } },
+                    { "decoratedText": { "startIcon": { "knownIcon": "DESCRIPTION" },  "text": "*Pull Request* : ${PR_LINK}" } },
+                    { "buttonList": { "buttons": [
+                      { "text": "Voir Workflow", "onClick": { "openLink": { "url": "${RUN_URL}" } } },
+                      { "text": "App déployée",  "onClick": { "openLink": { "url": "${APP_URL}" } } }
                     ]}}
                   ]
                 }]
               }
             }]
           }
-          EOF
+          JSON
