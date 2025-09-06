@@ -51,13 +51,26 @@ function MyHorses() {
   };
 
   const handleDelete = (horseId) => {
-    // 2) log avant navigate
     console.log("delete =>", horseId);
 
-    // 3) d�cale la nav pour que le log s�imprime
-    setTimeout(() => {
-      navigate(`/horses/my-horse/update-horse/${horseId}`, { replace: false });
-    }, 0);
+    try {
+      const res = await horseApi.DeleteHorse(horseId, token);
+
+      if (res?.status === 200 || res?.status === 204) {
+        // suppression c�t� front (met � jour ton state)
+        setUserHorses((prev) => prev.filter((horse) => horse.id !== horseId));
+
+        console.log("Cheval supprim� avec succ�s");
+      } else {
+        console.error("Erreur lors de la suppression :", res);
+        setError("Impossible de supprimer ce cheval.");
+      }
+    } catch (e) {
+      console.error("Erreur API :", e); 
+      setError(
+        e?.response?.data?.message || e?.message || "Erreur lors de la suppression."
+      );
+    }
   };
 
   return (

@@ -86,11 +86,21 @@ async function getHorse(id, token) {
   }
 }
 
+async function DeleteHorse(id, token) {
+  try {
+    setAccessToken(token)
+    const response = await client.delete(`/horses/${id}`);
+  } catch (error) {
+    return error.response
+  }
+}
+
 const horseApi = {
   AddHorse,
   UpdateHorse,
   getHorsesByUser,
   getHorse,
+  DeleteHorse,
 };
 
 export default horseApi;
