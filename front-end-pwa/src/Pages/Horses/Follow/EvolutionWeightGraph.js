@@ -7,6 +7,7 @@ import weightApi from "../../../services/weightApi";
 import ContactText from "../../../components/texts/ContactText";
 import MailFieldset from "../../../components/texts/ContactMailFieldset";
 import { useAuth } from "../../../contexts/AuthContext";
+import BottomNav from "../../../components/BottomNav";
 
 export default function WeightGraph() {
   const { id } = useParams();
@@ -82,7 +83,7 @@ export default function WeightGraph() {
       {/* HomeButton fixe, identique aux autres pages */}
       <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
         <div className="mx-auto w-full max-w-[360px] flex justify-center">
-          <HomeButton />
+          <BottomNav />
         </div>
       </div>
     </div>

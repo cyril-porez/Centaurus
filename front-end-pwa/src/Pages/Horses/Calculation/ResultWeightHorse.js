@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import weightApi from "../../../services/weightApi";
 import { useAuth } from "../../../contexts/AuthContext";
 import Button from "../../../components/buttons/Button";
+import BottomNav from "../../../components/BottomNav";
 
 const DASH = "\u2014";          // — (em dash)
 const LQ = "\u00AB";           // «
@@ -112,7 +113,7 @@ export default function ResultWeight() {
 
       <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
         <div className="mx-auto w-full max-w-[360px] flex justify-center">
-          <HomeButton />
+          <BottomNav />
         </div>
       </div>
     </div>
