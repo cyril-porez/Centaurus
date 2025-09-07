@@ -1,8 +1,19 @@
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from "react-router-dom"; 
 import App from './App';
+import { AuthProvider } from './contexts/AuthContext';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test("affiche la page de connexion par défaut", () => {
+  render(
+    <MemoryRouter initialEntries={['/']}>
+      <AuthProvider>      
+        <App />
+      </AuthProvider>
+    </MemoryRouter>
+
+  );
+
+  expect(screen.getByRole('heading', { level: 1, name: /connexion/i })).toBeInTheDocument();
+
 });
+
