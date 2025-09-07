@@ -8,7 +8,7 @@ CENTARUS est une application PWA destinée aux vétérinaires, soigneurs ou cava
 
 Afin de se suivre le bien etre des chevaux.
 
-## Pr�requis
+## Prérequis
 
 - [Docker](https://www.docker.com/) & Docker Compose
 - [Make](https://www.gnu.org/software/make/) (facultatif mais recommand�)
