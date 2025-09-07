@@ -60,7 +60,7 @@ jobs:
         with:
           name: backend-coverage
           path: backend/cover.out
-          S
+      
   frontend-tests:
     name: Frontend - tests (React)
     runs-on: ubuntu-latest
