@@ -86,7 +86,7 @@ function SignUp() {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
           <div className="flex flex-col gap-y-3 mt-3 mb-2">
             <div className="w-full">
-              <label className="*block mb-1 text-sm text-centaurus-oxford-blue">
+              <label htmlFor="email" className="*block mb-1 text-sm text-centaurus-oxford-blue">
                 E-mail
               </label>
               <input
@@ -106,7 +106,7 @@ function SignUp() {
             </div>
 
             <div className="w-full">
-              <label className="block mb-1 text-sm text-centaurus-oxford-blue">
+              <label htmlFor="pseudo" className="block mb-1 text-sm text-centaurus-oxford-blue">
                 Nom d'utilisateur
               </label>
               <input
@@ -126,7 +126,7 @@ function SignUp() {
             </div>
 
             <div className="w-full">
-              <legend className="block mb-1 text-sm text-centaurus-oxford-blue">
+              <legend htmlFor="password" className="block mb-1 text-sm text-centaurus-oxford-blue">
                 Mot de passe
               </legend>
               <input
@@ -148,7 +148,7 @@ function SignUp() {
               </p>
             </div>
 
-            <div className="w-full">
+            <div htmlFor="confirmPassword" className="w-full">
               <label className="block mb-1 text-sm text-centaurus-oxford-blue">
                 Confirmes ton mot de passe
               </label>

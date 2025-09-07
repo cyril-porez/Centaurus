@@ -10,7 +10,7 @@ const client = axios.create({
   baseURL: BASE,
   withCredentials: true,
 });
-console.log("tets", client.defaults.baseURL);
+//console.log("tets", client.defaults.baseURL);
 
 export const authHeader = (token?: string) =>
   token ? { Authorization: `Bearer ${token.trim()}` } : {};
