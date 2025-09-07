@@ -7,6 +7,7 @@ import { HeaderText } from "../../../components/texts/HeaderText";
 import { useNavigate } from "react-router";
 import { useAuth } from "../../../contexts/AuthContext";
 import horseApi from "../../../services/horseApi";
+import BottomNav from "../../../components/BottomNav";
 
 function FollowWeight() {
   let navigate = useNavigate();
@@ -85,7 +86,7 @@ function FollowWeight() {
 
       <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
         <div className="mx-auto w-full max-w-[360px] flex justify-center">
-          <HomeButton />
+          <BottomNav />
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import TextInput from "../../../components/inputs/TextInput";
 import SelectInput from "../../../components/SelectInput";
 import Button from "../../../components/buttons/Button";
 import { useAuth } from "../../../contexts/AuthContext";
+import BottomNav from "../../../components/BottomNav";
 
 function UpdateHorse() {
   const { id } = useParams();
@@ -118,7 +119,7 @@ function UpdateHorse() {
 
       <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
         <div className="mx-auto w-full max-w-[360px] flex justify-center">
-          <HomeButton />
+          <BottomNav />
         </div>
       </div>
     </div>

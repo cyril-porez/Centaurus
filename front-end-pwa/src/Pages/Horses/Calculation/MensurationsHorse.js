@@ -8,6 +8,7 @@ import HomeButton from "../../../components/buttons/HomeButton";
 import TextInput from "../../../components/inputs/TextInput";
 import Button from "../../../components/buttons/Button";
 import { useAuth } from "../../../contexts/AuthContext";
+import BottomNav from "../../../components/BottomNav";
 
 export default function Mensurations() {
   const { token } = useAuth();
@@ -270,7 +271,7 @@ export default function Mensurations() {
 
       <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
         <div className="mx-auto w-full max-w-[360px] flex justify-center">
-          <HomeButton />
+          <BottomNav />
         </div>
       </div>
     </div>

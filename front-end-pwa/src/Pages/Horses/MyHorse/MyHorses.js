@@ -8,6 +8,7 @@ import horseApi from "../../../services/horseApi";
 import Button from "../../../components/buttons/ButtonCenter";
 import { useAuth } from "../../../contexts/AuthContext";
 import HorseCard from "../../../components/cards/HorseCard";
+import BottomNav from "../../../components/BottomNav";
 
 function MyHorses() {
   let navigate = useNavigate();
@@ -115,7 +116,7 @@ function MyHorses() {
       {/* Barre / bouton fixe en bas comme ailleurs */}
       <div className="fixed inset-x-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
         <div className="mx-auto w-full max-w-[360px] flex justify-center">
-          <HomeButton />
+          <BottomNav />
         </div>
       </div>
     </div>
