@@ -22,7 +22,7 @@ func TestAddHorseHandler(t *testing.T) {
 	defer db.Close()	
 
 	mock.ExpectExec("INSERT INTO horses").
-			WithArgs("bolt", "Autre", 5, 15, sqlmock.AnyArg()).
+			WithArgs("bolt", 5, "Autre", 15).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 	repo := &repository.SQLHorseRepository{}

@@ -22,8 +22,8 @@ func  main()  {
 
 	envFile := os.Getenv("ENV_FILE")
 	if envFile == "" {
-		// envFile = "/env/.env" // fallback si non défini
-		envFile = "../.env"
+		envFile = "/env/.env" // fallback si non défini
+		//envFile = "../.env"
 	} 
 
 	// appEnv := os.Getenv("APP_ENV");

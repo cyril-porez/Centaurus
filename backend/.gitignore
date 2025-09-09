@@ -11,7 +11,7 @@
 /pkg/
 
 # Fichiers de dépendances Go
-go.sum
+#go.sum
 
 # Fichiers de configuration d'environnement
 .env
@@ -30,7 +30,7 @@ go.sum
 *.iml
 
 # Les modules téléchargés localement
-.mod
+#.mod
 
 # Config auto-générée
 .air.toml

@@ -4,16 +4,20 @@ import (
 	"back-end-go/model"
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 )
 
 type SQLHorseRepository struct {}
 
 func (r *SQLHorseRepository) InsertHorse(db *sql.DB, horse *model.Horses) error{
-	horse.CreatedAt = time.Now().Format(time.RFC3339);
-	query := "INSERT INTO horses (name, race, age, fk_user_id, created_at) VALUES (?, ?, ?, ?, ?)";
-	result, err := db.Exec(query, horse.Name, horse.Race, horse.Age, horse.FkUserId, horse.CreatedAt);
+	//horse.CreatedAt = time.Now().Format(time.RFC3339);
+	query := "INSERT INTO horses (name, age, race, fk_user_id) VALUES (?, ?, ?, ?)";
+	log.Printf("[DEBUG] Insertion horse: name=%s, age=%d, race=%s, fk_user_id=%d", 
+		horse.Name, horse.Age, horse.Race, horse.FkUserId)
+	result, err := db.Exec(query, horse.Name, horse.Age, horse.Race, horse.FkUserId);
 	if err != nil {
+		log.Printf("[ERROR] SQL insertion failed: %v", err)
 		return err
 	}
 
@@ -27,7 +31,7 @@ func (r *SQLHorseRepository) InsertHorse(db *sql.DB, horse *model.Horses) error{
 }
 
 func (r *SQLHorseRepository) UpdateHorse(db *sql.DB, input *model.HorseUpdateInput, id int) error {
-	updatedAt := time.Now().Format(time.RFC3339)
+	updatedAt := time.Now()
 	query := "UPDATE horses SET name = ?, age = ?, race = ?, updated_at = ?  WHERE id = ?";
 	_,err := db.Exec(query, input.Name, input.Age, input.Race, updatedAt, id);
 	return err;

@@ -1,0 +1,200 @@
+name: Preprod CI/CD
+
+on:
+  pull_request:
+    branches: [ preprod ]
+  push:
+    branches: [ preprod ]
+
+concurrency:
+  group: preprod-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Vérifier la config Docker Compose
+        run: docker compose -f docker-compose.yml -f docker-compose.preprod.yml config > /dev/null
+  
+  docker-validate:
+    name: Docker Compose - validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Vérifier la config Docker Compose
+        run: docker compose -f docker-compose.yml -f docker-compose.preprod.yml config > /dev/null
+
+  backend-tests:
+    name: Go backend - tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+          cache: true
+
+      # IMPORTANT : ajoute les dépendances manquantes dans go.mod/go.sum
+      - name: Tidy (ensure go.mod/go.sum are complete)
+        run: go mod tidy -v
+
+      - name: Go vet
+        run: go vet ./...
+
+      - name: Run tests (race + coverage)
+        run: go test ./... -v -race -covermode=atomic -coverprofile=cover.out
+
+      - name: Coverage summary
+        run: go tool cover -func=cover.out
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/cover.out
+      
+  frontend-tests:
+    name: Frontend - tests (React)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+         working-directory: front-end-pwa
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+          cache-dependency-path: front-end-pwa/package-lock.json
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Run tests (CI mode)
+        env:
+          CI: true
+        run: npm test -- --watchAll=false --passWithNoTests
+
+      - name: Upload coverage (optionnel)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: front-end-pwa/coverage
+          if-no-files-found: ignore
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: [ docker-validate, backend-tests, frontend-tests ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Démarrer l'agent SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.RPI_SSH_PRIVATE_KEY }}
+
+      - name: Ajouter le Pi dans known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "${{ secrets.RPI_PORT }}" -H "${{ secrets.RPI_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Déployer sur le Raspberry Pi
+        env:
+          RPI_HOST: ${{ secrets.RPI_HOST }}
+          RPI_PORT: ${{ secrets.RPI_PORT }}
+          RPI_USER: ${{ secrets.RPI_USER }}
+          RPI_PATH: ${{ secrets.RPI_PATH }}
+        run: |
+          set -euo pipefail
+          # Clé/known_hosts: déjà fait dans les étapes précédentes
+          ssh -o StrictHostKeyChecking=no -p "$RPI_PORT" "$RPI_USER@$RPI_HOST" bash -s <<EOF
+            set -euo pipefail
+            cd "$RPI_PATH"          # <� ici la valeur est déj& résolue par le runner
+            echo "Dans: \$(pwd)"
+            git fetch --all
+            git reset --hard origin/preprod
+            make preprod
+          EOF
+  notify:
+    if: always()
+    needs: [docker-validate, backend-tests, frontend-tests, deploy]
+    runs-on: ubuntu-latest
+    env:
+      GCHAT_WEBHOOK: ${{ secrets.GCHAT_WEBHOOK }}
+      APP_URL:       ${{ secrets.APP_URL }}
+    steps:
+      - name: Notify Google Chat
+        shell: bash
+        run: |
+          set -euo pipefail
+          export LANG=C.UTF-8
+
+          # Nettoyage éventuel du webhook
+          GCHAT_WEBHOOK="${GCHAT_WEBHOOK//$'\r'/}"
+          GCHAT_WEBHOOK="$(echo -n "$GCHAT_WEBHOOK" | tr -d '[:space:]')"
+
+          # Statut (unicode, pas d'emoji bruts)
+          STATUS="\u2705 Déploiement réussi"
+          if [[ "${{ needs.deploy.result }}" != "success" ]]; then
+            STATUS="\u274c Déploiement échoué"
+          fi
+
+          PROJECT="${{ github.repository }}"
+          ACTOR="${{ github.actor }}"
+          PR_LINK="${{ github.event.pull_request.html_url }}"
+          if [[ -z "${PR_LINK}" || "${PR_LINK}" == "null" ]]; then
+            PR_LINK="(push direct sans PR)"
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          # Fallback text + carte cardsV2
+          cat >payload.json <<JSON
+          {
+            "text": "${PROJECT} - ${STATUS}\nAuteur: ${ACTOR}\nPR: ${PR_LINK}\nWorkflow: ${RUN_URL}\nApp: ${APP_URL}",
+            "cardsV2": [
+              {
+                "cardId": "ci-cd-preprod",
+                "card": {
+                  "header": {
+                    "title": "${PROJECT}",
+                    "subtitle": "${STATUS}",
+                    "imageUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                    "imageType": "CIRCLE"
+                  },
+                  "sections": [
+                    {
+                      "widgets": [
+                        { "decoratedText": { "startIcon": { "knownIcon": "PERSON" },      "text": "*Auteur* : ${ACTOR}" } },
+                        { "decoratedText": { "startIcon": { "knownIcon": "DESCRIPTION" }, "text": "*Pull Request* : ${PR_LINK}" } },
+                        { "buttonList": { "buttons": [
+                          { "text": "Voir Workflow", "onClick": { "openLink": { "url": "${RUN_URL}" } } },
+                          { "text": "App d�ploy�e",  "onClick": { "openLink": { "url": "${APP_URL}" } } }
+                        ]}}
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+          JSON
+
+          # (Optionnel) vérifier rapidement que le JSON est valide
+          # jq . payload.json >/dev/null
+
+          curl -sS -X POST \
+            -H 'Content-Type: application/json; charset=UTF-8' \
+            --data-binary @payload.json \
+            "$GCHAT_WEBHOOK"
